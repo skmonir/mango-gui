@@ -1,18 +1,20 @@
 package context
 
 import (
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 )
 
 type HeaderUiCtx struct {
 	WorkSpaceDirChooser *widget.Button
-	ParsedProblemStatus *[]string
 	CurrentContestField *widget.Label
 }
 
 type ParserUiCtx struct {
-	OnlineJudgeOptions  *widget.Select
-	ContestIdInputField *widget.Entry
+	OnlineJudgeOptions         *widget.Select
+	ContestIdInputField        *widget.Entry
+	ParsedProblemStatus        *[]string
+	ParsedProblemListContainer *fyne.Container
 }
 
 type TesterUiCtx struct {

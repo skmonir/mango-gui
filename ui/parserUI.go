@@ -5,6 +5,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -13,65 +14,59 @@ import (
 )
 
 func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
-	parserUI := context.ParserUiCtx{}
+	ctx.ParserUi = &context.ParserUiCtx{
+		ParsedProblemStatus: &[]string{},
+	}
 
-	var parserContainer *fyne.Container
-	var ListContainer *fyne.Container
-	var list = []string{}
-
-	parserUI.OnlineJudgeOptions = widget.NewSelect([]string{
+	ctx.ParserUi.OnlineJudgeOptions = widget.NewSelect([]string{
 		"CodeForces",
 		"AtCoder",
 	}, func(s string) {})
-	parserUI.OnlineJudgeOptions.PlaceHolder = "Select Online Judge"
+	ctx.ParserUi.OnlineJudgeOptions.PlaceHolder = "Select Online Judge"
 
-	parserUI.ContestIdInputField = widget.NewEntry()
-	parserUI.ContestIdInputField.SetPlaceHolder("Enter Contest/Problem ID")
+	ctx.ParserUi.ContestIdInputField = widget.NewEntry()
+	ctx.ParserUi.ContestIdInputField.SetPlaceHolder("Enter Contest/Problem ID")
 
 	parseButton := widget.NewButtonWithIcon("Parse", theme.DownloadIcon(), func() {
-		// // system.Parse(cfg, "1521", &list, ListContainer)
-		// ctx.Config.CurrentContestId = "1234"
-		// ctx.HeaderUi.CurrentContestField.SetText("1234")
-		// ctx.ProgressBar.SetValue(100)
+		ctx.ProgressBar.SetValue(0)
 		if err := taskParser.Parse(ctx); err != nil {
-			//something
+			dialog.ShowError(err, MainWindow)
 		} else {
 			ctx.HeaderUi.CurrentContestField.SetText(ctx.Config.CurrentContestId)
 		}
 	})
 
 	createButton := widget.NewButtonWithIcon("Create", theme.DocumentCreateIcon(), func() {
+		ctx.ProgressBar.SetValue(0)
 		fmt.Println("Some code TODO")
 	})
 
-	components := widget.NewList(
+	parsedProblemList := widget.NewList(
 		func() int {
-			return len(list)
+			return len(*ctx.ParserUi.ParsedProblemStatus)
 		},
 		func() fyne.CanvasObject {
 			return widget.NewLabel("template")
 		},
-		func(i widget.ListItemID, o fyne.CanvasObject) {
-			fmt.Println(i)
-			o.(*widget.Label).SetText(list[i])
+		func(index widget.ListItemID, o fyne.CanvasObject) {
+			o.(*widget.Label).SetText((*ctx.ParserUi.ParsedProblemStatus)[index])
 		},
 	)
 
-	ListContainer = container.NewGridWrap(fyne.NewSize(1000, 550), components)
+	ctx.ParserUi.ParsedProblemListContainer = container.NewGridWrap(fyne.NewSize(1000, 550), parsedProblemList)
 
-	parserContainer = container.New(layout.NewVBoxLayout(),
+	parserContainer := container.New(layout.NewVBoxLayout(),
 		container.NewGridWithColumns(
 			4,
-			parserUI.OnlineJudgeOptions,
-			parserUI.ContestIdInputField,
+			ctx.ParserUi.OnlineJudgeOptions,
+			ctx.ParserUi.ContestIdInputField,
 			parseButton,
 			createButton,
 		),
 		widget.NewSeparator(),
-		ListContainer,
+		ctx.ParserUi.ParsedProblemListContainer,
 	)
 
-	ctx.ParserUi = &parserUI
 	return parserContainer
 }
 

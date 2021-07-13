@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"html"
 	"io/ioutil"
 	"net/http"
@@ -118,16 +117,20 @@ func ParseContest(ctx *context.AppCtx, parser Parser) error {
 		return errors.New("no problem found")
 	}
 
+	ctx.ProgressBar.Max = float64(len(problemIdList))
+
 	for i := 0; i < len(problemIdList); i++ {
 		problemName, err := ParseProblem(ctx, parser, problemIdList[i])
-		if err != nil {
-			fmt.Println("[PARSED] " + problemName)
-			// *parsedList = append(*parsedList, "Error while parsing problem")
-			// ansi.Println(color.New(color.FgRed).Sprintf("Error while parsing problem %v", problemId))
-			// ListContainer.Refresh()
-		} else {
-			fmt.Println("[FAILED] " + problemName)
+		if problemName == "" {
+			problemName = problemIdList[i]
 		}
+		if err != nil {
+			*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, "[FAILED] "+problemName)
+		} else {
+			*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, "[PARSED] "+problemName)
+		}
+		ctx.ParserUi.ParsedProblemListContainer.Refresh()
+		ctx.ProgressBar.SetValue(float64(i + 1))
 	}
 
 	return nil
@@ -136,7 +139,7 @@ func ParseContest(ctx *context.AppCtx, parser Parser) error {
 func Parse(ctx *context.AppCtx) error {
 	var parser Parser
 
-	if ctx.Config.OJ == "CodeForces" {
+	if ctx.ParserUi.OnlineJudgeOptions.Selected == "CodeForces" {
 		parser = CodeforcesParser{}
 	}
 
@@ -154,19 +157,25 @@ func Parse(ctx *context.AppCtx) error {
 	if err := ctx.Config.SaveConfig(); err != nil {
 		return nil
 	}
+	ctx.HeaderUi.CurrentContestField.SetText(contestId)
 
 	if problemId == "" {
 		if err := ParseContest(ctx, parser); err != nil {
 			return err
 		}
 	} else {
+		ctx.ProgressBar.Max = 1
 		problemName, err := ParseProblem(ctx, parser, problemId)
-		if err != nil {
-			fmt.Println("[PARSED] " + problemName)
-			return err
-		} else {
-			fmt.Println("[FAILED] " + problemName)
+		if problemName == "" {
+			problemName = problemId
 		}
+		if err != nil {
+			*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, "[FAILED] "+problemName)
+		} else {
+			*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, "[PARSED] "+problemName)
+		}
+		ctx.ParserUi.ParsedProblemListContainer.Refresh()
+		ctx.ProgressBar.SetValue(1)
 	}
 
 	return nil
