@@ -106,6 +106,7 @@ func CreateDefaultConfig() (*AppConfig, error) {
 		CompilationArgs:    "-std=c++17",
 		SrcDir:             "src",
 		TestDir:            "testcase",
+		CurrentTheme:       "dark",
 	}
 
 	if err := config.SaveConfig(); err != nil {

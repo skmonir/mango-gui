@@ -9,8 +9,8 @@ import (
 	"github.com/skmonir/mango-gui/context"
 )
 
-func GetMainWindowContainer(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
-	headerUI := GetHeaderUI(MainWindow, ctx)
+func GetMainWindowContainer(app fyne.App, MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
+	headerUI := GetHeaderUI(app, MainWindow, ctx)
 	footerUI := GetFooterUI(MainWindow, ctx)
 
 	tabs := container.NewAppTabs(

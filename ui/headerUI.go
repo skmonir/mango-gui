@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"fmt"
+
 	"fyne.io/fyne/v2/dialog"
 	"github.com/skmonir/mango-gui/context"
 
@@ -11,7 +13,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func GetHeaderUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
+func GetHeaderUI(app fyne.App, MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 	headerUI := context.HeaderUiCtx{}
 
 	workspaceDirPath := "Select workspace directory"
@@ -33,10 +35,15 @@ func GetHeaderUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 
 	headerUI.CurrentOnlineJudge = widget.NewLabel(ctx.Config.OJ)
 	headerUI.CurrentContestField = widget.NewLabel(ctx.Config.CurrentContestId)
+
+	themeToggler := widget.NewCheck("Dark Mode", func(isChecked bool) {
+		toggleAppTheme(app, ctx)
+	})
+
 	CurrentContestLabel := container.NewGridWithColumns(3,
 		widget.NewForm(widget.NewFormItem("OJ", headerUI.CurrentOnlineJudge)),
 		widget.NewForm(widget.NewFormItem("Contest ID", headerUI.CurrentContestField)),
-		widget.NewCheck("Dark Mode", func(isChecked bool) {}),
+		themeToggler,
 	)
 
 	headerContainer := container.New(layout.NewVBoxLayout(),
@@ -49,7 +56,30 @@ func GetHeaderUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 		widget.NewSeparator(),
 	)
 
+	initAppTheme(app, themeToggler, ctx)
+
 	ctx.HeaderUi = &headerUI
 
 	return headerContainer
+}
+
+func initAppTheme(app fyne.App, themeToggler *widget.Check, ctx *context.AppCtx) {
+	if ctx.Config.CurrentTheme == "dark" {
+		themeToggler.SetChecked(true)
+		app.Settings().SetTheme(theme.DarkTheme())
+	} else {
+		app.Settings().SetTheme(theme.LightTheme())
+	}
+}
+
+func toggleAppTheme(app fyne.App, ctx *context.AppCtx) {
+	fmt.Println("fff")
+	if ctx.Config.CurrentTheme == "light" {
+		ctx.Config.CurrentTheme = "dark"
+		app.Settings().SetTheme(theme.DarkTheme())
+	} else {
+		ctx.Config.CurrentTheme = "light"
+		app.Settings().SetTheme(theme.LightTheme())
+	}
+	ctx.Config.SaveConfig()
 }

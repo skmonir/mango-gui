@@ -11,4 +11,5 @@ type AppConfig struct {
 	Author             string
 	SrcDir             string
 	TestDir            string
+	CurrentTheme       string
 }

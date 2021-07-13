@@ -15,7 +15,7 @@ func main() {
 		Config: context.GetAppConfig(),
 	}
 
-	mainWindowContainer := ui.GetMainWindowContainer(MainWindow, ctx)
+	mainWindowContainer := ui.GetMainWindowContainer(app, MainWindow, ctx)
 
 	MainWindow.SetContent(mainWindowContainer)
 	MainWindow.Resize(fyne.NewSize(1000, 720))
