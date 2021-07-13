@@ -1,4 +1,4 @@
-package taskParser
+package system
 
 type Parser interface {
 	GetContestType(string) string

@@ -1,4 +1,4 @@
-package taskParser
+package system
 
 import (
 	"bufio"
@@ -53,11 +53,15 @@ func ParseProblem(ctx *context.AppCtx, parser Parser, problemId string) (string,
 	URL := parser.GetProblemUrl(ctx.Config.CurrentContestId, problemId)
 	body, err := GetHtmlBody(URL)
 	if err != nil {
-		return "", err
+		return problemId, err
 	}
 
 	probName := parser.GetProblemName(body)
 	timeLimit, memoryLimit := parser.GetProblemConstraints(body)
+
+	if probName == "" {
+		probName = problemId
+	}
 
 	input, output, err := parser.GetProblemSamples(body)
 	if err != nil {
@@ -103,7 +107,6 @@ func ParseProblem(ctx *context.AppCtx, parser Parser, problemId string) (string,
 	return probName, err
 }
 
-// Parse Contest
 func ParseContest(ctx *context.AppCtx, parser Parser) error {
 	URL := parser.GetContestUrl(ctx.Config.CurrentContestId)
 	body, err := GetHtmlBody(URL)
@@ -112,23 +115,19 @@ func ParseContest(ctx *context.AppCtx, parser Parser) error {
 	}
 
 	problemIdList := parser.GetProblemList(body)
-
 	if len(problemIdList) == 0 {
 		return errors.New("no problem found")
 	}
-
 	ctx.ProgressBar.Max = float64(len(problemIdList))
 
 	for i := 0; i < len(problemIdList); i++ {
+		status := "[PARSED] "
 		problemName, err := ParseProblem(ctx, parser, problemIdList[i])
-		if problemName == "" {
-			problemName = problemIdList[i]
-		}
 		if err != nil {
-			*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, "[FAILED] "+problemName)
-		} else {
-			*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, "[PARSED] "+problemName)
+			status = "[FAILED] "
 		}
+
+		*ctx.ParserUi.ParsedProblemStatus = append([]string{status + problemName}, (*ctx.ParserUi.ParsedProblemStatus)...)
 		ctx.ParserUi.ParsedProblemListContainer.Refresh()
 		ctx.ProgressBar.SetValue(float64(i + 1))
 	}
@@ -149,15 +148,16 @@ func Parse(ctx *context.AppCtx) error {
 	}
 
 	if contestId == "" {
-		return errors.New("please use contest & problem id combination like 1512G")
+		return errors.New("please enter valid contest & problem id combination like 1512G")
 	}
 
 	ctx.Config.CurrentContestId = contestId
-	ctx.Config.OJ = strings.ToLower(ctx.ParserUi.OnlineJudgeOptions.Selected)
+	ctx.Config.OJ = ctx.ParserUi.OnlineJudgeOptions.Selected
 	if err := ctx.Config.SaveConfig(); err != nil {
-		return nil
+		return err
 	}
 	ctx.HeaderUi.CurrentContestField.SetText(contestId)
+	ctx.HeaderUi.CurrentOnlineJudge.SetText(ctx.ParserUi.OnlineJudgeOptions.Selected)
 
 	if problemId == "" {
 		if err := ParseContest(ctx, parser); err != nil {
@@ -165,15 +165,14 @@ func Parse(ctx *context.AppCtx) error {
 		}
 	} else {
 		ctx.ProgressBar.Max = 1
+
 		problemName, err := ParseProblem(ctx, parser, problemId)
-		if problemName == "" {
-			problemName = problemId
-		}
+		status := "[PARSED] "
 		if err != nil {
-			*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, "[FAILED] "+problemName)
-		} else {
-			*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, "[PARSED] "+problemName)
+			status = "[FAILED] "
 		}
+
+		*ctx.ParserUi.ParsedProblemStatus = append([]string{status + problemName}, (*ctx.ParserUi.ParsedProblemStatus)...)
 		ctx.ParserUi.ParsedProblemListContainer.Refresh()
 		ctx.ProgressBar.SetValue(1)
 	}

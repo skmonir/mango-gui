@@ -8,6 +8,7 @@ import (
 type HeaderUiCtx struct {
 	WorkSpaceDirChooser *widget.Button
 	CurrentContestField *widget.Label
+	CurrentOnlineJudge  *widget.Label
 }
 
 type ParserUiCtx struct {

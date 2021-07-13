@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"fmt"
+	"errors"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -10,7 +10,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/skmonir/mango-gui/context"
-	"github.com/skmonir/mango-gui/system/taskParser"
+	"github.com/skmonir/mango-gui/system"
 )
 
 func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
@@ -27,18 +27,26 @@ func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 	ctx.ParserUi.ContestIdInputField = widget.NewEntry()
 	ctx.ParserUi.ContestIdInputField.SetPlaceHolder("Enter Contest/Problem ID")
 
-	parseButton := widget.NewButtonWithIcon("Parse", theme.DownloadIcon(), func() {
+	parseButton := widget.NewButtonWithIcon("Parse Samples", theme.DownloadIcon(), func() {
 		ctx.ProgressBar.SetValue(0)
-		if err := taskParser.Parse(ctx); err != nil {
+		if err := validate(ctx); err != nil {
 			dialog.ShowError(err, MainWindow)
-		} else {
-			ctx.HeaderUi.CurrentContestField.SetText(ctx.Config.CurrentContestId)
+			return
+		}
+		if err := system.Parse(ctx); err != nil {
+			dialog.ShowError(err, MainWindow)
 		}
 	})
 
-	createButton := widget.NewButtonWithIcon("Create", theme.DocumentCreateIcon(), func() {
+	createButton := widget.NewButtonWithIcon("Create Sources", theme.DocumentCreateIcon(), func() {
 		ctx.ProgressBar.SetValue(0)
-		fmt.Println("Some code TODO")
+		if err := validate(ctx); err != nil {
+			dialog.ShowError(err, MainWindow)
+			return
+		}
+		if err := system.Source(ctx); err != nil {
+			dialog.ShowError(err, MainWindow)
+		}
 	})
 
 	parsedProblemList := widget.NewList(
@@ -68,6 +76,15 @@ func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 	)
 
 	return parserContainer
+}
+
+func validate(ctx *context.AppCtx) error {
+	if ctx.ParserUi.OnlineJudgeOptions.Selected == "" {
+		return errors.New("please select Online Judge before continuing")
+	} else if ctx.ParserUi.ContestIdInputField.Text == "" {
+		return errors.New("please enter Contest ID before continuing")
+	}
+	return nil
 }
 
 // func makeList(rows []string) *fyne.Container {

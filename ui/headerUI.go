@@ -31,8 +31,13 @@ func GetHeaderUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 		}, MainWindow)
 	})
 
+	headerUI.CurrentOnlineJudge = widget.NewLabel(ctx.Config.OJ)
 	headerUI.CurrentContestField = widget.NewLabel(ctx.Config.CurrentContestId)
-	CurrentContestLabel := widget.NewForm(widget.NewFormItem("Current Working Contest ID", headerUI.CurrentContestField))
+	CurrentContestLabel := container.NewGridWithColumns(3,
+		widget.NewForm(widget.NewFormItem("OJ", headerUI.CurrentOnlineJudge)),
+		widget.NewForm(widget.NewFormItem("Contest ID", headerUI.CurrentContestField)),
+		widget.NewCheck("Dark Mode", func(isChecked bool) {}),
+	)
 
 	headerContainer := container.New(layout.NewVBoxLayout(),
 		container.NewGridWithColumns(

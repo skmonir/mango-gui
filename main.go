@@ -9,7 +9,7 @@ import (
 
 func main() {
 	app := app.New()
-	MainWindow := app.NewWindow("Mango - Task Parser & Tester")
+	MainWindow := app.NewWindow("Mango - Task Parser and Tester")
 
 	var ctx *context.AppCtx = &context.AppCtx{
 		Config: context.GetAppConfig(),

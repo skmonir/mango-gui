@@ -13,6 +13,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/skmonir/mango-gui/models"
 	"github.com/skmonir/mango-gui/utils"
 )
 
@@ -55,19 +56,6 @@ func CreateConfigDir() error {
 		}
 	}
 	return nil
-}
-
-func GetHost(OJ string) string {
-	HostMap := map[string]string{
-		"codeforces": "https://codeforces.com",
-		"atcoder":    "https://atcoder.jp",
-	}
-
-	host, ok := HostMap[OJ]
-	if !ok {
-		return ""
-	}
-	return host
 }
 
 func GetAppConfig() *AppConfig {
@@ -116,8 +104,6 @@ func CreateDefaultConfig() (*AppConfig, error) {
 	config := &AppConfig{
 		CompilationCommand: "g++",
 		CompilationArgs:    "-std=c++17",
-		OJ:                 "codeforces",
-		Host:               "https://codeforces.com",
 		SrcDir:             "src",
 		TestDir:            "testcase",
 	}
@@ -135,8 +121,7 @@ func (config *AppConfig) SetOnlineJudge(OJ string) error {
 		return errors.New("could not find AppConfig")
 	}
 
-	config.OJ = strings.ToLower(OJ)
-	config.Host = GetHost(config.OJ)
+	config.OJ = OJ
 
 	if err := config.SaveConfig(); err != nil {
 		return err
@@ -164,7 +149,7 @@ func (config *AppConfig) SetContest(contestId string) error {
 }
 
 func (config *AppConfig) GetSourceDirPath() string {
-	return filepath.Join(config.Workspace, config.OJ, config.CurrentContestId, config.SrcDir)
+	return filepath.Join(config.Workspace, strings.ToLower(config.OJ), config.CurrentContestId, config.SrcDir)
 }
 
 func (config *AppConfig) GetSourceFilePathWithExt(problemId string) string {
@@ -176,7 +161,7 @@ func (config *AppConfig) GetSourceFilePathWithoutExt(problemId string) string {
 }
 
 func (config *AppConfig) GetTestcaseDirPath() string {
-	return filepath.Join(config.Workspace, config.OJ, config.CurrentContestId, config.TestDir)
+	return filepath.Join(config.Workspace, strings.ToLower(config.OJ), config.CurrentContestId, config.TestDir)
 }
 
 func (config *AppConfig) GetTestcaseFilePath(problemId string) string {
@@ -191,6 +176,23 @@ func (config *AppConfig) ResolveTescasePath(problemId string) error {
 	}
 
 	return nil
+}
+
+func (config *AppConfig) GetProblemInfo(problemId string) (models.Problem, error) {
+	var problemInfo models.Problem
+	testpath := config.GetTestcaseFilePath(problemId)
+
+	data, err := ioutil.ReadFile(testpath)
+	if err != nil {
+		return problemInfo, err
+	}
+
+	err = json.Unmarshal(data, &problemInfo)
+	if err != nil {
+		return problemInfo, err
+	}
+
+	return problemInfo, nil
 }
 
 func Configure() error {
