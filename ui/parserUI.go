@@ -38,7 +38,7 @@ func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 		}
 	})
 
-	createButton := widget.NewButtonWithIcon("Create Sources", theme.DocumentCreateIcon(), func() {
+	createButton := widget.NewButtonWithIcon("Create Sources", theme.FileTextIcon(), func() {
 		ctx.ProgressBar.SetValue(0)
 		if err := validate(ctx); err != nil {
 			dialog.ShowError(err, MainWindow)

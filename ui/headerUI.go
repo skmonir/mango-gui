@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"fmt"
-
 	"fyne.io/fyne/v2/dialog"
 	"github.com/skmonir/mango-gui/context"
 
@@ -37,7 +35,7 @@ func GetHeaderUI(app fyne.App, MainWindow fyne.Window, ctx *context.AppCtx) *fyn
 	headerUI.CurrentContestField = widget.NewLabel(ctx.Config.CurrentContestId)
 
 	themeToggler := widget.NewCheck("Dark Mode", func(isChecked bool) {
-		toggleAppTheme(app, ctx)
+		toggleAppTheme(app, ctx, isChecked)
 	})
 
 	CurrentContestLabel := container.NewGridWithColumns(3,
@@ -56,25 +54,21 @@ func GetHeaderUI(app fyne.App, MainWindow fyne.Window, ctx *context.AppCtx) *fyn
 		widget.NewSeparator(),
 	)
 
-	initAppTheme(app, themeToggler, ctx)
+	initThemeTogglerValue(themeToggler, ctx)
 
 	ctx.HeaderUi = &headerUI
 
 	return headerContainer
 }
 
-func initAppTheme(app fyne.App, themeToggler *widget.Check, ctx *context.AppCtx) {
+func initThemeTogglerValue(themeToggler *widget.Check, ctx *context.AppCtx) {
 	if ctx.Config.CurrentTheme == "dark" {
 		themeToggler.SetChecked(true)
-		app.Settings().SetTheme(theme.DarkTheme())
-	} else {
-		app.Settings().SetTheme(theme.LightTheme())
 	}
 }
 
-func toggleAppTheme(app fyne.App, ctx *context.AppCtx) {
-	fmt.Println("fff")
-	if ctx.Config.CurrentTheme == "light" {
+func toggleAppTheme(app fyne.App, ctx *context.AppCtx, isChecked bool) {
+	if isChecked {
 		ctx.Config.CurrentTheme = "dark"
 		app.Settings().SetTheme(theme.DarkTheme())
 	} else {
