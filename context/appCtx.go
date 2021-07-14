@@ -3,6 +3,7 @@ package context
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
+	"github.com/skmonir/mango-gui/models"
 )
 
 type HeaderUiCtx struct {
@@ -19,6 +20,12 @@ type ParserUiCtx struct {
 }
 
 type TesterUiCtx struct {
+	OnlineJudgeOptions    *widget.Select
+	ContestIdInputField   *widget.Entry
+	RunTestsButton        *widget.Button
+	ProblemNameListSelect *widget.Select
+	ProblemNameList       *[]string
+	ProblemList           *[]models.Problem
 }
 
 type AppCtx struct {

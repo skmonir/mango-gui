@@ -38,9 +38,10 @@ func GetHeaderUI(app fyne.App, MainWindow fyne.Window, ctx *context.AppCtx) *fyn
 		toggleAppTheme(app, ctx, isChecked)
 	})
 
-	CurrentContestLabel := container.NewGridWithColumns(3,
-		widget.NewForm(widget.NewFormItem("OJ", headerUI.CurrentOnlineJudge)),
-		widget.NewForm(widget.NewFormItem("Contest ID", headerUI.CurrentContestField)),
+	CurrentContestLabel := container.NewGridWithColumns(4,
+		// widget.NewForm(widget.NewFormItem("OJ", headerUI.CurrentOnlineJudge)),
+		// widget.NewForm(widget.NewFormItem("Contest ID", headerUI.CurrentContestField)),
+		&widget.Label{}, &widget.Label{}, &widget.Label{},
 		themeToggler,
 	)
 

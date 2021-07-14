@@ -14,12 +14,9 @@ func GetMainWindowContainer(app fyne.App, MainWindow fyne.Window, ctx *context.A
 	footerUI := GetFooterUI(MainWindow, ctx)
 
 	tabs := container.NewAppTabs(
-		// container.NewTabItem("Tab 1", widget.NewLabel("Hello")),
 		// container.NewTabItemWithIcon("Home", theme.HomeIcon(), widget.NewLabel("Home tab")),
 		container.NewTabItemWithIcon("Parser", theme.DownloadIcon(), GetParserUI(MainWindow, ctx)),
-		// container.NewTabItemWithIcon("Tester", theme.DownloadIcon(), ui.GetTesterUI(MainWindow)),
-		// container.NewTabItemWithIcon("Input Generator", theme.SettingsIcon(), container.New(layout.NewVBoxLayout(), content, centered)),
-		// container.NewTabItemWithIcon("Output Generator", theme.SettingsIcon(), container.New(layout.NewVBoxLayout(), content, centered)),
+		container.NewTabItemWithIcon("Tester", theme.QuestionIcon(), GetTesterUI(MainWindow, ctx)),
 		// container.NewTabItemWithIcon("Settings", theme.SettingsIcon(), container.New(layout.NewVBoxLayout(), content, centered)),
 		// container.NewTabItemWithIcon("About", theme.InfoIcon(), widget.NewLabel("About")),
 	)

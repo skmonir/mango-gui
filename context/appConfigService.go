@@ -196,6 +196,20 @@ func (config *AppConfig) GetProblemInfo(problemId string) (models.Problem, error
 	return problemInfo, nil
 }
 
+func (config *AppConfig) GetProblemIdListForTester() []string {
+	files, err := ioutil.ReadDir(config.GetTestcaseDirPath())
+	if err != nil {
+		return []string{}
+	}
+
+	problemIdList := []string{}
+	for _, file := range files {
+		filename := strings.Split(file.Name(), ".")[0]
+		problemIdList = append(problemIdList, filename)
+	}
+	return problemIdList
+}
+
 func Configure() error {
 	var err error
 

@@ -29,7 +29,7 @@ func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 
 	parseButton := widget.NewButtonWithIcon("Parse Samples", theme.DownloadIcon(), func() {
 		ctx.ProgressBar.SetValue(0)
-		if err := validate(ctx); err != nil {
+		if err := validateParserUiFields(ctx); err != nil {
 			dialog.ShowError(err, MainWindow)
 			return
 		}
@@ -40,7 +40,7 @@ func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 
 	createButton := widget.NewButtonWithIcon("Create Sources", theme.FileTextIcon(), func() {
 		ctx.ProgressBar.SetValue(0)
-		if err := validate(ctx); err != nil {
+		if err := validateParserUiFields(ctx); err != nil {
 			dialog.ShowError(err, MainWindow)
 			return
 		}
@@ -78,11 +78,11 @@ func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 	return parserContainer
 }
 
-func validate(ctx *context.AppCtx) error {
+func validateParserUiFields(ctx *context.AppCtx) error {
 	if ctx.ParserUi.OnlineJudgeOptions.Selected == "" {
 		return errors.New("please select Online Judge before continuing")
 	} else if ctx.ParserUi.ContestIdInputField.Text == "" {
-		return errors.New("please enter Contest ID before continuing")
+		return errors.New("please enter valid Contest ID before continuing")
 	}
 	return nil
 }
