@@ -18,11 +18,8 @@ func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 		ParsedProblemStatus: &[]string{},
 	}
 
-	ctx.ParserUi.OnlineJudgeOptions = widget.NewSelect([]string{
-		"CodeForces",
-		"AtCoder",
-	}, func(s string) {})
-	ctx.ParserUi.OnlineJudgeOptions.PlaceHolder = "Select Online Judge"
+	ctx.ParserUi.OnlineJudgeOptionSelect = widget.NewSelect(*ctx.OnlineJudgeOptions, func(s string) {})
+	ctx.ParserUi.OnlineJudgeOptionSelect.PlaceHolder = "Select Online Judge"
 
 	ctx.ParserUi.ContestIdInputField = widget.NewEntry()
 	ctx.ParserUi.ContestIdInputField.SetPlaceHolder("Enter Contest/Problem ID")
@@ -66,7 +63,7 @@ func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 	parserContainer := container.New(layout.NewVBoxLayout(),
 		container.NewGridWithColumns(
 			4,
-			ctx.ParserUi.OnlineJudgeOptions,
+			ctx.ParserUi.OnlineJudgeOptionSelect,
 			ctx.ParserUi.ContestIdInputField,
 			parseButton,
 			createButton,
@@ -79,7 +76,7 @@ func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 }
 
 func validateParserUiFields(ctx *context.AppCtx) error {
-	if ctx.ParserUi.OnlineJudgeOptions.Selected == "" {
+	if ctx.ParserUi.OnlineJudgeOptionSelect.Selected == "" {
 		return errors.New("please select Online Judge before continuing")
 	} else if ctx.ParserUi.ContestIdInputField.Text == "" {
 		return errors.New("please enter valid Contest ID before continuing")

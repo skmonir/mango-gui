@@ -138,7 +138,7 @@ func ParseContest(ctx *context.AppCtx, parser Parser) error {
 func Parse(ctx *context.AppCtx) error {
 	var parser Parser
 
-	if ctx.ParserUi.OnlineJudgeOptions.Selected == "CodeForces" {
+	if ctx.ParserUi.OnlineJudgeOptionSelect.Selected == "CodeForces" {
 		parser = CodeforcesParser{}
 	}
 
@@ -152,12 +152,12 @@ func Parse(ctx *context.AppCtx) error {
 	}
 
 	ctx.Config.CurrentContestId = contestId
-	ctx.Config.OJ = ctx.ParserUi.OnlineJudgeOptions.Selected
+	ctx.Config.OJ = ctx.ParserUi.OnlineJudgeOptionSelect.Selected
 	if err := ctx.Config.SaveConfig(); err != nil {
 		return err
 	}
 	ctx.HeaderUi.CurrentContestField.SetText(contestId)
-	ctx.HeaderUi.CurrentOnlineJudge.SetText(ctx.ParserUi.OnlineJudgeOptions.Selected)
+	ctx.HeaderUi.CurrentOnlineJudge.SetText(ctx.ParserUi.OnlineJudgeOptionSelect.Selected)
 
 	if problemId == "" {
 		if err := ParseContest(ctx, parser); err != nil {

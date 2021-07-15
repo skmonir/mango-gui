@@ -183,6 +183,10 @@ func (config *AppConfig) GetProblemInfo(problemId string) (models.Problem, error
 	var problemInfo models.Problem
 	testpath := config.GetTestcaseFilePath(problemId)
 
+	if !utils.IsFileExist(testpath) {
+		return problemInfo, errors.New("problem not found")
+	}
+
 	data, err := ioutil.ReadFile(testpath)
 	if err != nil {
 		return problemInfo, err

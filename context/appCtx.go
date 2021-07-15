@@ -13,25 +13,26 @@ type HeaderUiCtx struct {
 }
 
 type ParserUiCtx struct {
-	OnlineJudgeOptions         *widget.Select
+	OnlineJudgeOptionSelect    *widget.Select
 	ContestIdInputField        *widget.Entry
 	ParsedProblemStatus        *[]string
 	ParsedProblemListContainer *fyne.Container
 }
 
 type TesterUiCtx struct {
-	OnlineJudgeOptions    *widget.Select
-	ContestIdInputField   *widget.Entry
-	RunTestsButton        *widget.Button
-	ProblemNameListSelect *widget.Select
-	ProblemNameList       *[]string
-	ProblemList           *[]models.Problem
+	OnlineJudgeOptionSelect *widget.Select
+	ContestIdInputField     *widget.Entry
+	RunTestsButton          *widget.Button
+	ProblemNameListSelect   *widget.Select
+	ProblemNameList         *[]string
+	ProblemList             *[]models.Problem
 }
 
 type AppCtx struct {
-	Config      *AppConfig
-	HeaderUi    *HeaderUiCtx
-	ParserUi    *ParserUiCtx
-	TesterUi    *TesterUiCtx
-	ProgressBar *widget.ProgressBar
+	Config             *AppConfig
+	HeaderUi           *HeaderUiCtx
+	ParserUi           *ParserUiCtx
+	TesterUi           *TesterUiCtx
+	ProgressBar        *widget.ProgressBar
+	OnlineJudgeOptions *[]string
 }
