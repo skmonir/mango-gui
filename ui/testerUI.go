@@ -84,6 +84,7 @@ func processProblems(ctx *context.AppCtx, problems []models.Problem) {
 		*ctx.TesterUi.ProblemNameList = append(*ctx.TesterUi.ProblemNameList, problem.Name)
 	}
 
+	ctx.TesterUi.ProblemNameListSelect.ClearSelected()
 	ctx.TesterUi.ProblemNameListSelect.SetOptions(*ctx.TesterUi.ProblemNameList)
 
 	if len(problems) > 0 {
