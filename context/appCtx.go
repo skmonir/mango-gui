@@ -26,6 +26,7 @@ type TesterUiCtx struct {
 	ProblemNameListSelect   *widget.Select
 	ProblemNameList         *[]string
 	ProblemList             *[]models.Problem
+	TestcaseList            *map[string][]models.ExecutionResult
 }
 
 type AppCtx struct {
