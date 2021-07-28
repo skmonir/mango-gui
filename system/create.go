@@ -43,5 +43,7 @@ func Create(ctx *context.AppCtx) []models.Problem {
 		ctx.ProgressBar.SetValue(float64(i + 1))
 	}
 
+	ctx.TesterUi.CurrentContestId = contestId
+
 	return problemInfoList
 }

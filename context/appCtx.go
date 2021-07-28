@@ -27,6 +27,7 @@ type TesterUiCtx struct {
 	ProblemNameList         *[]string
 	ProblemList             *[]models.Problem
 	TestcaseList            *map[string][]models.ExecutionResult
+	CurrentContestId        string
 }
 
 type AppCtx struct {
