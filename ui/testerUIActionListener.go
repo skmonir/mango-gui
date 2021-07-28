@@ -119,10 +119,15 @@ func MakeTable(headings []string, rows [][]string) *fyne.Container {
 	objects = append(objects, widget.NewSeparator())
 	for k, col := range columns {
 		box := container.NewVBox(widget.NewSeparator())
-		box.Add(widget.NewLabelWithStyle(headings[k], fyne.TextAlignLeading, fyne.TextStyle{Bold: true}))
+		box.Add(widget.NewLabelWithStyle(headings[k], fyne.TextAlignCenter, fyne.TextStyle{Bold: true}))
 		box.Add(widget.NewSeparator())
+
+		textAlign := fyne.TextAlignCenter
+		if 0 < k && k < 4 {
+			textAlign = fyne.TextAlignLeading
+		}
 		for _, val := range col {
-			box.Add(widget.NewLabel(val))
+			box.Add(widget.NewLabelWithStyle(val, textAlign, fyne.TextStyle{}))
 			box.Add(widget.NewSeparator())
 		}
 
