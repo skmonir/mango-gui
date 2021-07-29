@@ -129,12 +129,14 @@ func CreateSource(config *context.AppConfig, parser Parser, problemId string) (s
 func CreateSourceList(ctx *context.AppCtx, parser Parser, problemIdList []string) {
 	for index, problemId := range problemIdList {
 		srcName, err := CreateSource(ctx.Config, parser, problemId)
-		status := "[CREATED] Successfully created source "
+		status := "[CREATED] Successfully created source " + srcName
 		if err != nil {
-			status = "[FAILED] Error occured while creating source "
+			status = "[FAILED] Error occured while creating source " + srcName
+		} else {
+			status += ". Click to open the source file."
 		}
 
-		*ctx.ParserUi.ParsedProblemStatus = append([]string{status + srcName}, (*ctx.ParserUi.ParsedProblemStatus)...)
+		*ctx.ParserUi.ParsedProblemStatus = append([]string{status}, (*ctx.ParserUi.ParsedProblemStatus)...)
 		ctx.ParserUi.ParsedProblemListContainer.Refresh()
 		ctx.ProgressBar.SetValue(float64(index + 1))
 	}
@@ -156,6 +158,7 @@ func Source(ctx *context.AppCtx) error {
 		return errors.New("please enter valid contest & problem id combination like 1512G")
 	}
 
+	ctx.ParserUi.CurrentContestId = contestId
 	ctx.Config.CurrentContestId = contestId
 	ctx.Config.OJ = ctx.ParserUi.OnlineJudgeOptionSelect.Selected
 	if err := ctx.Config.SaveConfig(); err != nil {

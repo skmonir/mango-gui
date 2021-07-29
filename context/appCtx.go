@@ -17,12 +17,16 @@ type ParserUiCtx struct {
 	ContestIdInputField        *widget.Entry
 	ParsedProblemStatus        *[]string
 	ParsedProblemListContainer *fyne.Container
+	CurrentContestId           string
 }
 
 type TesterUiCtx struct {
 	OnlineJudgeOptionSelect *widget.Select
 	ContestIdInputField     *widget.Entry
 	RunTestsButton          *widget.Button
+	AddTestButton           *widget.Button
+	RemoveTestButton        *widget.Button
+	OpenSourceButton        *widget.Button
 	ProblemNameListSelect   *widget.Select
 	ProblemNameList         *[]string
 	ProblemList             *[]models.Problem

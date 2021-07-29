@@ -151,6 +151,7 @@ func Parse(ctx *context.AppCtx) error {
 		return errors.New("please enter valid contest & problem id combination like 1512G")
 	}
 
+	ctx.ParserUi.CurrentContestId = contestId
 	ctx.Config.CurrentContestId = contestId
 	ctx.Config.OJ = ctx.ParserUi.OnlineJudgeOptionSelect.Selected
 	if err := ctx.Config.SaveConfig(); err != nil {

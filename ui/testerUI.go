@@ -2,6 +2,7 @@ package ui
 
 import (
 	"errors"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -25,7 +26,7 @@ func GetTesterUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 	ctx.TesterUi.ContestIdInputField = widget.NewEntry()
 	ctx.TesterUi.ContestIdInputField.SetPlaceHolder("Enter Contest/Problem ID")
 
-	createContestButton := widget.NewButtonWithIcon("Create Contest/Problem", theme.ContentAddIcon(), func() {
+	createContestButton := widget.NewButtonWithIcon("Load Contest/Problem", theme.FolderOpenIcon(), func() {
 		if err := ValidateTesterUiFields(ctx); err != nil {
 			dialog.ShowError(err, MainWindow)
 			return
@@ -52,7 +53,10 @@ func GetTesterUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 	ctx.TesterUi.ProblemNameListSelect.PlaceHolder = "Select Problem"
 	ctx.TesterUi.ProblemNameListSelect.Hide()
 
-	ctx.TesterUi.RunTestsButton = widget.NewButtonWithIcon("Run Tests", theme.ContentAddIcon(), func() {
+	ctx.TesterUi.RunTestsButton = widget.NewButtonWithIcon("Run Tests", theme.MediaPlayIcon(), func() {
+		if ctx.TesterUi.ProblemNameListSelect.Selected == "" {
+			return
+		}
 		if err := RunTestClicked(ctx); err != nil {
 			dialog.ShowError(err, MainWindow)
 			return
@@ -66,6 +70,28 @@ func GetTesterUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 	})
 	ctx.TesterUi.RunTestsButton.Hide()
 
+	// ctx.TesterUi.AddTestButton = widget.NewButton("Add Test", func() {
+	// })
+	// ctx.TesterUi.AddTestButton.Hide()
+
+	// ctx.TesterUi.RemoveTestButton = widget.NewButton("Delete Test", func() {
+	// })
+	// ctx.TesterUi.RemoveTestButton.Hide()
+
+	ctx.TesterUi.OpenSourceButton = widget.NewButton("Open Source", func() {
+		selected := ctx.TesterUi.ProblemNameListSelect.Selected
+		if selected == "" {
+			return
+		}
+		problemId := strings.Split(selected, ".")[0]
+		problemId = strings.Trim(problemId, " \n")
+
+		if err := system.Open(ctx, ctx.TesterUi.CurrentContestId, problemId); err != nil {
+			dialog.ShowError(err, MainWindow)
+		}
+	})
+	ctx.TesterUi.OpenSourceButton.Hide()
+
 	testerContainer = container.New(layout.NewVBoxLayout(),
 		container.NewGridWithColumns(
 			4,
@@ -78,9 +104,11 @@ func GetTesterUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 			2,
 			ctx.TesterUi.ProblemNameListSelect,
 			container.NewGridWithColumns(
-				2,
+				4,
 				ctx.TesterUi.RunTestsButton,
-				&widget.Label{},
+				// ctx.TesterUi.AddTestButton,
+				// ctx.TesterUi.RemoveTestButton,
+				ctx.TesterUi.OpenSourceButton,
 			),
 		),
 		table,

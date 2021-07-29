@@ -2,6 +2,7 @@ package ui
 
 import (
 	"errors"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -57,6 +58,23 @@ func GetParserUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 			o.(*widget.Label).SetText((*ctx.ParserUi.ParsedProblemStatus)[index])
 		},
 	)
+	parsedProblemList.OnSelected = func(id int) {
+		selected := (*ctx.ParserUi.ParsedProblemStatus)[id]
+		prefix := "[CREATED] Successfully created source "
+		if strings.HasPrefix(selected, prefix) {
+			srcFileName := strings.TrimPrefix(selected, prefix)
+			srcFileName = strings.TrimSuffix(srcFileName, ". Click to open the source file.")
+			srcFileName = strings.Trim(srcFileName, " \n")
+			message := "Do you want to open " + srcFileName + " in default editor?"
+			dialog.ShowConfirm("Source Open Confirmation", message, func(response bool) {
+				if response {
+					if err := system.Open(ctx, ctx.ParserUi.CurrentContestId, strings.TrimSuffix(srcFileName, ".cpp")); err != nil {
+						dialog.ShowError(err, MainWindow)
+					}
+				}
+			}, MainWindow)
+		}
+	}
 
 	ctx.ParserUi.ParsedProblemListContainer = container.NewGridWrap(fyne.NewSize(1000, 550), parsedProblemList)
 

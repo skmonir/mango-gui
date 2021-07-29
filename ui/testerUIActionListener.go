@@ -51,6 +51,9 @@ func ProcessProblems(ctx *context.AppCtx, problems []models.Problem) {
 	if len(problems) > 0 {
 		ctx.TesterUi.ProblemNameListSelect.Show()
 		ctx.TesterUi.RunTestsButton.Show()
+		// ctx.TesterUi.AddTestButton.Show()
+		// ctx.TesterUi.RemoveTestButton.Show()
+		ctx.TesterUi.OpenSourceButton.Show()
 	}
 }
 
