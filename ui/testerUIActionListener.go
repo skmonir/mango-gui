@@ -68,7 +68,7 @@ func RunTestClicked(ctx *context.AppCtx) error {
 	return nil
 }
 
-func GetNewTable(testcaseList []models.ExecutionResult) *fyne.Container {
+func GetNewTable(testcaseList []models.ExecutionResult) *container.Scroll {
 	rowHeights := GetRowHeights(testcaseList)
 
 	rows := make([][]string, len(testcaseList))
@@ -86,7 +86,19 @@ func GetNewTable(testcaseList []models.ExecutionResult) *fyne.Container {
 
 	headings := []string{"#", "SAMPLE INPUT", "SAMPLE OUTPUT", "PROGRAM OUTPUT", "VERDICT", "TIME", "MEMORY"}
 
-	return MakeTable(headings, rows)
+	T := MakeTable(headings, rows)
+	table := container.NewScroll(T)
+
+	table_size := T.Size()
+	if table_size.Width > 1000 {
+		table_size.Width = 1000
+	}
+	if table_size.Height > 500 {
+		table_size.Height = 500
+	}
+	table.SetMinSize(table_size)
+
+	return table
 }
 
 func GetHeightAdjustedCell(height int, value string) string {

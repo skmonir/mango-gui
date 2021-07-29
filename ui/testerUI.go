@@ -16,9 +16,7 @@ import (
 func GetTesterUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 	ctx.TesterUi = &context.TesterUiCtx{}
 
-	// var table *fyne.Container
-	table := container.NewHBox()
-	// table := container.NewScroll(container.NewHBox())
+	table := container.NewScroll(container.NewHBox())
 	var testerContainer *fyne.Container
 
 	ctx.TesterUi.OnlineJudgeOptionSelect = widget.NewSelect(*ctx.OnlineJudgeOptions, nil)
@@ -35,15 +33,19 @@ func GetTesterUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 		problems := system.Create(ctx)
 		if len(problems) == 0 {
 			dialog.ShowError(errors.New("no problems found"), MainWindow)
+			return
 		}
 		ProcessProblems(ctx, problems)
+		testerContainer.Remove(table)
+		table = container.NewScroll(container.NewHBox())
+		testerContainer.Add(table)
 	})
 
 	ctx.TesterUi.ProblemNameListSelect = widget.NewSelect([]string{}, func(selected string) {
 		testcaseList, ok := (*ctx.TesterUi.TestcaseList)[selected]
 		if ok {
 			testerContainer.Remove(table)
-			table = container.NewGridWrap(fyne.NewSize(1000, 500), container.NewScroll(GetNewTable(testcaseList)))
+			table = GetNewTable(testcaseList)
 			testerContainer.Add(table)
 		}
 	})
@@ -58,7 +60,7 @@ func GetTesterUI(MainWindow fyne.Window, ctx *context.AppCtx) *fyne.Container {
 		testcaseList, ok := (*ctx.TesterUi.TestcaseList)[ctx.TesterUi.ProblemNameListSelect.Selected]
 		if ok {
 			testerContainer.Remove(table)
-			table = container.NewGridWrap(fyne.NewSize(1000, 500), container.NewScroll(GetNewTable(testcaseList)))
+			table = GetNewTable(testcaseList)
 			testerContainer.Add(table)
 		}
 	})
