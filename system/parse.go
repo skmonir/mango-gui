@@ -127,7 +127,8 @@ func ParseContest(ctx *context.AppCtx, parser Parser) error {
 			status = "[FAILED] "
 		}
 
-		*ctx.ParserUi.ParsedProblemStatus = append([]string{status + problemName}, (*ctx.ParserUi.ParsedProblemStatus)...)
+		// *ctx.ParserUi.ParsedProblemStatus = append([]string{status + problemName}, (*ctx.ParserUi.ParsedProblemStatus)...)
+		*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, status+problemName)
 		ctx.ParserUi.ParsedProblemListContainer.Refresh()
 		ctx.ProgressBar.SetValue(float64(i + 1))
 	}
@@ -160,6 +161,8 @@ func Parse(ctx *context.AppCtx) error {
 	ctx.HeaderUi.CurrentContestField.SetText(contestId)
 	ctx.HeaderUi.CurrentOnlineJudge.SetText(ctx.ParserUi.OnlineJudgeOptionSelect.Selected)
 
+	*ctx.ParserUi.ParsedProblemStatus = []string{}
+
 	if problemId == "" {
 		if err := ParseContest(ctx, parser); err != nil {
 			return err
@@ -173,7 +176,8 @@ func Parse(ctx *context.AppCtx) error {
 			status = "[FAILED] "
 		}
 
-		*ctx.ParserUi.ParsedProblemStatus = append([]string{status + problemName}, (*ctx.ParserUi.ParsedProblemStatus)...)
+		// *ctx.ParserUi.ParsedProblemStatus = append([]string{status + problemName}, (*ctx.ParserUi.ParsedProblemStatus)...)
+		*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, status+problemName)
 		ctx.ParserUi.ParsedProblemListContainer.Refresh()
 		ctx.ProgressBar.SetValue(1)
 	}

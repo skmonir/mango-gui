@@ -136,7 +136,8 @@ func CreateSourceList(ctx *context.AppCtx, parser Parser, problemIdList []string
 			status += ". Click to open the source file."
 		}
 
-		*ctx.ParserUi.ParsedProblemStatus = append([]string{status}, (*ctx.ParserUi.ParsedProblemStatus)...)
+		// *ctx.ParserUi.ParsedProblemStatus = append([]string{status}, (*ctx.ParserUi.ParsedProblemStatus)...)
+		*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, status)
 		ctx.ParserUi.ParsedProblemListContainer.Refresh()
 		ctx.ProgressBar.SetValue(float64(index + 1))
 	}
@@ -167,6 +168,8 @@ func Source(ctx *context.AppCtx) error {
 	ctx.HeaderUi.CurrentContestField.SetText(contestId)
 	ctx.HeaderUi.CurrentOnlineJudge.SetText(ctx.ParserUi.OnlineJudgeOptionSelect.Selected)
 
+	*ctx.ParserUi.ParsedProblemStatus = []string{}
+
 	if problemId == "" {
 		URL := parser.GetContestUrl(ctx.Config.CurrentContestId)
 		body, err := GetHtmlBody(URL)
@@ -183,12 +186,14 @@ func Source(ctx *context.AppCtx) error {
 		ctx.ProgressBar.Max = 1
 
 		srcName, err := CreateSource(ctx.Config, parser, problemId)
-		status := "[CREATED] Successfully created source "
+		status := "[CREATED] Successfully created source " + srcName
 		if err != nil {
-			status = "[FAILED] Error occured while creating source "
+			status = "[FAILED] Error occured while creating source " + srcName
+		} else {
+			status += ". Click to open the source file."
 		}
-
-		*ctx.ParserUi.ParsedProblemStatus = append([]string{status + srcName}, (*ctx.ParserUi.ParsedProblemStatus)...)
+		// *ctx.ParserUi.ParsedProblemStatus = append([]string{status}, (*ctx.ParserUi.ParsedProblemStatus)...)
+		*ctx.ParserUi.ParsedProblemStatus = append(*ctx.ParserUi.ParsedProblemStatus, status)
 		ctx.ParserUi.ParsedProblemListContainer.Refresh()
 		ctx.ProgressBar.SetValue(1)
 	}
