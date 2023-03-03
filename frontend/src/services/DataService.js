@@ -8,9 +8,6 @@ class DataService {
         url = BASE_URL + url;
 
         let requestConfig = {
-            // 'headers': {
-            //     'Authorization': AuthService.getAuthToken()
-            // },
             'params': params
         };
 
@@ -76,15 +73,23 @@ class DataService {
         return this.putData('config/', config);
     }
 
-    getCode(codeRequest) {
+    getCodeByMetadata(metadata) {
+        return this.getData('code/' + metadata);
+    }
+
+    getCodeByPath(codeRequest) {
         return this.putData('code/', codeRequest);
     }
 
-    openSource(openSourceRequest) {
-        return this.putData('source/', openSourceRequest);
+    openSourceByMetadata(metadata) {
+        return this.getData('source/open/' + metadata);
     }
 
-    testCode(path) {
+    openSourceByPath(openSourceRequest) {
+        return this.putData('source/open/', openSourceRequest);
+    }
+
+    runTest(path) {
         return this.getData('test/' + path)
     }
 

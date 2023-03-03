@@ -1,28 +1,23 @@
 package services
 
 import (
-	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/skmonir/mango-ui/backend/judge-framework/cacheServices"
-	"github.com/skmonir/mango-ui/backend/judge-framework/config"
 	"github.com/skmonir/mango-ui/backend/judge-framework/fileService"
 	"github.com/skmonir/mango-ui/backend/judge-framework/models"
 	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
-	"strings"
 )
 
 func GetProblem(platform string, cid string, label string) models.Problem {
-	judgeConfig := config.GetJudgeConfigFromCache()
-	folderPath := fmt.Sprintf("%v/%v/%v/metadata", strings.TrimRight(judgeConfig.WorkspaceDirectory, "/"), platform, cid)
-	fileName := label + ".json"
-
-	data := utils.ReadFileContent(folderPath+"/"+fileName, 123456, 123456)
-
-	var prob models.Problem
-	if err := json.Unmarshal([]byte(data), &prob); err != nil {
-		fmt.Println(err)
+	problems := GetProblemList(platform, cid)
+	for _, prob := range problems {
+		if prob.Label == label {
+			return prob
+		}
 	}
-	return prob
+	return models.Problem{}
 }
 
 func GetProblemListByUrl(url string) []models.Problem {

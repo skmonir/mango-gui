@@ -3,12 +3,13 @@ package executor
 import (
 	"bytes"
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/judge-framework/config"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
 	"os"
 	"os/exec"
 	"strings"
 	"unicode"
+
+	"github.com/skmonir/mango-ui/backend/judge-framework/config"
+	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
 )
 
 // parseCommand parses a command line and handle arguments in quotes.
@@ -70,7 +71,7 @@ func Compile(platform string, cid string, label string) string {
 	filePathWithExt := folderPath + "/" + label + judgeConfig.ActiveLanguage.FileExtension
 
 	if !utils.IsFileExist(filePathWithExt) {
-		return "Source fileService not found!"
+		return "Source file not found!"
 	}
 
 	command := fmt.Sprintf("%v %v %v -o %v", judgeConfig.ActiveLanguage.CompilationCommand, judgeConfig.ActiveLanguage.CompilationArgs, filePathWithExt, filePathWithoutExt)

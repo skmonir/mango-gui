@@ -3,6 +3,7 @@ package socket
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/skmonir/mango-ui/backend/judge-framework/models"
 )
 
@@ -32,7 +33,7 @@ func PublishParseMessage(parsedProblemList []models.Problem) {
 }
 
 func PublishStatusMessage(topic string, message string, messageType string) {
-	fmt.Println("publishing test result.....")
+	fmt.Println("publishing test status message.....")
 
 	messageContent := struct {
 		Message string `json:"message"`

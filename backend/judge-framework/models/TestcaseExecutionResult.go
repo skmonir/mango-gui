@@ -1,7 +1,7 @@
 package models
 
 type TestcaseExecutionResult struct {
-	ExecutionError error  `json:"executionError"`
+	ExecutionError string `json:"executionError"`
 	Output         string `json:"output"`
 	Verdict        string `json:"verdict"`
 	ConsumedTime   int64  `json:"consumedTime"`

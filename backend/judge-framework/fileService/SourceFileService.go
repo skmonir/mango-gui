@@ -2,14 +2,15 @@ package fileService
 
 import (
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/judge-framework/config"
-	"github.com/skmonir/mango-ui/backend/judge-framework/models"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/skmonir/mango-ui/backend/judge-framework/config"
+	"github.com/skmonir/mango-ui/backend/judge-framework/models"
+	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
 )
 
 func CreateSourceFiles(problems []models.Problem) {
@@ -89,7 +90,7 @@ func getGenericTemplateBody() string {
 	return body
 }
 
-func Open(filePath string) {
+func OpenSourceByPath(filePath string) {
 	var err error
 	switch runtime.GOOS {
 	case "linux":
@@ -104,4 +105,38 @@ func Open(filePath string) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func OpenSourceByMetadata(platform string, cid string, label string) {
+	filePath := getSourceFilePath(platform, cid, label)
+	if utils.IsFileExist(filePath) {
+		OpenSourceByPath(filePath)
+	}
+}
+
+func GetCodeByMetadata(platform string, cid string, label string) string {
+	filePath := getSourceFilePath(platform, cid, label)
+	if utils.IsFileExist(filePath) {
+		return utils.ReadFileContent(filePath, 123456, 123456)
+	}
+	return ""
+}
+
+func getSourceFilePath(platform string, cid string, label string) string {
+	judgeConfig := config.GetJudgeConfigFromCache()
+
+	folderPath := fmt.Sprintf("%v/%v/%v/source", strings.TrimRight(judgeConfig.WorkspaceDirectory, "/"), platform, cid)
+	fileName := label + judgeConfig.ActiveLanguage.FileExtension
+	filePath := filepath.Join(folderPath, fileName)
+
+	return filePath
+}
+
+func GetSourceBinaryPath(platform string, cid string, label string) string {
+	judgeConfig := config.GetJudgeConfigFromCache()
+
+	folderPath := fmt.Sprintf("%v/%v/%v/source", strings.TrimRight(judgeConfig.WorkspaceDirectory, "/"), platform, cid)
+	binaryPath := filepath.Join(folderPath, label)
+
+	return binaryPath
 }

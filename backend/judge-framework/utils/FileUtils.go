@@ -74,7 +74,7 @@ func GetFilenamesInDir(folderPath string) []string {
 func CreateFile(folderPath string, filename string) error {
 	filePath := filepath.Join(folderPath, filename)
 	if !IsFileExist(filePath) {
-		fmt.Println("Creating fileService " + filePath)
+		fmt.Println("Creating file " + filePath)
 		if err := CreateDir(folderPath); err != nil {
 			return err
 		}
@@ -122,14 +122,17 @@ func ReadFileContent(filePath string, maxRow int, maxCol int) string {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if rowCount == maxRow {
-			content += "..."
+			content += "\n....."
 			break
 		}
 		line = strings.TrimRight(line, " ")
 		if len(line) > maxCol {
 			line = line[:len(line)-1] + "..."
 		}
-		content += line + "\n"
+		if len(content) > 0 {
+			content += "\n"
+		}
+		content += line
 		rowCount++
 	}
 
