@@ -56,6 +56,19 @@ func PublishStatusMessage(topic string, message string, messageType string) {
 }
 
 func PublishExecutionResult(execResult dto.ProblemExecutionResult) {
+	totalPassed, totalTests := 0, len(execResult.TestcaseExecutionDetailsList)
+	for _, execDetails := range execResult.TestcaseExecutionDetailsList {
+		if execDetails.TestcaseExecutionResult.Verdict == "OK" {
+			totalPassed++
+		}
+	}
+	testStatus := fmt.Sprintf("%v/%v Tests Passed", totalPassed, totalTests)
+	if totalPassed == totalTests {
+		PublishStatusMessage("test_status", testStatus, "success")
+	} else {
+		PublishStatusMessage("test_status", testStatus, "error")
+	}
+
 	fmt.Println("publishing execution result.....")
 
 	execResultJson, err := json.Marshal(execResult)

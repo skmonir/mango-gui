@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -108,13 +109,16 @@ func OpenFile(filePath string) error {
 func ReadFileContent(filePath string, maxRow int, maxCol int) string {
 	fmt.Println("Reading content from fileService " + filePath)
 	file, err := os.Open(filePath)
+	defer file.Close()
 	if err != nil {
 		fmt.Println(err)
 		return ""
 	}
+	return ResizeIOContentForUI(file, maxRow, maxCol)
+}
 
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
+func ResizeIOContentForUI(r io.Reader, maxRow int, maxCol int) string {
+	scanner := bufio.NewScanner(r)
 	buf := make([]byte, 0, 64*1024)
 	scanner.Buffer(buf, 1024*1024)
 
@@ -137,7 +141,7 @@ func ReadFileContent(filePath string, maxRow int, maxCol int) string {
 		rowCount++
 	}
 
-	if err = scanner.Err(); err != nil {
+	if err := scanner.Err(); err != nil {
 		fmt.Println(err)
 		return ""
 	}

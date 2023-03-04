@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/skmonir/mango-ui/backend/judge-framework/constants"
 	"github.com/skmonir/mango-ui/backend/socket"
 	"io"
 	"os"
@@ -12,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shirou/gopsutil/process"
+	"github.com/shirou/gopsutil/v3/process"
 	"github.com/skmonir/mango-ui/backend/judge-framework/dto"
 	"github.com/skmonir/mango-ui/backend/judge-framework/models"
 	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
@@ -25,7 +26,7 @@ type executionResponse struct {
 
 var executionCompleteChan = make(chan executionResponse)
 
-func getVerdict(execDetails dto.TestcaseExecutionDetails) dto.TestcaseExecutionDetails {
+func getVerdict(execDetails dto.TestcaseExecutionDetails, judgeOutput string) dto.TestcaseExecutionDetails {
 	if strings.Contains(execDetails.TestcaseExecutionResult.ExecutionError, "segmentation fault") {
 		execDetails.TestcaseExecutionResult.Verdict = "RE"
 	} else if (execDetails.TestcaseExecutionResult.ConsumedTime > (execDetails.Testcase.TimeLimit * 1000)) || strings.Contains(execDetails.TestcaseExecutionResult.ExecutionError, "killed") {
@@ -35,7 +36,7 @@ func getVerdict(execDetails dto.TestcaseExecutionDetails) dto.TestcaseExecutionD
 		execDetails.TestcaseExecutionResult.Verdict = "MLE"
 	} else if execDetails.TestcaseExecutionResult.ExecutionError != "" {
 		execDetails.TestcaseExecutionResult.Verdict = "RE"
-	} else if execDetails.Testcase.Output == execDetails.TestcaseExecutionResult.Output {
+	} else if judgeOutput == execDetails.TestcaseExecutionResult.Output {
 		execDetails.TestcaseExecutionResult.Verdict = "OK"
 	} else {
 		execDetails.TestcaseExecutionResult.Verdict = "WA"
@@ -127,6 +128,8 @@ func Execute(execResult dto.ProblemExecutionResult) dto.ProblemExecutionResult {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
+	judgeOutputs := make([]string, len(execResult.TestcaseExecutionDetailsList))
+
 	go func() {
 		for {
 			select {
@@ -136,8 +139,14 @@ func Execute(execResult dto.ProblemExecutionResult) dto.ProblemExecutionResult {
 				fmt.Println("exec done", len(execResult.TestcaseExecutionDetailsList), testExecutionResult.index)
 				execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult = testExecutionResult.testExecResult
 				execResult.TestcaseExecutionDetailsList[testExecutionResult.index].Status = "success"
-				execResult.TestcaseExecutionDetailsList[testExecutionResult.index] = getVerdict(execResult.TestcaseExecutionDetailsList[testExecutionResult.index])
+				execResult.TestcaseExecutionDetailsList[testExecutionResult.index] = getVerdict(
+					execResult.TestcaseExecutionDetailsList[testExecutionResult.index],
+					judgeOutputs[testExecutionResult.index])
+				execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult.Output = utils.ResizeIOContentForUI(
+					strings.NewReader(execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult.Output), constants.IO_MAX_ROW, constants.IO_MAX_COL)
+
 				socket.PublishExecutionResult(execResult)
+
 				untestedProblemExists := false
 				for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
 					untestedProblemExists = untestedProblemExists || execResult.TestcaseExecutionDetailsList[i].Status == "running"
@@ -153,9 +162,8 @@ func Execute(execResult dto.ProblemExecutionResult) dto.ProblemExecutionResult {
 	}()
 
 	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
-		testcase := execResult.TestcaseExecutionDetailsList[i].Testcase
-		testcase.Output = utils.ReadFileContent(testcase.OutputFilePath, 10000000, 10000000)
-		go executeSourceBinary(i, testcase)
+		judgeOutputs[i] = utils.TrimIO(utils.ReadFileContent(execResult.TestcaseExecutionDetailsList[i].Testcase.OutputFilePath, 10000000, 10000000))
+		go executeSourceBinary(i, execResult.TestcaseExecutionDetailsList[i].Testcase)
 	}
 	wg.Wait()
 	return execResult
