@@ -1,11 +1,14 @@
 package executor
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"github.com/skmonir/mango-ui/backend/socket"
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 	"sync"
 	"time"
 
@@ -15,52 +18,56 @@ import (
 	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
 )
 
-type testExecutionResult struct {
+type executionResponse struct {
 	index          int
 	testExecResult models.TestcaseExecutionResult
 }
 
-var executionCompleteChan = make(chan testExecutionResult)
+var executionCompleteChan = make(chan executionResponse)
 
-func getVerdict(testcase *models.Testcase) {
-	// errorMsg := ""
-	// if testcase.ExecResult.Error != nil {
-	// 	errorMsg = testcase.ExecResult.Error.Error()
-	// }
-
-	// if strings.Contains(errorMsg, "segmentation fault") {
-	// 	testcase.ExecResult.Verdict = "RE"
-	// } else if (testcase.ExecResult.Runtime > (testcase.TimeLimit * 1000)) || strings.Contains(errorMsg, "killed") {
-	// 	testcase.ExecResult.Verdict = "TLE"
-	// 	testcase.ExecResult.Runtime = testcase.TimeLimit * 1000
-	// } else if utils.ConvertMemoryInMb(testcase.ExecResult.Memory) > testcase.MemoryLimit {
-	// 	testcase.ExecResult.Verdict = "MLE"
-	// } else if testcase.ExecResult.Status == "error" {
-	// 	testcase.ExecResult.Verdict = "RE"
-	// } else if testcase.Output == testcase.ExecResult.Output {
-	// 	testcase.ExecResult.Verdict = "OK"
-	// } else {
-	// 	testcase.ExecResult.Verdict = "WA"
-	// }
+func getVerdict(execDetails dto.TestcaseExecutionDetails) dto.TestcaseExecutionDetails {
+	if strings.Contains(execDetails.TestcaseExecutionResult.ExecutionError, "segmentation fault") {
+		execDetails.TestcaseExecutionResult.Verdict = "RE"
+	} else if (execDetails.TestcaseExecutionResult.ConsumedTime > (execDetails.Testcase.TimeLimit * 1000)) || strings.Contains(execDetails.TestcaseExecutionResult.ExecutionError, "killed") {
+		execDetails.TestcaseExecutionResult.Verdict = "TLE"
+		execDetails.TestcaseExecutionResult.ConsumedTime = execDetails.Testcase.TimeLimit * 1000
+	} else if utils.ConvertMemoryInMb(execDetails.TestcaseExecutionResult.ConsumedMemory) > execDetails.Testcase.MemoryLimit {
+		execDetails.TestcaseExecutionResult.Verdict = "MLE"
+	} else if execDetails.TestcaseExecutionResult.ExecutionError != "" {
+		execDetails.TestcaseExecutionResult.Verdict = "RE"
+	} else if execDetails.Testcase.Output == execDetails.TestcaseExecutionResult.Output {
+		execDetails.TestcaseExecutionResult.Verdict = "OK"
+	} else {
+		execDetails.TestcaseExecutionResult.Verdict = "WA"
+	}
+	return execDetails
 }
 
 func executeSourceBinary(index int, testcase models.Testcase) {
-	utils.PanicRecovery()
+	defer utils.PanicRecovery()
+
+	fmt.Println("Running input", testcase.InputFilePath)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(testcase.TimeLimit)*time.Second)
 	defer cancel()
 
+	//inputBuffer := bytes.NewBuffer([]byte(testcase.Input))
+	var outputBuffer bytes.Buffer
 	cmd := exec.CommandContext(ctx, testcase.SourceBinaryPath)
 	stdin, _ := cmd.StdinPipe()
-	stdout, _ := cmd.StdoutPipe()
+	//stdout, _ := cmd.StdoutPipe()
+	//cmd.Stdin = inputBuffer
+	cmd.Stdout = &outputBuffer
 
 	inputFile, _ := os.Open(testcase.InputFilePath)
-	io.Copy(stdin, inputFile)
-	stdin.Close()
+	go func() {
+		io.Copy(stdin, inputFile)
+		defer stdin.Close()
+	}()
 
-	outputFile, _ := os.OpenFile(testcase.UserOutputFilePath, os.O_WRONLY, os.ModeAppend)
+	//outputFile, _ := os.OpenFile(testcase.UserOutputFilePath, os.O_RDWR|os.O_CREATE, 0644)
 
-	testExecRes := testExecutionResult{
+	execResponse := executionResponse{
 		index:          index,
 		testExecResult: models.TestcaseExecutionResult{},
 	}
@@ -69,19 +76,19 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 	completeExecution := func(err error) {
 		if err != nil {
 			fmt.Println(err.Error())
-			testExecRes.testExecResult.ExecutionError = err.Error()
+			execResponse.testExecResult.ExecutionError = err.Error()
 		}
-		testExecRes.testExecResult.ConsumedMemory = maxMemory / 1024 // converting to KB
-		testExecRes.testExecResult.ConsumedTime = cmd.ProcessState.UserTime().Milliseconds()
+		execResponse.testExecResult.ConsumedMemory = maxMemory / 1024 // converting to KB
+		execResponse.testExecResult.ConsumedTime = cmd.ProcessState.UserTime().Milliseconds()
 	}
 
 	if err := cmd.Start(); err != nil {
 		completeExecution(err)
-		executionCompleteChan <- testExecRes
+		executionCompleteChan <- execResponse
 		return
 	}
 
-	io.Copy(io.MultiWriter(outputFile, os.Stdout), stdout)
+	//io.Copy(io.MultiWriter(outputFile, os.Stdout), stdout)
 
 	pid := int32(cmd.Process.Pid)
 	ch := make(chan error)
@@ -94,7 +101,7 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 		case err := <-ch:
 			completeExecution(err)
 			if err != nil {
-				executionCompleteChan <- testExecRes
+				executionCompleteChan <- execResponse
 				return
 			}
 			running = false
@@ -109,7 +116,11 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 		}
 	}
 
-	executionCompleteChan <- testExecRes
+	if execResponse.testExecResult.ExecutionError == "" {
+		execResponse.testExecResult.Output = utils.TrimIO(outputBuffer.String())
+	}
+
+	executionCompleteChan <- execResponse
 }
 
 func Execute(execResult dto.ProblemExecutionResult) dto.ProblemExecutionResult {
@@ -125,8 +136,8 @@ func Execute(execResult dto.ProblemExecutionResult) dto.ProblemExecutionResult {
 				fmt.Println("exec done", len(execResult.TestcaseExecutionDetailsList), testExecutionResult.index)
 				execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult = testExecutionResult.testExecResult
 				execResult.TestcaseExecutionDetailsList[testExecutionResult.index].Status = "success"
-				// getVerdict(&execResult.TestcaseExecutionDetailsList[testExecutionResult.index])
-				// socket.PublishTestMessage(prob)
+				execResult.TestcaseExecutionDetailsList[testExecutionResult.index] = getVerdict(execResult.TestcaseExecutionDetailsList[testExecutionResult.index])
+				socket.PublishExecutionResult(execResult)
 				untestedProblemExists := false
 				for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
 					untestedProblemExists = untestedProblemExists || execResult.TestcaseExecutionDetailsList[i].Status == "running"
@@ -142,7 +153,9 @@ func Execute(execResult dto.ProblemExecutionResult) dto.ProblemExecutionResult {
 	}()
 
 	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
-		go executeSourceBinary(i, execResult.TestcaseExecutionDetailsList[i].Testcase)
+		testcase := execResult.TestcaseExecutionDetailsList[i].Testcase
+		testcase.Output = utils.ReadFileContent(testcase.OutputFilePath, 10000000, 10000000)
+		go executeSourceBinary(i, testcase)
 	}
 	wg.Wait()
 	return execResult

@@ -3,6 +3,7 @@ package socket
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/skmonir/mango-ui/backend/judge-framework/dto"
 
 	"github.com/skmonir/mango-ui/backend/judge-framework/models"
 )
@@ -51,5 +52,20 @@ func PublishStatusMessage(topic string, message string, messageType string) {
 	broadcastMessage(Message{
 		Key:     topic,
 		Content: string(messageContentJson),
+	})
+}
+
+func PublishExecutionResult(execResult dto.ProblemExecutionResult) {
+	fmt.Println("publishing execution result.....")
+
+	execResultJson, err := json.Marshal(execResult)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	broadcastMessage(Message{
+		Key:     "test_exec_result_event",
+		Content: string(execResultJson),
 	})
 }

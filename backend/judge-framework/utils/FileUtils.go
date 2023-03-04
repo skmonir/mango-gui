@@ -45,7 +45,9 @@ func GetFileNamesInDirectory(folderPath string) []string {
 		return filenames
 	}
 	for _, e := range entries {
-		filenames = append(filenames, e.Name())
+		if !strings.Contains(strings.ToLower(e.Name()), ".ds_store") {
+			filenames = append(filenames, e.Name())
+		}
 	}
 	return filenames
 }
@@ -113,11 +115,10 @@ func ReadFileContent(filePath string, maxRow int, maxCol int) string {
 
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
+	buf := make([]byte, 0, 64*1024)
+	scanner.Buffer(buf, 1024*1024)
+
 	content := ""
-
-	buf := make([]byte, maxCol+1)
-	scanner.Buffer(buf, maxCol+1)
-
 	rowCount := 0
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -127,7 +128,7 @@ func ReadFileContent(filePath string, maxRow int, maxCol int) string {
 		}
 		line = strings.TrimRight(line, " ")
 		if len(line) > maxCol {
-			line = line[:len(line)-1] + "..."
+			line = line[:maxCol] + "..."
 		}
 		if len(content) > 0 {
 			content += "\n"

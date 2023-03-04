@@ -36,8 +36,8 @@ export default function Tester({ appState, setAppState }) {
 
   useEffect(() => {
     let socketConnTest = socketClient.initSocketConnection(
-      "test_problem_event",
-      updateTestStatusMessageFromSocket
+      "test_exec_result_event",
+      updateExecResultFromSocket
     );
     let socketConnStatus = socketClient.initSocketConnection(
       "test_status",
@@ -56,6 +56,7 @@ export default function Tester({ appState, setAppState }) {
         setLoadingInProgress(false);
         setProblemList(data ? data : []);
         if (data && data.length > 0) {
+          setSelectedProblem(data[0]);
           changeSelectedProblemMetadata(
             data[0].platform + "/" + data[0].contestId + "/" + data[0].label
           );
@@ -95,15 +96,20 @@ export default function Tester({ appState, setAppState }) {
     setTestStatusMessage(message);
   };
 
+  const updateExecResultFromSocket = (data) => {
+    setSelectedProblemExecResult(data);
+  }
+
   const changeSelectedProblemMetadata = (metadata) => {
     setTestStatusMessage(null);
-    setSelectedProblemMetadata(metadata);
     setSelectedProblemByMetadata(metadata);
     getSelectedProblemExecResult(metadata);
+    setSelectedProblemMetadata(metadata);
   };
 
   const setSelectedProblemByMetadata = (metadata) => {
     if (metadata && metadata.length > 0) {
+      console.log(problemList)
       const values = metadata.split("/");
       const prob = problemList.find(
         (p) =>
@@ -111,7 +117,10 @@ export default function Tester({ appState, setAppState }) {
           p.contestId === values[1] &&
           p.label === values[2]
       );
-      setSelectedProblem(prob);
+      if (prob) {
+        setSelectedProblem(prob);
+      }
+      console.log("found problem: ", prob)
     } else {
       setSelectedProblem(null);
     }
@@ -142,10 +151,9 @@ export default function Tester({ appState, setAppState }) {
   };
 
   const getVerdict = (testcaseExecutionDetails) => {
-    if (testcaseExecutionDetails?.message === "running") {
+    if (testcaseExecutionDetails?.status === "running") {
       return <Spinner animation="border" variant="primary" size="sm" />;
-    } else if (testcaseExecutionDetails?.message === "none") {
-    } else if (testcaseExecutionDetails?.message) {
+    } else if (testcaseExecutionDetails?.status !== "none") {
       if (testcaseExecutionDetails?.testcaseExecutionResult?.verdict === "OK") {
         return (
           <pre style={{ color: "green" }}>
@@ -391,8 +399,8 @@ export default function Tester({ appState, setAppState }) {
             <Form.Text> {getTestStatusText()} </Form.Text>
           </Col>
         </Row>
-        {getExecutionTable()}
-        {getAlert()}
+        <Row>{getExecutionTable()}</Row>
+        <Row>{getAlert()}</Row>
         {showCodeModal && (
           <ViewCodeModal
             metadata={selectedProblemMetadata}

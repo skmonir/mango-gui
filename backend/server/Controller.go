@@ -110,6 +110,6 @@ func getExecutionResult(ctx *fiber.Ctx) error {
 	platform := ctx.Params("platform")
 	cid := ctx.Params("cid")
 	label := ctx.Params("label")
-	probExecResult := services.GetProblemExecutionResult(platform, cid, label)
+	probExecResult := services.GetProblemExecutionResult(platform, cid, label, true)
 	return ctx.Status(fiber.StatusOK).JSON(probExecResult)
 }

@@ -14,7 +14,7 @@ import (
 )
 
 func RunTest(platform string, cid string, label string) dto.ProblemExecutionResult {
-	execResult := GetProblemExecutionResult(platform, cid, label)
+	execResult := GetProblemExecutionResult(platform, cid, label, true)
 
 	// Step 1: Compile the source
 	socket.PublishStatusMessage("test_status", "Compiling source code", "info")
@@ -35,17 +35,19 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 		return execResult
 	}
 
-	// Step 3: Perpare testcases for execution
+	// Step 3: Prepare testcases for execution
 	prob := GetProblem(platform, cid, label)
 	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
 		execResult.TestcaseExecutionDetailsList[i].Status = "running"
 		execResult.TestcaseExecutionDetailsList[i].Testcase.TimeLimit = prob.TimeLimit
 		execResult.TestcaseExecutionDetailsList[i].Testcase.MemoryLimit = prob.MemoryLimit
 	}
+	socket.PublishExecutionResult(execResult)
 
 	// Step 4: Run the binary and check testcases
 	socket.PublishStatusMessage("test_status", "Running testcases", "info")
 	execResult = executor.Execute(execResult)
+	cacheServices.SaveExecutionResult(platform, cid, label, execResult)
 
 	totalPassed, totalTests := 0, len(execResult.TestcaseExecutionDetailsList)
 	for _, execDetails := range execResult.TestcaseExecutionDetailsList {
@@ -63,14 +65,18 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	return execResult
 }
 
-func GetProblemExecutionResult(platform string, cid string, label string) dto.ProblemExecutionResult {
+func GetProblemExecutionResult(platform string, cid string, label string, isForUI bool) dto.ProblemExecutionResult {
 	fmt.Println("Fetching execution result for", platform, cid, label)
 
-	if ok, execResult := cacheServices.GetExecutionResult(platform, cid, label); ok {
-		return execResult
+	maxRow, maxCol := 10000000, 10000000
+	if isForUI {
+		if ok, execResult := cacheServices.GetExecutionResult(platform, cid, label); ok {
+			return execResult
+		}
+		maxRow, maxCol = 30, 50
 	}
 
-	testcases := fileService.GetTestcasesFromFile(platform, cid, label)
+	testcases := fileService.GetTestcasesFromFile(platform, cid, label, maxRow, maxCol)
 	var testcaseExecutionDetailsList []dto.TestcaseExecutionDetails
 	for i := 0; i < len(testcases); i++ {
 		testcaseExecutionDetailsList = append(testcaseExecutionDetailsList, dto.TestcaseExecutionDetails{
