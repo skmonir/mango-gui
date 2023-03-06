@@ -25,10 +25,10 @@ import DataService from "../services/DataService.js";
 import ViewCodeModal from "./modals/ViewCodeModal.jsx";
 import AddEditTestModal from "./modals/AddEditTestModal.jsx";
 
-export default function Tester({ appState, setAppState }) {
+export default function Tester({ appState }) {
   const socketClient = new SocketClient();
 
-  const [verdicts, setVerdicts] = useState([
+  const verdicts = [
     { label: "All", value: "" },
     { label: "Accepted", value: "AC" },
     { label: "Not Accepted", value: "NA" },
@@ -37,9 +37,10 @@ export default function Tester({ appState, setAppState }) {
     { label: "Runtime Error", value: "RE" },
     { label: "Time Limit Exceeded", value: "TLE" },
     { label: "Memory Limit Exceeded", value: "MLE" },
-  ]);
+  ];
   const [selectedVerdictKey, setSelectedVerdictKey] = useState("");
 
+  const [testContestUrl, setTestContestUrl] = useState("");
   const [loadingInProgress, setLoadingInProgress] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [showAddEditTestModal, setShowAddEditTestModal] = useState(false);
@@ -76,7 +77,7 @@ export default function Tester({ appState, setAppState }) {
   const getProblemList = () => {
     setLoadingInProgress(true);
     setTimeout(() => {
-      DataService.getProblemList(window.btoa(appState.url)).then((data) => {
+      DataService.getProblemList(window.btoa(testContestUrl)).then((data) => {
         setLoadingInProgress(false);
         setProblemList(data ? data : []);
         if (data && data.length > 0) {
@@ -265,8 +266,8 @@ export default function Tester({ appState, setAppState }) {
 
   const disableActionButtons = () => {
     return (
-      !appState.url ||
-      appState.url === "" ||
+      !testContestUrl ||
+      testContestUrl === "" ||
       loadingInProgress ||
       !appState.config.workspaceDirectory
     );
@@ -403,11 +404,9 @@ export default function Tester({ appState, setAppState }) {
                 type="text"
                 size="sm"
                 placeholder="Enter Contest/Problem URL [Codeforces, AtCoder]"
-                value={appState.url}
+                value={testContestUrl}
                 disabled={!appState.config.workspaceDirectory}
-                onChange={(e) =>
-                  setAppState({ ...appState, url: e.target.value })
-                }
+                onChange={(e) => setTestContestUrl(e.target.value)}
               />
             </Form.Group>
           </Col>

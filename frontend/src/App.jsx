@@ -28,8 +28,6 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 function App() {
   const [state, setState] = useState({
     config: {},
-    url: "",
-    parsedProblemList: [],
   });
 
   const navigate = useNavigate();
@@ -112,10 +110,10 @@ function App() {
                 {/*    <Route path="/settings" element={<Settings appState={{...state}} setAppState={setState}/>}/>*/}
                 {/*</Routes>*/}
                 <Tab.Pane eventKey="parser">
-                  <Parser appState={{ ...state }} setAppState={setState} />
+                  <Parser appState={{ ...state }} />
                 </Tab.Pane>
                 <Tab.Pane eventKey="tester">
-                  <Tester appState={{ ...state }} setAppState={setState} />
+                  <Tester appState={{ ...state }} />
                 </Tab.Pane>
                 {/*<Tab.Pane eventKey="testcase_generator">*/}
                 {/*</Tab.Pane>*/}

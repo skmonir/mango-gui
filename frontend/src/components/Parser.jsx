@@ -12,9 +12,10 @@ import SocketClient from "../socket/SocketClient.js";
 import DataService from "../services/DataService.js";
 import Loading from "./Loading.jsx";
 
-function Parser({ appState, setAppState }) {
+function Parser({ appState }) {
   const socketClient = new SocketClient();
 
+  const [parseUrl, setParseUrl] = useState("");
   const [initAlert, setInitAlert] = useState(false);
   const [parsingInProgress, setParsingInProgress] = useState(false);
   const [parsingSingleProblem, setParsingSingleProblem] = useState(false);
@@ -33,9 +34,8 @@ function Parser({ appState, setAppState }) {
   const parseTriggerred = () => {
     setParsingInProgress(true);
     setTimeout(() => {
-      DataService.parse(window.btoa(appState.url)).then((data) => {
+      DataService.parse(window.btoa(parseUrl)).then((data) => {
         setParsedProblemList(data);
-        setAppState({ ...appState, parsedProblemList: data });
         setParsingInProgress(false);
         setInitAlert(true);
       });
@@ -50,16 +50,16 @@ function Parser({ appState, setAppState }) {
         i === index
           ? {
               ...prob,
-              parseStatus: "running",
+              status: "running",
             }
           : prob
       )
     );
+    console.log(parsedProblemList);
     DataService.parse(window.btoa(url)).then((data) => {
       setParsedProblemList(
         parsedProblemList.map((prob, i) => (i === index ? data[0] : prob))
       );
-      setAppState({ ...appState, parsedProblemList: [...parsedProblemList] });
       setParsingInProgress(false);
       setParsingSingleProblem(false);
     });
@@ -87,8 +87,8 @@ function Parser({ appState, setAppState }) {
 
   const disableActionButtons = () => {
     return (
-      !appState.url ||
-      appState.url === "" ||
+      !parseUrl ||
+      parseUrl === "" ||
       parsingInProgress ||
       !appState.config.workspaceDirectory
     );
@@ -164,11 +164,9 @@ function Parser({ appState, setAppState }) {
               type="text"
               size="sm"
               placeholder="Enter Contest/Problem URL [Codeforces, AtCoder]"
-              value={appState.url}
+              value={parseUrl}
               disabled={!appState.config.workspaceDirectory}
-              onChange={(e) =>
-                setAppState({ ...appState, url: e.target.value })
-              }
+              onChange={(e) => setParseUrl(e.target.value)}
             />
           </Col>
           <Col>
