@@ -49,7 +49,7 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 
 	fmt.Println("Running input", testcase.InputFilePath)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(testcase.TimeLimit)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(testcase.TimeLimit+1)*time.Second)
 	defer cancel()
 
 	//inputBuffer := bytes.NewBuffer([]byte(testcase.Input))

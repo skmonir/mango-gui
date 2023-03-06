@@ -62,11 +62,7 @@ export default function ViewCodeModal({
         </SyntaxHighlighter>
       </Modal.Body>
       <Modal.Footer>
-        <Button
-          size="sm"
-          variant="outline-primary"
-          onClick={() => closeModal()}
-        >
+        <Button size="sm" variant="outline-danger" onClick={() => closeModal()}>
           Close Code
         </Button>
       </Modal.Footer>
