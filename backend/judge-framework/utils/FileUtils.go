@@ -142,3 +142,10 @@ func WriteFileContent(folderPath string, filename string, data []byte) {
 		return
 	}
 }
+
+func RemoveFile(filePath string) {
+	err := os.Remove(filePath)
+	if err != nil {
+		fmt.Println(err)
+	}
+}

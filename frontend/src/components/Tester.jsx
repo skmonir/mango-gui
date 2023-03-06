@@ -168,6 +168,19 @@ export default function Tester({ appState, setAppState }) {
     setShowAddEditTestModal(true);
   };
 
+  const deleteCustomTest = (inputFilePath) => {
+    const data = selectedProblemMetadata.split("/");
+    const req = {
+      platform: data[0],
+      contestId: data[1],
+      label: data[2],
+      inputFilePath: inputFilePath,
+    };
+    DataService.deleteCustomTest(req).then(() => {
+      getSelectedProblemExecResult(selectedProblemMetadata);
+    });
+  };
+
   const closeAddEditTestModal = () => {
     setShowAddEditTestModal(false);
     getSelectedProblemExecResult(selectedProblemMetadata);
@@ -268,7 +281,7 @@ export default function Tester({ appState, setAppState }) {
         <div>
           <div
             style={{
-              maxHeight: "68.5vh",
+              maxHeight: "70.5vh",
               overflowY: "auto",
               overflowX: "auto",
             }}
@@ -334,7 +347,15 @@ export default function Tester({ appState, setAppState }) {
                             >
                               <FontAwesomeIcon icon={faEdit} />
                             </Button>
-                            <Button size="sm" variant="danger">
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() =>
+                                deleteCustomTest(
+                                  execDetails.testcase.inputFilePath
+                                )
+                              }
+                            >
                               <FontAwesomeIcon icon={faTrashAlt} />
                             </Button>
                           </ButtonGroup>
@@ -495,7 +516,7 @@ export default function Tester({ appState, setAppState }) {
                     variant="outline-success"
                     onClick={() => addCustomTest()}
                   >
-                    <FontAwesomeIcon icon={faPlus} /> Add Test
+                    <FontAwesomeIcon icon={faPlus} /> Add Custom Test
                   </Button>
                 </div>
               </Col>

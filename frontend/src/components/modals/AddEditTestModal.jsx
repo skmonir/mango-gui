@@ -3,7 +3,6 @@ import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
 import { useEffect, useState } from "react";
 import { Alert, Button, Col, Modal, ModalHeader, Row } from "react-bootstrap";
 import DataService from "../../services/DataService.js";
-import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 
 SyntaxHighlighter.registerLanguage("jsx", jsx);

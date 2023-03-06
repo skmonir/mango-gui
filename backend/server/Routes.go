@@ -35,6 +35,8 @@ func SetRoutes(app fiber.Router) {
 
 	app.Put("/testcase/custom/update", updateCustomTest)
 
+	app.Delete("/testcase/custom/delete", deleteCustomTest)
+
 	app.Get("/test/:platform/:cid/:label", testProblem)
 
 	app.Get("/execresult/:platform/:cid/:label", getExecutionResult)

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"github.com/skmonir/mango-ui/backend/judge-framework/cacheServices"
 	"github.com/skmonir/mango-ui/backend/judge-framework/fileService"
 	"github.com/skmonir/mango-ui/backend/judge-framework/models"
 	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
@@ -31,13 +30,15 @@ func SaveCustomTestcaseIntoFile(platform string, cid string, label string, input
 	maxCustomTestId++
 
 	fileService.SaveCustomTestcaseIntoFile(inputDirectory, outputDirectory, input, output, maxCustomTestId)
-
-	execResult := GetProblemExecutionResult(platform, cid, label, true, true)
-	cacheServices.SaveExecutionResult(platform, cid, label, execResult)
+	GetProblemExecutionResult(platform, cid, label, true, true)
 }
 
 func UpdateCustomTestcaseIntoFile(platform, cid, label, inputFilePath, outputFilePath, input, output string) {
 	fileService.UpdateCustomTestcaseIntoFile(inputFilePath, outputFilePath, input, output)
-	execResult := GetProblemExecutionResult(platform, cid, label, true, true)
-	cacheServices.SaveExecutionResult(platform, cid, label, execResult)
+	GetProblemExecutionResult(platform, cid, label, true, true)
+}
+
+func DeleteCustomTestcaseFromFile(platform, cid, label, inputFilePath string) {
+	utils.RemoveFile(inputFilePath)
+	GetProblemExecutionResult(platform, cid, label, true, true)
 }

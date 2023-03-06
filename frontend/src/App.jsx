@@ -41,7 +41,7 @@ function App() {
         <Tab.Container id="left-tabs-example" defaultActiveKey="parser">
           <Row>
             <Col sm={1}>
-              <Card body bg="light" style={{ height: "95vh" }}>
+              <div body bg="light" style={{ height: "95vh" }}>
                 <Nav variant="pills" className="flex-column">
                   <Nav.Item>
                     <OverlayTrigger
@@ -102,9 +102,9 @@ function App() {
                   {/*    <Nav.Link onClick={() => navigate('/settings')}><FontAwesomeIcon icon={faTools}/> Parser</Nav.Link>*/}
                   {/*</Nav.Item>*/}
                 </Nav>
-              </Card>
+              </div>
             </Col>
-            <Col sm={11}>
+            <Col sm={11} style={{ height: "95vh" }}>
               <Tab.Content>
                 {/*<Routes>*/}
                 {/*    <Route path="/parser" element={<Parser appState={{...state}} setAppState={setState}/>}/>*/}

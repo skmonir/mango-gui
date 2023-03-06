@@ -42,20 +42,18 @@ class DataService {
       .then((response) => response.data);
   }
 
-  //
-  // deleteData(url, data) {
-  //     url = BASE_URL + url;
-  //
-  //     let requestConfig = {
-  //         'headers': {
-  //             'Content-Type': 'application/json',
-  //             'Authorization': AuthService.getAuthToken()
-  //         },
-  //         'data': data
-  //     };
-  //
-  //     return axios.delete(url, requestConfig).then(response => response.data);
-  // }
+  deleteData(url, data) {
+    url = BASE_URL + url;
+
+    let requestConfig = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+
+    return axios.delete(url, requestConfig).then((response) => response.data);
+  }
 
   parse(encodedUrl) {
     return this.getData("parse/" + encodedUrl);
@@ -103,6 +101,10 @@ class DataService {
 
   updateCustomTest(updateCustomTestRequest) {
     return this.putData("testcase/custom/update/", updateCustomTestRequest);
+  }
+
+  deleteCustomTest(deleteCustomTestRequest) {
+    return this.deleteData("testcase/custom/delete/", deleteCustomTestRequest);
   }
 
   runTest(path) {

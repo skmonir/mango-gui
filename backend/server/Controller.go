@@ -171,6 +171,30 @@ func updateCustomTest(ctx *fiber.Ctx) error {
 	})
 }
 
+func deleteCustomTest(ctx *fiber.Ctx) error {
+	updateCustomTestRequest := struct {
+		Platform      string `json:"platform"`
+		ContestId     string `json:"contestId"`
+		Label         string `json:"label"`
+		InputFilePath string `json:"inputFilePath"`
+	}{}
+	err := ctx.BodyParser(&updateCustomTestRequest)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	fmt.Println(updateCustomTestRequest)
+	services.DeleteCustomTestcaseFromFile(
+		updateCustomTestRequest.Platform,
+		updateCustomTestRequest.ContestId,
+		updateCustomTestRequest.Label,
+		updateCustomTestRequest.InputFilePath)
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "success",
+	})
+}
+
 func testProblem(ctx *fiber.Ctx) error {
 	platform := ctx.Params("platform")
 	cid := ctx.Params("cid")
