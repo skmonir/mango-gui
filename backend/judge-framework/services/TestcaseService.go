@@ -1,0 +1,43 @@
+package services
+
+import (
+	"github.com/skmonir/mango-ui/backend/judge-framework/cacheServices"
+	"github.com/skmonir/mango-ui/backend/judge-framework/fileService"
+	"github.com/skmonir/mango-ui/backend/judge-framework/models"
+	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
+	"strconv"
+	"strings"
+)
+
+func GetTestcaseByPath(inputFilePath string, outputFilePath string) models.Testcase {
+	return fileService.GetTestcaseByPath(inputFilePath, outputFilePath)
+}
+
+func SaveCustomTestcaseIntoFile(platform string, cid string, label string, input string, output string) {
+	inputDirectory, outputDirectory := fileService.GetInputOutputDirectories(platform, cid, label)
+	inputFiles := utils.GetFileNamesInDirectory(inputDirectory)
+	maxCustomTestId := -1
+	for _, filename := range inputFiles {
+		if strings.Contains(filename, "01_custom_input_") {
+			serialStr := strings.Replace(filename, "01_custom_input_", "", -1)
+			serialStr = strings.Replace(serialStr, ".txt", "", -1)
+			if serial, err := strconv.Atoi(serialStr); err == nil {
+				if serial > maxCustomTestId {
+					maxCustomTestId = serial
+				}
+			}
+		}
+	}
+	maxCustomTestId++
+
+	fileService.SaveCustomTestcaseIntoFile(inputDirectory, outputDirectory, input, output, maxCustomTestId)
+
+	execResult := GetProblemExecutionResult(platform, cid, label, true, true)
+	cacheServices.SaveExecutionResult(platform, cid, label, execResult)
+}
+
+func UpdateCustomTestcaseIntoFile(platform, cid, label, inputFilePath, outputFilePath, input, output string) {
+	fileService.UpdateCustomTestcaseIntoFile(inputFilePath, outputFilePath, input, output)
+	execResult := GetProblemExecutionResult(platform, cid, label, true, true)
+	cacheServices.SaveExecutionResult(platform, cid, label, execResult)
+}

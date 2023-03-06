@@ -29,6 +29,12 @@ func SetRoutes(app fiber.Router) {
 
 	app.Put("/source/open", openSourceByPath)
 
+	app.Put("/testcase/custom", getCustomTestByPath)
+
+	app.Post("/testcase/custom/add", addCustomTest)
+
+	app.Put("/testcase/custom/update", updateCustomTest)
+
 	app.Get("/test/:platform/:cid/:label", testProblem)
 
 	app.Get("/execresult/:platform/:cid/:label", getExecutionResult)

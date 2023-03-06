@@ -3,6 +3,7 @@ package cacheServices
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/skmonir/mango-ui/backend/judge-framework/models"
 
 	"github.com/skmonir/mango-ui/backend/judge-framework/cache"
 	"github.com/skmonir/mango-ui/backend/judge-framework/dto"
@@ -39,4 +40,27 @@ func SaveExecutionResult(platform string, cid string, label string, execResult d
 
 	key := fmt.Sprintf("ProblemExecutionResult:%v.%v.%v", platform, cid, label)
 	cache.GetGlobalCache().Set(key, string(data))
+}
+
+func UpdateTestcaseIntoExecutionResult(platform string, cid string, label string, testcase models.Testcase) {
+	fmt.Println("Saving execution result into cache...")
+
+	ok, execResult := GetExecutionResult(platform, cid, label)
+	if !ok {
+		return
+	}
+	isFound := false
+	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
+		if execResult.TestcaseExecutionDetailsList[i].Testcase.InputFilePath == testcase.OutputFilePath {
+			isFound = true
+			execResult.TestcaseExecutionDetailsList[i].Testcase = testcase
+		}
+	}
+	if !isFound {
+		execResult.TestcaseExecutionDetailsList = append(execResult.TestcaseExecutionDetailsList, dto.TestcaseExecutionDetails{
+			Status:   "none",
+			Testcase: testcase,
+		})
+	}
+	SaveExecutionResult(platform, cid, label, execResult)
 }

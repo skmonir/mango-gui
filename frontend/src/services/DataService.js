@@ -1,101 +1,117 @@
-import axios from 'axios';
+import axios from "axios";
 // import AuthService from './auth.service';
 
-const BASE_URL = 'http://localhost:3456/api/v1/';
+const BASE_URL = "http://localhost:3456/api/v1/";
 
 class DataService {
-    getData(url, params) {
-        url = BASE_URL + url;
+  getData(url, params) {
+    url = BASE_URL + url;
 
-        let requestConfig = {
-            'params': params
-        };
+    let requestConfig = {
+      params: params,
+    };
 
-        return axios.get(url, requestConfig).then(response => response.data);
-    }
+    return axios.get(url, requestConfig).then((response) => response.data);
+  }
 
-    postData(url, payload) {
-        url = BASE_URL + url;
+  postData(url, payload) {
+    url = BASE_URL + url;
 
-        let requestConfig = {
-            'headers': {
-                'Content-Type': 'application/json'
-            }
-        };
+    let requestConfig = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
 
-        return axios.post(url, payload, requestConfig).then(response => response.data);
-    }
+    return axios
+      .post(url, payload, requestConfig)
+      .then((response) => response.data);
+  }
 
-    putData(url, payload) {
-        url = BASE_URL + url;
+  putData(url, payload) {
+    url = BASE_URL + url;
 
-        let requestConfig = {
-            'headers': {
-                'Content-Type': 'application/json'
-            }
-        };
+    let requestConfig = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
 
-        return axios.put(url, payload, requestConfig).then(response => response.data);
-    }
+    return axios
+      .put(url, payload, requestConfig)
+      .then((response) => response.data);
+  }
 
-    //
-    // deleteData(url, data) {
-    //     url = BASE_URL + url;
-    //
-    //     let requestConfig = {
-    //         'headers': {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': AuthService.getAuthToken()
-    //         },
-    //         'data': data
-    //     };
-    //
-    //     return axios.delete(url, requestConfig).then(response => response.data);
-    // }
+  //
+  // deleteData(url, data) {
+  //     url = BASE_URL + url;
+  //
+  //     let requestConfig = {
+  //         'headers': {
+  //             'Content-Type': 'application/json',
+  //             'Authorization': AuthService.getAuthToken()
+  //         },
+  //         'data': data
+  //     };
+  //
+  //     return axios.delete(url, requestConfig).then(response => response.data);
+  // }
 
-    parse(encodedUrl) {
-        return this.getData('parse/' + encodedUrl);
-    }
+  parse(encodedUrl) {
+    return this.getData("parse/" + encodedUrl);
+  }
 
-    getProblem(path) {
-        return this.getData('problem/' + path);
-    }
+  getProblem(path) {
+    return this.getData("problem/" + path);
+  }
 
-    getProblemList(encodedUrl) {
-        return this.getData('problem/' + encodedUrl);
-    }
+  getProblemList(encodedUrl) {
+    return this.getData("problem/" + encodedUrl);
+  }
 
-    getConfig() {
-        return this.getData('config/');
-    }
+  getConfig() {
+    return this.getData("config/");
+  }
 
-    updateConfig(config) {
-        return this.putData('config/', config);
-    }
+  updateConfig(config) {
+    return this.putData("config/", config);
+  }
 
-    getCodeByMetadata(metadata) {
-        return this.getData('code/' + metadata);
-    }
+  getCodeByMetadata(metadata) {
+    return this.getData("code/" + metadata);
+  }
 
-    getCodeByPath(codeRequest) {
-        return this.putData('code/', codeRequest);
-    }
+  getCodeByPath(codeRequest) {
+    return this.putData("code/", codeRequest);
+  }
 
-    openSourceByMetadata(metadata) {
-        return this.getData('source/open/' + metadata);
-    }
+  openSourceByMetadata(metadata) {
+    return this.getData("source/open/" + metadata);
+  }
 
-    openSourceByPath(openSourceRequest) {
-        return this.putData('source/open/', openSourceRequest);
-    }
+  openSourceByPath(openSourceRequest) {
+    return this.putData("source/open/", openSourceRequest);
+  }
 
-    runTest(path) {
-        return this.getData('test/' + path)
-    }
+  getTestcaseByFilePath(getTestcaseRequest) {
+    return this.putData("testcase/custom/", getTestcaseRequest);
+  }
 
-    getExecutionResult(path) {
-        return this.getData('execresult/' + path)
-    }
+  addCustomTest(addCustomTestRequest) {
+    return this.postData("testcase/custom/add/", addCustomTestRequest);
+  }
+
+  updateCustomTest(updateCustomTestRequest) {
+    return this.putData("testcase/custom/update/", updateCustomTestRequest);
+  }
+
+  runTest(path) {
+    return this.getData("test/" + path);
+  }
+
+  getExecutionResult(path) {
+    return this.getData("execresult/" + path);
+  }
 }
 
 export default new DataService();

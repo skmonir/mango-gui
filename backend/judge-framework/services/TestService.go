@@ -15,7 +15,7 @@ import (
 )
 
 func RunTest(platform string, cid string, label string) dto.ProblemExecutionResult {
-	execResult := GetProblemExecutionResult(platform, cid, label, true)
+	execResult := GetProblemExecutionResult(platform, cid, label, true, false)
 
 	// Step 1: Compile the source
 	socket.PublishStatusMessage("test_status", "Compiling source code", "info")
@@ -55,15 +55,18 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	return execResult
 }
 
-func GetProblemExecutionResult(platform string, cid string, label string, isForUI bool) dto.ProblemExecutionResult {
+func GetProblemExecutionResult(platform string, cid string, label string, isForUI bool, isSkipCache bool) dto.ProblemExecutionResult {
 	fmt.Println("Fetching execution result for", platform, cid, label)
 
-	maxRow, maxCol := 10000000, 10000000
+	maxRow, maxCol := constants.IO_MAX_ROW_FOR_TEST, constants.IO_MAX_COL_FOR_TEST
 	if isForUI {
+		maxRow, maxCol = constants.IO_MAX_ROW_FOR_UI, constants.IO_MAX_COL_FOR_UI
+	}
+
+	if !isSkipCache {
 		if ok, execResult := cacheServices.GetExecutionResult(platform, cid, label); ok {
 			return execResult
 		}
-		maxRow, maxCol = constants.IO_MAX_ROW, constants.IO_MAX_COL
 	}
 
 	testcases := fileService.GetTestcasesFromFile(platform, cid, label, maxRow, maxCol)

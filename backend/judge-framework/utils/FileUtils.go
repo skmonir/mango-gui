@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 )
 
@@ -50,27 +51,7 @@ func GetFileNamesInDirectory(folderPath string) []string {
 			filenames = append(filenames, e.Name())
 		}
 	}
-	return filenames
-}
-
-func GetFilenamesInDir(folderPath string) []string {
-	var filenames []string
-
-	if !IsDirExist(folderPath) {
-		return filenames
-	}
-
-	files, err := ioutil.ReadDir(folderPath)
-
-	if err == nil {
-		for _, f := range files {
-			fname := f.Name()
-			if strings.HasSuffix(fname, ".cpp") {
-				fname = strings.TrimSuffix(fname, filepath.Ext(fname))
-				filenames = append(filenames, fname)
-			}
-		}
-	}
+	sort.Strings(filenames)
 	return filenames
 }
 

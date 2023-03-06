@@ -3,7 +3,7 @@ import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
 import { darcula } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import DataService from "../services/DataService.js";
+import DataService from "../../services/DataService.js";
 
 SyntaxHighlighter.registerLanguage("jsx", jsx);
 
@@ -26,7 +26,6 @@ export default function ViewCodeModal({
   const fetchCodeByPath = (filepath) => {
     DataService.getCodeByPath({ filePath: filepath })
       .then((code) => {
-        console.log(code);
         setCode(code);
         setShowModal(true);
       })
@@ -36,7 +35,6 @@ export default function ViewCodeModal({
   const fetchCodeByMetadata = (metadata) => {
     DataService.getCodeByMetadata(metadata)
       .then((code) => {
-        console.log(code);
         setCode(code);
         setShowModal(true);
       })

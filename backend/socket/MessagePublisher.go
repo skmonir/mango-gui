@@ -56,18 +56,7 @@ func PublishStatusMessage(topic string, message string, messageType string) {
 }
 
 func PublishExecutionResult(execResult dto.ProblemExecutionResult) {
-	totalPassed, totalTests := 0, len(execResult.TestcaseExecutionDetailsList)
-	for _, execDetails := range execResult.TestcaseExecutionDetailsList {
-		if execDetails.TestcaseExecutionResult.Verdict == "OK" {
-			totalPassed++
-		}
-	}
-	testStatus := fmt.Sprintf("%v/%v Tests Passed", totalPassed, totalTests)
-	if totalPassed == totalTests {
-		PublishStatusMessage("test_status", testStatus, "success")
-	} else {
-		PublishStatusMessage("test_status", testStatus, "error")
-	}
+	PublishExecPassedStat(execResult.TestcaseExecutionDetailsList)
 
 	fmt.Println("publishing execution result.....")
 
@@ -81,4 +70,22 @@ func PublishExecutionResult(execResult dto.ProblemExecutionResult) {
 		Key:     "test_exec_result_event",
 		Content: string(execResultJson),
 	})
+}
+
+func PublishExecPassedStat(testcaseExecutionDetailsList []dto.TestcaseExecutionDetails) {
+	totalPassed, totalTests, isExecutedOnce := 0, len(testcaseExecutionDetailsList), false
+	for _, execDetails := range testcaseExecutionDetailsList {
+		isExecutedOnce = isExecutedOnce || (execDetails.Status != "none")
+		if execDetails.TestcaseExecutionResult.Verdict == "AC" {
+			totalPassed++
+		}
+	}
+	if isExecutedOnce {
+		testStatus := fmt.Sprintf("%v/%v Tests Passed", totalPassed, totalTests)
+		if totalPassed == totalTests {
+			PublishStatusMessage("test_status", testStatus, "success")
+		} else {
+			PublishStatusMessage("test_status", testStatus, "error")
+		}
+	}
 }

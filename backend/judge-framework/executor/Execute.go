@@ -37,7 +37,7 @@ func getVerdict(execDetails dto.TestcaseExecutionDetails, judgeOutput string) dt
 	} else if execDetails.TestcaseExecutionResult.ExecutionError != "" {
 		execDetails.TestcaseExecutionResult.Verdict = "RE"
 	} else if judgeOutput == execDetails.TestcaseExecutionResult.Output {
-		execDetails.TestcaseExecutionResult.Verdict = "OK"
+		execDetails.TestcaseExecutionResult.Verdict = "AC"
 	} else {
 		execDetails.TestcaseExecutionResult.Verdict = "WA"
 	}
@@ -143,7 +143,7 @@ func Execute(execResult dto.ProblemExecutionResult) dto.ProblemExecutionResult {
 					execResult.TestcaseExecutionDetailsList[testExecutionResult.index],
 					judgeOutputs[testExecutionResult.index])
 				execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult.Output = utils.ResizeIOContentForUI(
-					strings.NewReader(execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult.Output), constants.IO_MAX_ROW, constants.IO_MAX_COL)
+					strings.NewReader(execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult.Output), constants.IO_MAX_ROW_FOR_UI, constants.IO_MAX_COL_FOR_UI)
 
 				socket.PublishExecutionResult(execResult)
 
@@ -162,7 +162,8 @@ func Execute(execResult dto.ProblemExecutionResult) dto.ProblemExecutionResult {
 	}()
 
 	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
-		judgeOutputs[i] = utils.TrimIO(utils.ReadFileContent(execResult.TestcaseExecutionDetailsList[i].Testcase.OutputFilePath, 10000000, 10000000))
+		judgeOutputs[i] = utils.TrimIO(utils.ReadFileContent(
+			execResult.TestcaseExecutionDetailsList[i].Testcase.OutputFilePath, constants.IO_MAX_ROW_FOR_TEST, constants.IO_MAX_COL_FOR_TEST))
 		go executeSourceBinary(i, execResult.TestcaseExecutionDetailsList[i].Testcase)
 	}
 	wg.Wait()
