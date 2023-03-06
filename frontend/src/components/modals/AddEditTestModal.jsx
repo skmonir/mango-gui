@@ -120,18 +120,23 @@ export default function AddEditTestModal({
               <Form.Label>
                 <strong>INPUT</strong>
               </Form.Label>
-              <Form.Control
-                value={inputOutputObj.input}
-                onChange={(e) =>
-                  setInputOutputObj({
-                    ...inputOutputObj,
-                    input: e.target.value,
-                  })
-                }
-                as="textarea"
-                aria-label="With textarea"
-                rows={19}
-              />
+              <pre>
+                <Form.Control
+                  value={inputOutputObj.input}
+                  onChange={(e) =>
+                    setInputOutputObj({
+                      ...inputOutputObj,
+                      input: e.target.value,
+                    })
+                  }
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  as="textarea"
+                  aria-label="With textarea"
+                  rows={19}
+                />
+              </pre>
             </Form>
           </Col>
           <Col xs={6}>
@@ -139,18 +144,23 @@ export default function AddEditTestModal({
               <Form.Label>
                 <strong>EXPECTED OUTPUT</strong>
               </Form.Label>
-              <Form.Control
-                value={inputOutputObj.output}
-                onChange={(e) =>
-                  setInputOutputObj({
-                    ...inputOutputObj,
-                    output: e.target.value,
-                  })
-                }
-                as="textarea"
-                aria-label="With textarea"
-                rows={19}
-              />
+              <pre>
+                <Form.Control
+                  value={inputOutputObj.output}
+                  onChange={(e) =>
+                    setInputOutputObj({
+                      ...inputOutputObj,
+                      output: e.target.value,
+                    })
+                  }
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  as="textarea"
+                  aria-label="With textarea"
+                  rows={19}
+                />
+              </pre>
             </Form>
           </Col>
         </Row>

@@ -102,6 +102,9 @@ export default function Settings({ appState, setAppState }) {
           <Form.Control
             type="text"
             size="sm"
+            autoCorrect="off"
+            autoComplete="off"
+            autoCapitalize="none"
             placeholder="Enter your workspace directory absolute path"
             value={config.workspaceDirectory}
             onChange={(e) =>
@@ -136,6 +139,9 @@ export default function Settings({ appState, setAppState }) {
             <Form.Control
               type="text"
               size="sm"
+              autoCorrect="off"
+              autoComplete="off"
+              autoCapitalize="none"
               placeholder="Example: g++"
               value={config.compilationCommand}
               onChange={(e) =>
@@ -152,6 +158,9 @@ export default function Settings({ appState, setAppState }) {
             <Form.Control
               type="text"
               size="sm"
+              autoCorrect="off"
+              autoComplete="off"
+              autoCapitalize="none"
               placeholder="Example: -std=c++20"
               value={config.compilationArgs}
               onChange={(e) =>
@@ -170,6 +179,9 @@ export default function Settings({ appState, setAppState }) {
             <Form.Control
               type="text"
               size="sm"
+              autoCorrect="off"
+              autoComplete="off"
+              autoCapitalize="none"
               placeholder="Enter your name"
               value={config.author}
               onChange={(e) => setConfig({ ...config, author: e.target.value })}
@@ -185,9 +197,15 @@ export default function Settings({ appState, setAppState }) {
               <Form.Control
                 type="text"
                 size="sm"
+                autoCorrect="off"
+                autoComplete="off"
+                autoCapitalize="none"
                 value={config.templatePath}
                 onChange={(e) =>
                   setConfig({ ...config, templatePath: e.target.value })
+                }
+                placeholder={
+                  "Template file ends with extension(.cpp). The template will be used to create source files."
                 }
               />
               <Button
@@ -198,10 +216,6 @@ export default function Settings({ appState, setAppState }) {
               >
                 <FontAwesomeIcon icon={faCode} /> View Code{" "}
               </Button>
-              <Form.Text muted>
-                Template file ends with extension(.cpp). The template will be
-                used to create source files
-              </Form.Text>
             </InputGroup>
           </Form.Group>
         </Col>
