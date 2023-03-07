@@ -244,6 +244,20 @@ export default function Tester({ appState }) {
     }
   };
 
+  const getTestcaseBorderColor = testcaseExecutionDetails => {
+    if (testcaseExecutionDetails?.status === "none") {
+      return "";
+    } else if (testcaseExecutionDetails?.status === "running") {
+      return "orange";
+    } else {
+      if (testcaseExecutionDetails?.testcaseExecutionResult?.verdict === "AC") {
+        return "green";
+      } else {
+        return "red";
+      }
+    }
+  };
+
   const filterVerdicts = key => {
     console.log(key);
     setSelectedVerdictKey(key);
@@ -310,7 +324,14 @@ export default function Tester({ appState }) {
               <tbody>
                 {selectedProblemFilteredExecResult.testcaseExecutionDetailsList.map(
                   (execDetails, id) => (
-                    <tr key={id}>
+                    <tr
+                      key={id}
+                      style={{
+                        border: "2px solid transparent",
+                        borderColor: `${getTestcaseBorderColor(execDetails)}`,
+                        borderRadius: "5px"
+                      }}
+                    >
                       <td>{id + 1}</td>
                       <td>
                         <pre>{execDetails.testcase.input}</pre>
@@ -553,7 +574,13 @@ export default function Tester({ appState }) {
                       <Table bordered responsive="sm" size="sm">
                         <tbody>
                           <tr>
-                            <td>
+                            <td
+                              style={{
+                                border: "2px solid transparent",
+                                borderColor: "red",
+                                borderRadius: "5px"
+                              }}
+                            >
                               <pre>
                                 {
                                   selectedProblemFilteredExecResult?.compilationError
