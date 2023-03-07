@@ -39,7 +39,7 @@ function App() {
         <Tab.Container id="left-tabs-example" defaultActiveKey="parser">
           <Row>
             <Col sm={1}>
-              <div body bg="light">
+              <div bg="light">
                 <Nav variant="pills" className="flex-column">
                   <Nav.Item>
                     <OverlayTrigger
