@@ -26,6 +26,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 		return execResult
 	}
 	socket.PublishStatusMessage("test_status", "Compilation successful!", "success")
+	socket.PublishExecutionResult(execResult)
 
 	time.Sleep(500 * time.Millisecond)
 
