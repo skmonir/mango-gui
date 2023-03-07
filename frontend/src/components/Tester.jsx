@@ -244,16 +244,14 @@ export default function Tester({ appState }) {
     }
   };
 
-  const getTestcaseBorderColor = testcaseExecutionDetails => {
-    if (testcaseExecutionDetails?.status === "none") {
+  const getTestcaseRowColor = testcaseExecutionDetails => {
+    if (["none", "running"].includes(testcaseExecutionDetails?.status)) {
       return "";
-    } else if (testcaseExecutionDetails?.status === "running") {
-      return "orange";
     } else {
       if (testcaseExecutionDetails?.testcaseExecutionResult?.verdict === "AC") {
-        return "green";
+        return "table-success";
       } else {
-        return "red";
+        return "table-danger";
       }
     }
   };
@@ -324,14 +322,7 @@ export default function Tester({ appState }) {
               <tbody>
                 {selectedProblemFilteredExecResult.testcaseExecutionDetailsList.map(
                   (execDetails, id) => (
-                    <tr
-                      key={id}
-                      style={{
-                        border: "2px solid transparent",
-                        borderColor: `${getTestcaseBorderColor(execDetails)}`,
-                        borderRadius: "5px"
-                      }}
-                    >
+                    <tr key={id} className={getTestcaseRowColor(execDetails)}>
                       <td>{id + 1}</td>
                       <td>
                         <pre>{execDetails.testcase.input}</pre>
@@ -577,9 +568,10 @@ export default function Tester({ appState }) {
                             <td
                               style={{
                                 border: "2px solid transparent",
-                                borderColor: "red",
+                                borderColor: "black",
                                 borderRadius: "5px"
                               }}
+                              className="table-danger"
                             >
                               <pre>
                                 {
