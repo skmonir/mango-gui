@@ -133,7 +133,7 @@ export default function AddEditTestModal({
                   autoCapitalize="none"
                   as="textarea"
                   aria-label="With textarea"
-                  rows={19}
+                  rows={23}
                 />
               </pre>
             </Form>
@@ -157,7 +157,7 @@ export default function AddEditTestModal({
                   autoCapitalize="none"
                   as="textarea"
                   aria-label="With textarea"
-                  rows={19}
+                  rows={23}
                 />
               </pre>
             </Form>
