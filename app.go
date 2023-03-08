@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/server"
+	"github.com/skmonir/mango-gui/backend/server"
 )
 
 // App struct

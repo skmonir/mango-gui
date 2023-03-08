@@ -1,4 +1,4 @@
-module github.com/skmonir/mango-ui
+module github.com/skmonir/mango-gui
 
 go 1.19
 

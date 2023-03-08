@@ -2,14 +2,14 @@ package server
 
 import (
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/socket"
+	"github.com/skmonir/mango-gui/backend/socket"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/skmonir/mango-ui/backend/judge-framework/config"
-	"github.com/skmonir/mango-ui/backend/judge-framework/fileService"
-	"github.com/skmonir/mango-ui/backend/judge-framework/parser"
-	"github.com/skmonir/mango-ui/backend/judge-framework/services"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
+	"github.com/skmonir/mango-gui/backend/judge-framework/config"
+	"github.com/skmonir/mango-gui/backend/judge-framework/fileService"
+	"github.com/skmonir/mango-gui/backend/judge-framework/parser"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
 
 func parse(ctx *fiber.Ctx) error {
@@ -208,6 +208,6 @@ func getExecutionResult(ctx *fiber.Ctx) error {
 	cid := ctx.Params("cid")
 	label := ctx.Params("label")
 	probExecResult := services.GetProblemExecutionResult(platform, cid, label, true, false)
-	socket.PublishExecPassedStat(probExecResult.TestcaseExecutionDetailsList)
+	socket.PublishPreviousRunStatus(probExecResult)
 	return ctx.Status(fiber.StatusOK).JSON(probExecResult)
 }

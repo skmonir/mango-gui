@@ -3,7 +3,7 @@ package server
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
-	"github.com/skmonir/mango-ui/backend/socket"
+	"github.com/skmonir/mango-gui/backend/socket"
 )
 
 func SetRoutes(app fiber.Router) {

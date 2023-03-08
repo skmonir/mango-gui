@@ -3,8 +3,8 @@ package cacheServices
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/judge-framework/cache"
-	"github.com/skmonir/mango-ui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/cache"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 )
 
 func GetProblemListFromCache(platform string, cid string) []models.Problem {

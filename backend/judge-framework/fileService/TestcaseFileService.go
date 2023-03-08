@@ -2,13 +2,13 @@ package fileService
 
 import (
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/judge-framework/constants"
+	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
 	"path/filepath"
 	"strings"
 
-	"github.com/skmonir/mango-ui/backend/judge-framework/config"
-	"github.com/skmonir/mango-ui/backend/judge-framework/models"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
+	"github.com/skmonir/mango-gui/backend/judge-framework/config"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
 
 func GetTestcaseByPath(inputFilePath string, outputFilePath string) models.Testcase {

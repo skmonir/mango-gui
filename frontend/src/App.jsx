@@ -7,7 +7,7 @@ import {
   OverlayTrigger,
   Row,
   Tab,
-  Tooltip,
+  Tooltip
 } from "react-bootstrap";
 import Tester from "./components/Tester.jsx";
 import Parser from "./components/Parser.jsx";
@@ -19,7 +19,7 @@ import {
   faCogs,
   faDownload,
   faLaptopCode,
-  faTools,
+  faTools
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import Settings from "./components/Settings.jsx";
@@ -27,7 +27,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 
 function App() {
   const [state, setState] = useState({
-    config: {},
+    config: {}
   });
 
   const navigate = useNavigate();
@@ -39,9 +39,9 @@ function App() {
         <Tab.Container id="left-tabs-example" defaultActiveKey="parser">
           <Row>
             <Col sm={1}>
-              <div body bg="light" style={{ height: "95vh" }}>
+              <div bg="light">
                 <Nav variant="pills" className="flex-column">
-                  <Nav.Item>
+                  <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
                       placement="right"
@@ -52,7 +52,7 @@ function App() {
                       </Nav.Link>
                     </OverlayTrigger>
                   </Nav.Item>
-                  <Nav.Item>
+                  <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
                       placement="right"
@@ -63,7 +63,7 @@ function App() {
                       </Nav.Link>
                     </OverlayTrigger>
                   </Nav.Item>
-                  <Nav.Item>
+                  <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
                       placement="right"
@@ -78,7 +78,7 @@ function App() {
                       </Nav.Link>
                     </OverlayTrigger>
                   </Nav.Item>
-                  <Nav.Item>
+                  <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
                       placement="right"
@@ -102,7 +102,7 @@ function App() {
                 </Nav>
               </div>
             </Col>
-            <Col sm={11} style={{ height: "95vh" }}>
+            <Col sm={11}>
               <Tab.Content>
                 {/*<Routes>*/}
                 {/*    <Route path="/parser" element={<Parser appState={{...state}} setAppState={setState}/>}/>*/}

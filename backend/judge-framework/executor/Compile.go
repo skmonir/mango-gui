@@ -8,8 +8,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/skmonir/mango-ui/backend/judge-framework/config"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
+	"github.com/skmonir/mango-gui/backend/judge-framework/config"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
 
 // parseCommand parses a command line and handle arguments in quotes.

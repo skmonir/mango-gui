@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/judge-framework/constants"
-	"github.com/skmonir/mango-ui/backend/socket"
+	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
+	"github.com/skmonir/mango-gui/backend/socket"
 	"io"
 	"os"
 	"os/exec"
@@ -14,9 +14,9 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/v3/process"
-	"github.com/skmonir/mango-ui/backend/judge-framework/dto"
-	"github.com/skmonir/mango-ui/backend/judge-framework/models"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
+	"github.com/skmonir/mango-gui/backend/judge-framework/dto"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
 
 type executionResponse struct {

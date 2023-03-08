@@ -2,8 +2,8 @@ package parser
 
 import (
 	"github.com/anaskhan96/soup"
-	"github.com/skmonir/mango-ui/backend/judge-framework/models"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"log"
 	"regexp"
 	"strconv"

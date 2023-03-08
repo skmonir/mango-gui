@@ -1,4 +1,5 @@
 import {
+  Accordion,
   Alert,
   Button,
   ButtonGroup,
@@ -6,7 +7,7 @@ import {
   Col,
   Row,
   Spinner,
-  Table,
+  Table
 } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,7 +18,7 @@ import {
   faPlus,
   faTasks,
   faTerminal,
-  faTrashAlt,
+  faTrashAlt
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import SocketClient from "../socket/SocketClient.js";
@@ -29,14 +30,13 @@ export default function Tester({ appState }) {
   const socketClient = new SocketClient();
 
   const verdicts = [
-    { label: "All", value: "" },
+    { label: "Any Verdict", value: "" },
     { label: "Accepted", value: "AC" },
     { label: "Not Accepted", value: "NA" },
     { label: "Wrong Answer", value: "WA" },
-    { label: "Compile Error", value: "CE" },
     { label: "Runtime Error", value: "RE" },
     { label: "Time Limit Exceeded", value: "TLE" },
-    { label: "Memory Limit Exceeded", value: "MLE" },
+    { label: "Memory Limit Exceeded", value: "MLE" }
   ];
   const [selectedVerdictKey, setSelectedVerdictKey] = useState("");
 
@@ -50,11 +50,11 @@ export default function Tester({ appState }) {
   const [selectedProblemMetadata, setSelectedProblemMetadata] = useState("");
   const [
     selectedProblemOriginalExecResult,
-    setSelectedProblemOriginalExecResult,
+    setSelectedProblemOriginalExecResult
   ] = useState(null);
   const [
     selectedProblemFilteredExecResult,
-    setSelectedProblemFilteredExecResult,
+    setSelectedProblemFilteredExecResult
   ] = useState(null);
   const [selectedTestcase, setSelectedTestcase] = useState(null);
   const [testStatusMessage, setTestStatusMessage] = useState({});
@@ -77,7 +77,7 @@ export default function Tester({ appState }) {
   const getProblemList = () => {
     setLoadingInProgress(true);
     setTimeout(() => {
-      DataService.getProblemList(window.btoa(testContestUrl)).then((data) => {
+      DataService.getProblemList(window.btoa(testContestUrl)).then(data => {
         setLoadingInProgress(false);
         setProblemList(data ? data : []);
         if (data && data.length > 0) {
@@ -92,10 +92,10 @@ export default function Tester({ appState }) {
     }, 0);
   };
 
-  const getSelectedProblemExecResult = (metadata) => {
+  const getSelectedProblemExecResult = metadata => {
     if (metadata && metadata.length > 0) {
       setLoadingInProgress(true);
-      DataService.getExecutionResult(metadata).then((data) => {
+      DataService.getExecutionResult(metadata).then(data => {
         setSelectedProblemOriginalExecResult(data);
         setSelectedProblemFilteredExecResult(data);
         setLoadingInProgress(false);
@@ -109,43 +109,43 @@ export default function Tester({ appState }) {
   };
 
   const openSource = () => {
-    DataService.openSourceByMetadata(selectedProblemMetadata).then((resp) => {
+    DataService.openSourceByMetadata(selectedProblemMetadata).then(resp => {
       console.log(resp);
     });
   };
 
   const runTest = () => {
-    DataService.runTest(selectedProblemMetadata).then((data) => {
+    DataService.runTest(selectedProblemMetadata).then(data => {
       setSelectedProblemOriginalExecResult(data);
       setSelectedProblemFilteredExecResult(data);
       setSelectedVerdictKey("");
     });
   };
 
-  const updateTestStatusMessageFromSocket = (message) => {
+  const updateTestStatusMessageFromSocket = message => {
     console.log(message);
     setTestStatusMessage(message);
   };
 
-  const updateExecResultFromSocket = (data) => {
+  const updateExecResultFromSocket = data => {
     setSelectedProblemOriginalExecResult(data);
     setSelectedProblemFilteredExecResult(data);
     setSelectedVerdictKey("");
   };
 
-  const changeSelectedProblemMetadata = (metadata) => {
+  const changeSelectedProblemMetadata = metadata => {
     setTestStatusMessage(null);
     setSelectedProblemByMetadata(metadata);
     getSelectedProblemExecResult(metadata);
     setSelectedProblemMetadata(metadata);
   };
 
-  const setSelectedProblemByMetadata = (metadata) => {
+  const setSelectedProblemByMetadata = metadata => {
     if (metadata && metadata.length > 0) {
       console.log(problemList);
       const values = metadata.split("/");
       const prob = problemList.find(
-        (p) =>
+        p =>
           p.platform === values[0] &&
           p.contestId === values[1] &&
           p.label === values[2]
@@ -164,18 +164,18 @@ export default function Tester({ appState }) {
     setTimeout(() => setShowAddEditTestModal(true), 200);
   };
 
-  const updateCustomTest = (testcase) => {
+  const updateCustomTest = testcase => {
     setSelectedTestcase(testcase);
     setShowAddEditTestModal(true);
   };
 
-  const deleteCustomTest = (inputFilePath) => {
+  const deleteCustomTest = inputFilePath => {
     const data = selectedProblemMetadata.split("/");
     const req = {
       platform: data[0],
       contestId: data[1],
       label: data[2],
-      inputFilePath: inputFilePath,
+      inputFilePath: inputFilePath
     };
     DataService.deleteCustomTest(req).then(() => {
       getSelectedProblemExecResult(selectedProblemMetadata);
@@ -211,7 +211,7 @@ export default function Tester({ appState }) {
     }
   };
 
-  const getVerdict = (testcaseExecutionDetails) => {
+  const getVerdict = testcaseExecutionDetails => {
     if (testcaseExecutionDetails?.status === "running") {
       return <Spinner animation="border" variant="primary" size="sm" />;
     } else if (testcaseExecutionDetails?.status !== "none") {
@@ -243,23 +243,34 @@ export default function Tester({ appState }) {
     }
   };
 
-  const filterVerdicts = (key) => {
+  const getTestcaseRowColor = testcaseExecutionDetails => {
+    if (["none", "running"].includes(testcaseExecutionDetails?.status)) {
+      return "";
+    } else {
+      if (testcaseExecutionDetails?.testcaseExecutionResult?.verdict === "AC") {
+        return "table-success";
+      } else {
+        return "table-danger";
+      }
+    }
+  };
+
+  const filterVerdicts = key => {
     console.log(key);
     setSelectedVerdictKey(key);
-    const filteredExecDetailsList =
-      selectedProblemOriginalExecResult?.testcaseExecutionDetailsList.filter(
-        (ted) => {
-          return (
-            key === "" ||
-            (key === "NA" && ted.testcaseExecutionResult?.verdict !== "AC") ||
-            (key !== "NA" && ted.testcaseExecutionResult?.verdict === key)
-          );
-        }
-      );
+    const filteredExecDetailsList = selectedProblemOriginalExecResult?.testcaseExecutionDetailsList.filter(
+      ted => {
+        return (
+          key === "" ||
+          (key === "NA" && ted.testcaseExecutionResult?.verdict !== "AC") ||
+          (key !== "NA" && ted.testcaseExecutionResult?.verdict === key)
+        );
+      }
+    );
     console.log(filteredExecDetailsList);
     const updatedExecResult = {
       ...selectedProblemOriginalExecResult,
-      testcaseExecutionDetailsList: filteredExecDetailsList,
+      testcaseExecutionDetailsList: filteredExecDetailsList
     };
     setSelectedProblemFilteredExecResult(updatedExecResult);
   };
@@ -284,7 +295,7 @@ export default function Tester({ appState }) {
             style={{
               maxHeight: "70.5vh",
               overflowY: "auto",
-              overflowX: "auto",
+              overflowX: "auto"
             }}
           >
             <Table bordered responsive="sm" size="sm">
@@ -293,7 +304,7 @@ export default function Tester({ appState }) {
                   position: "sticky",
                   top: 0,
                   zIndex: 1,
-                  background: "#fff",
+                  background: "#fff"
                 }}
               >
                 <tr className="text-center">
@@ -310,7 +321,7 @@ export default function Tester({ appState }) {
               <tbody>
                 {selectedProblemFilteredExecResult.testcaseExecutionDetailsList.map(
                   (execDetails, id) => (
-                    <tr key={id}>
+                    <tr key={id} className={getTestcaseRowColor(execDetails)}>
                       <td>{id + 1}</td>
                       <td>
                         <pre>{execDetails.testcase.input}</pre>
@@ -406,7 +417,7 @@ export default function Tester({ appState }) {
                 placeholder="Enter Contest/Problem URL [Codeforces, AtCoder]"
                 value={testContestUrl}
                 disabled={!appState.config.workspaceDirectory}
-                onChange={(e) => setTestContestUrl(e.target.value)}
+                onChange={e => setTestContestUrl(e.target.value)}
               />
             </Form.Group>
           </Col>
@@ -430,7 +441,7 @@ export default function Tester({ appState }) {
                 size="sm"
                 aria-label="Default select example"
                 value={selectedProblemMetadata}
-                onChange={(e) =>
+                onChange={e =>
                   changeSelectedProblemMetadata(e.currentTarget.value)
                 }
               >
@@ -459,7 +470,7 @@ export default function Tester({ appState }) {
                 onClick={() => runTest()}
                 disabled={!selectedProblemFilteredExecResult}
               >
-                <FontAwesomeIcon icon={faTerminal} /> Test Code
+                <FontAwesomeIcon icon={faTerminal} /> Run Test
               </Button>
             </div>
           </Col>
@@ -498,7 +509,7 @@ export default function Tester({ appState }) {
                     size="sm"
                     aria-label="Default select example"
                     value={selectedVerdictKey}
-                    onChange={(e) => filterVerdicts(e.currentTarget.value)}
+                    onChange={e => filterVerdicts(e.currentTarget.value)}
                   >
                     {verdicts.map((ver, id) => (
                       <option key={id} value={ver.value}>
@@ -522,7 +533,7 @@ export default function Tester({ appState }) {
             </Row>
             <Row>
               <Col xs={8}>
-                <Form.Text>
+                <Form.Text style={{ color: "darkcyan" }}>
                   <strong>
                     {selectedProblem.label.toUpperCase() +
                       " - " +
@@ -539,6 +550,41 @@ export default function Tester({ appState }) {
                 <Form.Text> {getTestStatusText()} </Form.Text>
               </Col>
             </Row>
+            {selectedProblemFilteredExecResult &&
+              selectedProblemFilteredExecResult?.compilationError && (
+                <Row>
+                  <Col xs={12}>
+                    <div
+                      style={{
+                        maxHeight: "50vh",
+                        overflowY: "auto",
+                        overflowX: "auto"
+                      }}
+                    >
+                      <Table bordered responsive="sm" size="sm">
+                        <tbody>
+                          <tr>
+                            <td
+                              style={{
+                                border: "2px solid transparent",
+                                borderColor: "black",
+                                borderRadius: "5px"
+                              }}
+                              className="table-danger"
+                            >
+                              <pre>
+                                {
+                                  selectedProblemFilteredExecResult?.compilationError
+                                }
+                              </pre>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </Table>
+                    </div>
+                  </Col>
+                </Row>
+              )}
           </>
         )}
         <Row>{getExecutionTable()}</Row>

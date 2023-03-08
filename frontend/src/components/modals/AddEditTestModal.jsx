@@ -10,12 +10,12 @@ SyntaxHighlighter.registerLanguage("jsx", jsx);
 export default function AddEditTestModal({
   metadata,
   testcaseFilePath,
-  closeAddEditTestModal,
+  closeAddEditTestModal
 }) {
   const [eventType, setEventType] = useState("");
   const [inputOutputObj, setInputOutputObj] = useState({
     input: "",
-    output: "",
+    output: ""
   });
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState(null);
@@ -33,68 +33,70 @@ export default function AddEditTestModal({
 
   const fetchTestcaseByFilePath = () => {
     DataService.getTestcaseByFilePath(testcaseFilePath)
-      .then((testcase) => {
+      .then(testcase => {
         setShowModal(true);
         setTimeout(() => {
           setInputOutputObj({
             input: testcase.input,
-            output: testcase.output,
+            output: testcase.output
           });
         }, 0);
       })
       .finally(() => setShowModal(true));
   };
 
-  const saveTriggered = (isCloseAfterSave) => {
+  const saveTriggered = isCloseAfterSave => {
     const data = metadata.split("/");
     let req = {
       platform: data[0],
       contestId: data[1],
       label: data[2],
       input: inputOutputObj.input,
-      output: inputOutputObj.output,
+      output: inputOutputObj.output
     };
     if (eventType === "Save") {
       DataService.addCustomTest(req)
-        .then((resp) => {
+        .then(resp => {
           if (resp.message === "success") {
             setMessage({
               type: "success",
-              text: "Saved custom testcase successfully!",
+              text: "Saved custom testcase successfully!"
             });
+            if (isCloseAfterSave) {
+              setTimeout(() => closeModal(), 1000);
+            } else {
+              setInputOutputObj({
+                input: "",
+                output: ""
+              });
+            }
           } else {
             setMessage({ type: "danger", text: "Error from server!" });
           }
         })
-        .catch(() => setMessage({ type: "danger", text: "Error from server!" }))
-        .finally(() => {
-          if (isCloseAfterSave) {
-            closeModal();
-          } else {
-            setInputOutputObj({
-              input: "",
-              output: "",
-            });
-          }
-        });
+        .catch(() =>
+          setMessage({ type: "danger", text: "Error from server!" })
+        );
     } else if (eventType === "Update") {
       DataService.updateCustomTest({
         ...req,
         inputFilePath: testcaseFilePath.inputFilePath,
-        outputFilePath: testcaseFilePath.outputFilePath,
+        outputFilePath: testcaseFilePath.outputFilePath
       })
-        .then((resp) => {
+        .then(resp => {
           if (resp.message === "success") {
             setMessage({
               type: "success",
-              text: `${eventType}d custom testcase successfully!`,
+              text: `${eventType}d custom testcase successfully!`
             });
+            setTimeout(() => closeModal(), 1000);
           } else {
             setMessage({ type: "danger", text: "Error from server!" });
           }
         })
-        .catch(() => setMessage({ type: "danger", text: "Error from server!" }))
-        .finally(() => closeModal());
+        .catch(() =>
+          setMessage({ type: "danger", text: "Error from server!" })
+        );
     }
   };
 
@@ -122,10 +124,10 @@ export default function AddEditTestModal({
               <pre>
                 <Form.Control
                   value={inputOutputObj.input}
-                  onChange={(e) =>
+                  onChange={e =>
                     setInputOutputObj({
                       ...inputOutputObj,
-                      input: e.target.value,
+                      input: e.target.value
                     })
                   }
                   autoCorrect="off"
@@ -146,10 +148,10 @@ export default function AddEditTestModal({
               <pre>
                 <Form.Control
                   value={inputOutputObj.output}
-                  onChange={(e) =>
+                  onChange={e =>
                     setInputOutputObj({
                       ...inputOutputObj,
-                      output: e.target.value,
+                      output: e.target.value
                     })
                   }
                   autoCorrect="off"

@@ -2,20 +2,27 @@ package services
 
 import (
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/judge-framework/constants"
+	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"time"
 
-	"github.com/skmonir/mango-ui/backend/judge-framework/cacheServices"
-	"github.com/skmonir/mango-ui/backend/judge-framework/fileService"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
+	"github.com/skmonir/mango-gui/backend/judge-framework/cacheServices"
+	"github.com/skmonir/mango-gui/backend/judge-framework/fileService"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 
-	"github.com/skmonir/mango-ui/backend/judge-framework/dto"
-	"github.com/skmonir/mango-ui/backend/judge-framework/executor"
-	"github.com/skmonir/mango-ui/backend/socket"
+	"github.com/skmonir/mango-gui/backend/judge-framework/dto"
+	"github.com/skmonir/mango-gui/backend/judge-framework/executor"
+	"github.com/skmonir/mango-gui/backend/socket"
 )
 
 func RunTest(platform string, cid string, label string) dto.ProblemExecutionResult {
+	// Step 0: Fetch new/previous execution result object and reset necessary fields
 	execResult := GetProblemExecutionResult(platform, cid, label, true, false)
+	execResult.CompilationError = ""
+	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
+		execResult.TestcaseExecutionDetailsList[i].Status = "none"
+		execResult.TestcaseExecutionDetailsList[i].TestcaseExecutionResult = models.TestcaseExecutionResult{}
+	}
 
 	// Step 1: Compile the source
 	socket.PublishStatusMessage("test_status", "Compiling source code", "info")
@@ -23,9 +30,11 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	if err != "" {
 		socket.PublishStatusMessage("test_status", "Compilation error!", "error")
 		execResult.CompilationError = err
+		cacheServices.SaveExecutionResult(platform, cid, label, execResult)
 		return execResult
 	}
 	socket.PublishStatusMessage("test_status", "Compilation successful!", "success")
+	socket.PublishExecutionResult(execResult)
 
 	time.Sleep(500 * time.Millisecond)
 
@@ -40,8 +49,6 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	prob := GetProblem(platform, cid, label)
 	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
 		execResult.TestcaseExecutionDetailsList[i].Status = "running"
-		execResult.TestcaseExecutionDetailsList[i].TestcaseExecutionResult.Verdict = ""
-		execResult.TestcaseExecutionDetailsList[i].TestcaseExecutionResult.Output = ""
 		execResult.TestcaseExecutionDetailsList[i].Testcase.TimeLimit = prob.TimeLimit
 		execResult.TestcaseExecutionDetailsList[i].Testcase.MemoryLimit = prob.MemoryLimit
 	}
