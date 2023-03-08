@@ -41,7 +41,7 @@ function App() {
             <Col sm={1}>
               <div bg="light">
                 <Nav variant="pills" className="flex-column">
-                  <Nav.Item>
+                  <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
                       placement="right"
@@ -52,7 +52,7 @@ function App() {
                       </Nav.Link>
                     </OverlayTrigger>
                   </Nav.Item>
-                  <Nav.Item>
+                  <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
                       placement="right"
@@ -63,7 +63,7 @@ function App() {
                       </Nav.Link>
                     </OverlayTrigger>
                   </Nav.Item>
-                  <Nav.Item>
+                  <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
                       placement="right"
@@ -78,7 +78,7 @@ function App() {
                       </Nav.Link>
                     </OverlayTrigger>
                   </Nav.Item>
-                  <Nav.Item>
+                  <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
                       placement="right"
