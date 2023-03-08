@@ -17,7 +17,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:     "mango-ui",
+		Title:     "Mango",
 		Width:     1180,
 		Height:    815,
 		MinWidth:  1180,

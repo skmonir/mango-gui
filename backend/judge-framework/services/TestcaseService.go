@@ -1,9 +1,9 @@
 package services
 
 import (
-	"github.com/skmonir/mango-ui/backend/judge-framework/fileService"
-	"github.com/skmonir/mango-ui/backend/judge-framework/models"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
+	"github.com/skmonir/mango-gui/backend/judge-framework/fileService"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"strconv"
 	"strings"
 )

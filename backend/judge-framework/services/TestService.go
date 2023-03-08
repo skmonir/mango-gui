@@ -2,17 +2,17 @@ package services
 
 import (
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/judge-framework/constants"
-	"github.com/skmonir/mango-ui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"time"
 
-	"github.com/skmonir/mango-ui/backend/judge-framework/cacheServices"
-	"github.com/skmonir/mango-ui/backend/judge-framework/fileService"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
+	"github.com/skmonir/mango-gui/backend/judge-framework/cacheServices"
+	"github.com/skmonir/mango-gui/backend/judge-framework/fileService"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 
-	"github.com/skmonir/mango-ui/backend/judge-framework/dto"
-	"github.com/skmonir/mango-ui/backend/judge-framework/executor"
-	"github.com/skmonir/mango-ui/backend/socket"
+	"github.com/skmonir/mango-gui/backend/judge-framework/dto"
+	"github.com/skmonir/mango-gui/backend/judge-framework/executor"
+	"github.com/skmonir/mango-gui/backend/socket"
 )
 
 func RunTest(platform string, cid string, label string) dto.ProblemExecutionResult {

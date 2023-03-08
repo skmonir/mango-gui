@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/skmonir/mango-ui/backend/socket"
+	"github.com/skmonir/mango-gui/backend/socket"
 	"log"
 )
 

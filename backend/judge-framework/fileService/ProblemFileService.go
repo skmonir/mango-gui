@@ -3,9 +3,9 @@ package fileService
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/judge-framework/config"
-	"github.com/skmonir/mango-ui/backend/judge-framework/models"
-	"github.com/skmonir/mango-ui/backend/judge-framework/utils"
+	"github.com/skmonir/mango-gui/backend/judge-framework/config"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"strings"
 )
 

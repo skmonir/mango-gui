@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/skmonir/mango-ui/backend/judge-framework/models"
+import "github.com/skmonir/mango-gui/backend/judge-framework/models"
 
 type TestcaseExecutionDetails struct {
 	Status                  string                         `json:"status"`

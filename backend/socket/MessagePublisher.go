@@ -3,9 +3,9 @@ package socket
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/skmonir/mango-ui/backend/judge-framework/dto"
+	"github.com/skmonir/mango-gui/backend/judge-framework/dto"
 
-	"github.com/skmonir/mango-ui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 )
 
 type Message struct {
