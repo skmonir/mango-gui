@@ -30,11 +30,10 @@ export default function Tester({ appState }) {
   const socketClient = new SocketClient();
 
   const verdicts = [
-    { label: "All", value: "" },
+    { label: "Any Verdict", value: "" },
     { label: "Accepted", value: "AC" },
     { label: "Not Accepted", value: "NA" },
     { label: "Wrong Answer", value: "WA" },
-    { label: "Compile Error", value: "CE" },
     { label: "Runtime Error", value: "RE" },
     { label: "Time Limit Exceeded", value: "TLE" },
     { label: "Memory Limit Exceeded", value: "MLE" }
@@ -471,7 +470,7 @@ export default function Tester({ appState }) {
                 onClick={() => runTest()}
                 disabled={!selectedProblemFilteredExecResult}
               >
-                <FontAwesomeIcon icon={faTerminal} /> Test Code
+                <FontAwesomeIcon icon={faTerminal} /> Run Test
               </Button>
             </div>
           </Col>
@@ -534,7 +533,7 @@ export default function Tester({ appState }) {
             </Row>
             <Row>
               <Col xs={8}>
-                <Form.Text>
+                <Form.Text style={{ color: "darkcyan" }}>
                   <strong>
                     {selectedProblem.label.toUpperCase() +
                       " - " +

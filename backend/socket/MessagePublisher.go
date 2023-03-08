@@ -56,7 +56,7 @@ func PublishStatusMessage(topic string, message string, messageType string) {
 }
 
 func PublishExecutionResult(execResult dto.ProblemExecutionResult) {
-	PublishExecPassedStat(execResult.TestcaseExecutionDetailsList)
+	PublishPreviousRunStatus(execResult)
 
 	fmt.Println("publishing execution result.....")
 
@@ -72,7 +72,8 @@ func PublishExecutionResult(execResult dto.ProblemExecutionResult) {
 	})
 }
 
-func PublishExecPassedStat(testcaseExecutionDetailsList []dto.TestcaseExecutionDetails) {
+func PublishPreviousRunStatus(execResult dto.ProblemExecutionResult) {
+	testcaseExecutionDetailsList := execResult.TestcaseExecutionDetailsList
 	totalPassed, totalTests, isExecutedOnce := 0, len(testcaseExecutionDetailsList), false
 	for _, execDetails := range testcaseExecutionDetailsList {
 		isExecutedOnce = isExecutedOnce || (execDetails.Status != "none")
@@ -87,5 +88,7 @@ func PublishExecPassedStat(testcaseExecutionDetailsList []dto.TestcaseExecutionD
 		} else {
 			PublishStatusMessage("test_status", testStatus, "error")
 		}
+	} else if execResult.CompilationError != "" {
+		PublishStatusMessage("test_status", "Compilation error!", "error")
 	}
 }

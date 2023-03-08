@@ -208,6 +208,6 @@ func getExecutionResult(ctx *fiber.Ctx) error {
 	cid := ctx.Params("cid")
 	label := ctx.Params("label")
 	probExecResult := services.GetProblemExecutionResult(platform, cid, label, true, false)
-	socket.PublishExecPassedStat(probExecResult.TestcaseExecutionDetailsList)
+	socket.PublishPreviousRunStatus(probExecResult)
 	return ctx.Status(fiber.StatusOK).JSON(probExecResult)
 }
