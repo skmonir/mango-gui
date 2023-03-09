@@ -1,123 +1,118 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {
-  Button,
-  Card,
-  Col,
-  OverlayTrigger,
-  Row,
-  Tab,
-  Tooltip
-} from "react-bootstrap";
+import { Col, NavDropdown, Row, Tab } from "react-bootstrap";
 import Tester from "./components/Tester.jsx";
 import Parser from "./components/Parser.jsx";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faAngleDoubleLeft,
+  faAngleDoubleRight,
   faCog,
-  faCogs,
   faDownload,
   faLaptopCode,
   faTools
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import Settings from "./components/Settings.jsx";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import TestcaseGenerator from "./components/TestcaseGenerator/TestcaseGenerator.jsx";
+import Navbar from "react-bootstrap/Navbar";
+import InputGenerator from "./components/TestcaseGenerator/InputGenerator.jsx";
+import OutputGenerator from "./components/TestcaseGenerator/OutputGenerator.jsx";
 
 function App() {
   const [state, setState] = useState({
     config: {}
   });
 
-  const navigate = useNavigate();
+  const [currentTab, setCurrentTab] = useState("parser");
 
   return (
     <div className="App" style={{ height: "100vh" }}>
-      <br />
       <Container fluid>
-        <Tab.Container id="left-tabs-example" defaultActiveKey="parser">
+        <Tab.Container
+          id="left-tabs-example"
+          defaultActiveKey="parser"
+          activeKey={currentTab}
+        >
           <Row>
-            <Col sm={1}>
-              <div bg="light">
-                <Nav variant="pills" className="flex-column">
-                  <Nav.Item className="text-center">
-                    <OverlayTrigger
-                      key={"right"}
-                      placement="bottom"
-                      overlay={<Tooltip id="parser">Testcase Parser</Tooltip>}
-                    >
-                      <Nav.Link eventKey="parser">
-                        <FontAwesomeIcon icon={faDownload} />
+            <Col xs={12}>
+              <Navbar collapseOnSelect expand="lg" sticky="top">
+                <Navbar.Collapse id="basic-navbar-nav">
+                  <Nav className="mr-auto">
+                    <Nav.Item className="text-center">
+                      <Nav.Link
+                        onClick={() => setCurrentTab("parser")}
+                        eventKey="parser"
+                      >
+                        <FontAwesomeIcon icon={faDownload} /> Parser
                       </Nav.Link>
-                    </OverlayTrigger>
-                  </Nav.Item>
-                  <Nav.Item className="text-center">
-                    <OverlayTrigger
-                      key={"right"}
-                      placement="bottom"
-                      overlay={<Tooltip id="tester">Problem Tester</Tooltip>}
-                    >
-                      <Nav.Link eventKey="tester">
-                        <FontAwesomeIcon icon={faLaptopCode} />
+                    </Nav.Item>
+                    <Nav.Item className="text-center">
+                      <Nav.Link
+                        onClick={() => setCurrentTab("tester")}
+                        eventKey="tester"
+                      >
+                        <FontAwesomeIcon icon={faLaptopCode} /> Tester
                       </Nav.Link>
-                    </OverlayTrigger>
-                  </Nav.Item>
-                  <Nav.Item className="text-center">
-                    <OverlayTrigger
-                      key={"right"}
-                      placement="bottom"
-                      overlay={
-                        <Tooltip id="testcase_generator">
-                          Testcase Generator
-                        </Tooltip>
-                      }
-                    >
-                      <Nav.Link eventKey="testcase_generator">
-                        <FontAwesomeIcon icon={faCog} />
+                    </Nav.Item>
+                    <Nav.Item className="text-center">
+                      <NavDropdown
+                        title={
+                          <>
+                            <FontAwesomeIcon icon={faCog} /> Testcase Generator
+                          </>
+                        }
+                        id="basic-nav-dropdown"
+                      >
+                        <NavDropdown.Item
+                          onClick={() => setCurrentTab("input_generator")}
+                        >
+                          <FontAwesomeIcon icon={faAngleDoubleRight} /> Input
+                          Generator
+                        </NavDropdown.Item>
+                        <NavDropdown.Divider />
+                        <NavDropdown.Item
+                          onClick={() => setCurrentTab("output_generator")}
+                        >
+                          <FontAwesomeIcon icon={faAngleDoubleLeft} /> Output
+                          Generator
+                        </NavDropdown.Item>
+                      </NavDropdown>
+                    </Nav.Item>
+                    <Nav.Item className="text-center">
+                      <Nav.Link
+                        onClick={() => setCurrentTab("settings")}
+                        eventKey="settings"
+                      >
+                        <FontAwesomeIcon icon={faTools} /> Settings
                       </Nav.Link>
-                    </OverlayTrigger>
-                  </Nav.Item>
-                  <Nav.Item className="text-center">
-                    <OverlayTrigger
-                      key={"right"}
-                      placement="bottom"
-                      overlay={<Tooltip id="settings">Settings</Tooltip>}
-                    >
-                      <Nav.Link eventKey="settings">
-                        <FontAwesomeIcon icon={faTools} />
-                      </Nav.Link>
-                    </OverlayTrigger>
-                  </Nav.Item>
-
-                  {/*<Nav.Item>*/}
-                  {/*    <Nav.Link onClick={() => navigate('/parser')}><FontAwesomeIcon icon={faDownload}/> Parser</Nav.Link>*/}
-                  {/*</Nav.Item>*/}
-                  {/*<Nav.Item>*/}
-                  {/*    <Nav.Link onClick={() => navigate('/tester')}><FontAwesomeIcon icon={faLaptopCode}/> Parser</Nav.Link>*/}
-                  {/*</Nav.Item>*/}
-                  {/*<Nav.Item>*/}
-                  {/*    <Nav.Link onClick={() => navigate('/settings')}><FontAwesomeIcon icon={faTools}/> Parser</Nav.Link>*/}
-                  {/*</Nav.Item>*/}
-                </Nav>
-              </div>
+                    </Nav.Item>
+                  </Nav>
+                </Navbar.Collapse>
+              </Navbar>
             </Col>
-            <Col sm={11}>
+          </Row>
+          <Row
+            style={{
+              maxHeight: "92vh",
+              overflowY: "auto",
+              overflowX: "auto"
+            }}
+          >
+            <Col xs={12}>
               <Tab.Content>
-                {/*<Routes>*/}
-                {/*    <Route path="/parser" element={<Parser appState={{...state}} setAppState={setState}/>}/>*/}
-                {/*    <Route path="/tester" element={<Tester appState={{...state}} setAppState={setState}/>}/>*/}
-                {/*    <Route path="/settings" element={<Settings appState={{...state}} setAppState={setState}/>}/>*/}
-                {/*</Routes>*/}
                 <Tab.Pane eventKey="parser">
                   <Parser appState={{ ...state }} />
                 </Tab.Pane>
                 <Tab.Pane eventKey="tester">
                   <Tester appState={{ ...state }} />
                 </Tab.Pane>
-                <Tab.Pane eventKey="testcase_generator">
-                  <TestcaseGenerator appState={{ ...state }} />
+                <Tab.Pane eventKey="input_generator">
+                  <InputGenerator appState={{ ...state }} />
+                </Tab.Pane>
+                <Tab.Pane eventKey="output_generator">
+                  <OutputGenerator appState={{ ...state }} />
                 </Tab.Pane>
                 <Tab.Pane eventKey="settings">
                   <Settings appState={{ ...state }} setAppState={setState} />

@@ -217,371 +217,375 @@ export default function InputGenerator({ appState }) {
 
   return (
     <div>
-      <Row>
-        <Col xs={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>
-                Problem URL [Tick below to generate input for parsed problem]
-              </strong>
-            </Form.Label>
-            <InputGroup className="mb-3" size="sm">
-              <InputGroup.Checkbox
-                onChange={e => {
-                  setIsForProblem(e.currentTarget.checked);
-                  setInputGenerateRequest({
-                    ...inputGenerateRequest,
-                    problemUrl: "",
-                    inputDirectoryPath: "",
-                    fileName: e.currentTarget.checked
-                      ? "02_random_input"
-                      : inputGenerateRequest.fileName
-                  });
-                }}
-              />
+      <Card body bg="light">
+        <Row>
+          <Col xs={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>
+                  Problem URL [Tick below to generate input for parsed problem]
+                </strong>
+              </Form.Label>
+              <InputGroup className="mb-3" size="sm">
+                <InputGroup.Checkbox
+                  onChange={e => {
+                    setIsForProblem(e.currentTarget.checked);
+                    setInputGenerateRequest({
+                      ...inputGenerateRequest,
+                      problemUrl: "",
+                      inputDirectoryPath: "",
+                      fileName: e.currentTarget.checked
+                        ? "02_random_input"
+                        : inputGenerateRequest.fileName
+                    });
+                  }}
+                />
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  placeholder="Enter Problem URL [Codeforces, AtCoder]"
+                  disabled={!isForProblem}
+                  value={inputGenerateRequest.problemUrl}
+                  onChange={e =>
+                    setInputGenerateRequest({
+                      ...inputGenerateRequest,
+                      problemUrl: e.target.value
+                    })
+                  }
+                  onBlur={fetchIODirectories}
+                />
+              </InputGroup>
+            </Form.Group>
+          </Col>
+          <Col xs={6}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Directory to save the input files</strong>
+              </Form.Label>
               <Form.Control
                 type="text"
                 size="sm"
                 autoCorrect="off"
                 autoComplete="off"
                 autoCapitalize="none"
-                placeholder="Enter Problem URL [Codeforces, AtCoder]"
-                disabled={!isForProblem}
-                value={inputGenerateRequest.problemUrl}
+                placeholder="Enter directory where you want to save the input files"
+                disabled={isForProblem}
+                value={inputGenerateRequest.inputDirectoryPath}
                 onChange={e =>
                   setInputGenerateRequest({
                     ...inputGenerateRequest,
-                    problemUrl: e.target.value
+                    inputDirectoryPath: e.target.value
                   })
                 }
-                onBlur={fetchIODirectories}
               />
-            </InputGroup>
-          </Form.Group>
-        </Col>
-        <Col xs={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>Directory to save the input files</strong>
-            </Form.Label>
-            <Form.Control
-              type="text"
-              size="sm"
-              autoCorrect="off"
-              autoComplete="off"
-              autoCapitalize="none"
-              placeholder="Enter directory where you want to save the input files"
-              disabled={isForProblem}
-              value={inputGenerateRequest.inputDirectoryPath}
-              onChange={e =>
-                setInputGenerateRequest({
-                  ...inputGenerateRequest,
-                  inputDirectoryPath: e.target.value
-                })
-              }
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={3}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>Number of files to generate</strong>
-            </Form.Label>
-            <Form.Select
-              size="sm"
-              aria-label="Default select example"
-              value={inputGenerateRequest.fileNum}
-              onChange={e =>
-                setInputGenerateRequest({
-                  ...inputGenerateRequest,
-                  fileNum: Number(e.currentTarget.value)
-                })
-              }
-            >
-              {[...Array(100).keys()].map(idx => (
-                <option key={idx} value={idx + 1}>
-                  {idx + 1}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        </Col>
-        <Col xs={3}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>File mode</strong>
-            </Form.Label>
-            <Form.Select
-              size="sm"
-              aria-label="Default select example"
-              value={inputGenerateRequest.fileMode}
-              onChange={e =>
-                setInputGenerateRequest({
-                  ...inputGenerateRequest,
-                  fileMode: e.target.value
-                })
-              }
-            >
-              <option value="write">
-                Write - Overwrite new or existing file
-              </option>
-              <option value="append">
-                Append - Append into new or existing file
-              </option>
-            </Form.Select>
-          </Form.Group>
-        </Col>
-        <Col xs={3}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>Number of test on each file</strong>
-            </Form.Label>
-            <Form.Control
-              type="number"
-              min="1"
-              max="1000"
-              size="sm"
-              autoCorrect="off"
-              autoComplete="off"
-              autoCapitalize="none"
-              placeholder="In between [1, 1000]. Default 1."
-              value={inputGenerateRequest.testPerFile}
-              onChange={e =>
-                setInputGenerateRequest({
-                  ...inputGenerateRequest,
-                  testPerFile: isNaN(e.target.value)
-                    ? 1
-                    : Number(e.target.value)
-                })
-              }
-            />
-          </Form.Group>
-        </Col>
-        <Col xs={3}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>File name [without extension]</strong>
-            </Form.Label>
-            <Form.Control
-              type="text"
-              size="sm"
-              autoCorrect="off"
-              autoComplete="off"
-              autoCapitalize="none"
-              placeholder="Default '02_random_input'"
-              disabled={isForProblem}
-              value={inputGenerateRequest.fileName}
-              onChange={e =>
-                setInputGenerateRequest({
-                  ...inputGenerateRequest,
-                  fileName: e.target.value
-                })
-              }
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={3}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>File serial starts from</strong>
-            </Form.Label>
-            <Form.Select
-              size="sm"
-              aria-label="Default select example"
-              value={inputGenerateRequest.serialFrom}
-              onChange={e =>
-                setInputGenerateRequest({
-                  ...inputGenerateRequest,
-                  serialFrom: Number(e.target.value)
-                })
-              }
-            >
-              {[...Array(200).keys()].map(idx => (
-                <option key={idx} value={idx + 1}>
-                  {idx + 1}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        </Col>
-        <Col xs={3}>
-          <Form.Label>
-            <strong>Test generation process</strong>
-          </Form.Label>
-          <Form.Select
-            size="sm"
-            aria-label="Default select example"
-            value={inputGenerateRequest.generationProcess}
-            onChange={e =>
-              setInputGenerateRequest({
-                ...inputGenerateRequest,
-                generationProcess: e.target.value
-              })
-            }
-          >
-            <option value="tgen_script">Tgen script</option>
-            <option value="custom_script">Generator script source</option>
-          </Form.Select>
-        </Col>
-        <Col xs={6}>
-          {inputGenerateRequest.generationProcess !== "tgen_script" ? (
-            <Form.Group controlId="formFileSm" className="mb-3">
-              <Form.Label>
-                <strong>Generator script source</strong>
-              </Form.Label>
-              <Form.Control type="file" size="sm" />
             </Form.Group>
-          ) : (
-            <Form.Group controlId="formFileSm" className="mb-3">
-              <Form.Label>
-                <strong>TGen script keywords</strong>
-              </Form.Label>
-              <InputGroup className="mb-3">
-                <Form.Select
-                  size="sm"
-                  aria-label="Default select example"
-                  value={selectedScriptKeyword}
-                  onChange={e =>
-                    setSelectedScriptKeyword(e.currentTarget.value)
-                  }
-                >
-                  {tgenKeywords.map((keyword, idx) => (
-                    <option key={idx} value={keyword.script}>
-                      {keyword.label}
-                    </option>
-                  ))}
-                </Form.Select>
-                <Button
-                  size="sm"
-                  variant="outline-success"
-                  onClick={() => insertScript()}
-                >
-                  <FontAwesomeIcon icon={faPlus} /> Insert Script
-                </Button>
-              </InputGroup>
-            </Form.Group>
-          )}
-        </Col>
-      </Row>
-      <Row>
-        {inputGenerateRequest.generationProcess === "tgen_script" && (
-          <Col xs={7}>
-            <div
-              style={{
-                height: "35vh",
-                overflowY: "auto",
-                overflowX: "auto",
-                border: "2px solid transparent",
-                borderColor: "black",
-                borderRadius: "5px"
-              }}
-            >
-              <pre> Write your script below </pre>
-              <Editor
-                value={inputGenerateRequest.tgenScriptContent}
-                onValueChange={code =>
-                  setInputGenerateRequest({
-                    ...inputGenerateRequest,
-                    tgenScriptContent: code
-                  })
-                }
-                highlight={code => highlight(code, languages.js)}
-                padding={10}
-                tabSize={4}
-                style={{
-                  fontFamily: '"Fira code", "Fira Mono", monospace',
-                  fontSize: 13
-                }}
-              />
-            </div>
-          </Col>
-        )}
-        {generatorExecResult && generatorExecResult?.compilationError === "" && (
-          <Col
-            xs={
-              inputGenerateRequest.generationProcess === "tgen_script" ? 5 : 12
-            }
-          >
-            <div
-              style={{
-                height: "35vh",
-                overflowY: "auto",
-                overflowX: "auto",
-                border: "2px solid transparent",
-                borderColor: "black",
-                borderRadius: "5px"
-              }}
-            >
-              <Table bordered responsive="sm" size="sm">
-                <tbody>
-                  {generatorExecResult.testcaseExecutionDetailsList
-                    .filter(e => e.status === "success")
-                    .map((t, id) => (
-                      <tr
-                        key={id}
-                        className={
-                          t.testcaseExecutionResult.executionError !== ""
-                            ? "table-danger"
-                            : "table-success"
-                        }
-                      >
-                        <td>
-                          <pre>{t.testcase.execOutputFilePath}</pre>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </Table>
-            </div>
-          </Col>
-        )}
-      </Row>
-      {generatorExecResult && generatorExecResult?.compilationError && (
-        <Row>
-          <Col xs={7}>
-            <div
-              style={{
-                maxHeight: "30vh",
-                overflowY: "auto",
-                overflowX: "auto"
-              }}
-            >
-              <Table bordered responsive="sm" size="sm">
-                <tbody>
-                  <tr>
-                    <td
-                      style={{
-                        border: "2px solid transparent",
-                        borderColor: "black",
-                        borderRadius: "5px"
-                      }}
-                      className="table-danger"
-                    >
-                      <pre>{generatorExecResult?.compilationError}</pre>
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-            </div>
           </Col>
         </Row>
-      )}
-      <Row>
-        <Col md={{ span: 4, offset: 5 }}>
-          <br />
-          <Button
-            size="sm"
-            variant="outline-success"
-            onClick={generateInputTriggered}
-          >
-            Generate Input
-          </Button>
-        </Col>
-      </Row>
+        <Row>
+          <Col xs={3}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Number of files to generate</strong>
+              </Form.Label>
+              <Form.Select
+                size="sm"
+                aria-label="Default select example"
+                value={inputGenerateRequest.fileNum}
+                onChange={e =>
+                  setInputGenerateRequest({
+                    ...inputGenerateRequest,
+                    fileNum: Number(e.currentTarget.value)
+                  })
+                }
+              >
+                {[...Array(100).keys()].map(idx => (
+                  <option key={idx} value={idx + 1}>
+                    {idx + 1}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col xs={3}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>File mode</strong>
+              </Form.Label>
+              <Form.Select
+                size="sm"
+                aria-label="Default select example"
+                value={inputGenerateRequest.fileMode}
+                onChange={e =>
+                  setInputGenerateRequest({
+                    ...inputGenerateRequest,
+                    fileMode: e.target.value
+                  })
+                }
+              >
+                <option value="write">
+                  Write - Overwrite new or existing file
+                </option>
+                <option value="append">
+                  Append - Append into new or existing file
+                </option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col xs={3}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Number of test on each file</strong>
+              </Form.Label>
+              <Form.Control
+                type="number"
+                min="1"
+                max="1000"
+                size="sm"
+                autoCorrect="off"
+                autoComplete="off"
+                autoCapitalize="none"
+                placeholder="In between [1, 1000]. Default 1."
+                value={inputGenerateRequest.testPerFile}
+                onChange={e =>
+                  setInputGenerateRequest({
+                    ...inputGenerateRequest,
+                    testPerFile: isNaN(e.target.value)
+                      ? 1
+                      : Number(e.target.value)
+                  })
+                }
+              />
+            </Form.Group>
+          </Col>
+          <Col xs={3}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>File name [without extension]</strong>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                size="sm"
+                autoCorrect="off"
+                autoComplete="off"
+                autoCapitalize="none"
+                placeholder="Default '02_random_input'"
+                disabled={isForProblem}
+                value={inputGenerateRequest.fileName}
+                onChange={e =>
+                  setInputGenerateRequest({
+                    ...inputGenerateRequest,
+                    fileName: e.target.value
+                  })
+                }
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={3}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>File serial starts from</strong>
+              </Form.Label>
+              <Form.Select
+                size="sm"
+                aria-label="Default select example"
+                value={inputGenerateRequest.serialFrom}
+                onChange={e =>
+                  setInputGenerateRequest({
+                    ...inputGenerateRequest,
+                    serialFrom: Number(e.target.value)
+                  })
+                }
+              >
+                {[...Array(200).keys()].map(idx => (
+                  <option key={idx} value={idx + 1}>
+                    {idx + 1}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col xs={3}>
+            <Form.Label>
+              <strong>Test generation process</strong>
+            </Form.Label>
+            <Form.Select
+              size="sm"
+              aria-label="Default select example"
+              value={inputGenerateRequest.generationProcess}
+              onChange={e =>
+                setInputGenerateRequest({
+                  ...inputGenerateRequest,
+                  generationProcess: e.target.value
+                })
+              }
+            >
+              <option value="tgen_script">Tgen script</option>
+              <option value="custom_script">Generator script source</option>
+            </Form.Select>
+          </Col>
+          <Col xs={6}>
+            {inputGenerateRequest.generationProcess !== "tgen_script" ? (
+              <Form.Group controlId="formFileSm" className="mb-3">
+                <Form.Label>
+                  <strong>Generator script source</strong>
+                </Form.Label>
+                <Form.Control type="file" size="sm" />
+              </Form.Group>
+            ) : (
+              <Form.Group controlId="formFileSm" className="mb-3">
+                <Form.Label>
+                  <strong>TGen script keywords</strong>
+                </Form.Label>
+                <InputGroup className="mb-3">
+                  <Form.Select
+                    size="sm"
+                    aria-label="Default select example"
+                    value={selectedScriptKeyword}
+                    onChange={e =>
+                      setSelectedScriptKeyword(e.currentTarget.value)
+                    }
+                  >
+                    {tgenKeywords.map((keyword, idx) => (
+                      <option key={idx} value={keyword.script}>
+                        {keyword.label}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    onClick={() => insertScript()}
+                  >
+                    <FontAwesomeIcon icon={faPlus} /> Insert Script
+                  </Button>
+                </InputGroup>
+              </Form.Group>
+            )}
+          </Col>
+        </Row>
+        <Row>
+          {inputGenerateRequest.generationProcess === "tgen_script" && (
+            <Col xs={7}>
+              <div
+                style={{
+                  height: "35vh",
+                  overflowY: "auto",
+                  overflowX: "auto",
+                  border: "2px solid transparent",
+                  borderColor: "black",
+                  borderRadius: "5px"
+                }}
+              >
+                <pre> Write your script below </pre>
+                <Editor
+                  value={inputGenerateRequest.tgenScriptContent}
+                  onValueChange={code =>
+                    setInputGenerateRequest({
+                      ...inputGenerateRequest,
+                      tgenScriptContent: code
+                    })
+                  }
+                  highlight={code => highlight(code, languages.js)}
+                  padding={10}
+                  tabSize={4}
+                  style={{
+                    fontFamily: '"Fira code", "Fira Mono", monospace',
+                    fontSize: 13
+                  }}
+                />
+              </div>
+            </Col>
+          )}
+          {generatorExecResult && generatorExecResult?.compilationError === "" && (
+            <Col
+              xs={
+                inputGenerateRequest.generationProcess === "tgen_script"
+                  ? 5
+                  : 12
+              }
+            >
+              <div
+                style={{
+                  height: "35vh",
+                  overflowY: "auto",
+                  overflowX: "auto",
+                  border: "2px solid transparent",
+                  borderColor: "black",
+                  borderRadius: "5px"
+                }}
+              >
+                <Table bordered responsive="sm" size="sm">
+                  <tbody>
+                    {generatorExecResult.testcaseExecutionDetailsList
+                      .filter(e => e.status === "success")
+                      .map((t, id) => (
+                        <tr
+                          key={id}
+                          className={
+                            t.testcaseExecutionResult.executionError !== ""
+                              ? "table-danger"
+                              : "table-success"
+                          }
+                        >
+                          <td>
+                            <pre>{t.testcase.execOutputFilePath}</pre>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </Table>
+              </div>
+            </Col>
+          )}
+        </Row>
+        {generatorExecResult && generatorExecResult?.compilationError && (
+          <Row>
+            <Col xs={7}>
+              <div
+                style={{
+                  maxHeight: "30vh",
+                  overflowY: "auto",
+                  overflowX: "auto"
+                }}
+              >
+                <Table bordered responsive="sm" size="sm">
+                  <tbody>
+                    <tr>
+                      <td
+                        style={{
+                          border: "2px solid transparent",
+                          borderColor: "black",
+                          borderRadius: "5px"
+                        }}
+                        className="table-danger"
+                      >
+                        <pre>{generatorExecResult?.compilationError}</pre>
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </div>
+            </Col>
+          </Row>
+        )}
+        <Row>
+          <Col md={{ span: 4, offset: 5 }}>
+            <br />
+            <Button
+              size="sm"
+              variant="outline-success"
+              onClick={generateInputTriggered}
+            >
+              Generate Input
+            </Button>
+          </Col>
+        </Row>
+      </Card>
       {showToast && (
         <ShowToast toastMsgObj={toastMsgObj} setShowToast={setShowToast} />
       )}
