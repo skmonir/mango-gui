@@ -60,6 +60,7 @@ func GetTestcasesFromFile(platform string, cid string, label string, maxRow int,
 			InputFilePath:    inputPaths[i],
 			OutputFilePath:   outputPaths[i],
 			SourceBinaryPath: sourceBinaryPath,
+			ExecutionCommand: []string{sourceBinaryPath},
 		})
 	}
 	fmt.Println("Fetched testcases from file.")

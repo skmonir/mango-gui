@@ -15,7 +15,7 @@ import {
 } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import Editor from "react-simple-code-editor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
@@ -71,23 +71,36 @@ export default function InputGenerator({ appState }) {
     variant: "",
     message: ""
   });
+
   const [showToast, setShowToast] = useState(false);
 
-  const [problemUrl, setProblemUrl] = useState("");
   const [isForProblem, setIsForProblem] = useState(false);
   const [selectedScriptKeyword, setSelectedScriptKeyword] = useState("<line>");
 
   const [inputGenerateRequest, setInputGenerateRequest] = useState({
-    fileNum: "1",
+    problemUrl: "",
+    fileNum: 1,
     fileMode: "write",
     fileName: "02_random_input",
-    testPerFile: "1",
-    serialFrom: "1",
+    testPerFile: 1,
+    serialFrom: 1,
     inputDirectoryPath: "",
     generationProcess: "tgen_script",
     generatorScriptPath: "",
     tgenScriptContent: ""
   });
+
+  const [generatorExecResult, setGeneratorExecResult] = useState({});
+
+  useEffect(() => {
+    let socketConnGenerator = socketClient.initSocketConnection(
+      "input_generate_result_event",
+      updateExecResultFromSocket
+    );
+    return () => {
+      socketConnGenerator.close();
+    };
+  }, []);
 
   const insertScript = () => {
     let keyword = selectedScriptKeyword;
@@ -104,15 +117,15 @@ export default function InputGenerator({ appState }) {
   };
 
   const fetchIODirectories = () => {
-    if (!isNullOrEmpty(problemUrl)) {
-      DataService.getInputOutputDirectoriesByUrl(window.btoa(problemUrl)).then(
-        dir => {
-          setInputGenerateRequest({
-            ...inputGenerateRequest,
-            inputDirectoryPath: dir?.inputDirectory
-          });
-        }
-      );
+    if (!isNullOrEmpty(inputGenerateRequest.problemUrl)) {
+      DataService.getInputOutputDirectoriesByUrl(
+        window.btoa(inputGenerateRequest.problemUrl)
+      ).then(dir => {
+        setInputGenerateRequest({
+          ...inputGenerateRequest,
+          inputDirectoryPath: dir?.inputDirectory
+        });
+      });
     }
   };
 
@@ -125,7 +138,7 @@ export default function InputGenerator({ appState }) {
   const isValidNum = (n, min, max) => {
     console.log("isValidNum: " + n);
     return (
-      !isNullOrEmpty(n) &&
+      !isNaN(n) &&
       new RegExp("^[0-9]*$").test(n) &&
       min <= Number(n) &&
       Number(n) <= max
@@ -159,7 +172,7 @@ export default function InputGenerator({ appState }) {
         "Input filename only contains alphanumeric character and underscore(_)\n";
     }
     if (
-      !isNullOrEmpty(inputGenerateRequest.testPerFile) &&
+      !isNaN(inputGenerateRequest.testPerFile) &&
       !isValidNum(inputGenerateRequest.testPerFile, 1, 1000)
     ) {
       errMessage +=
@@ -176,8 +189,8 @@ export default function InputGenerator({ appState }) {
   const prepareRequest = () => {
     setInputGenerateRequest({
       ...inputGenerateRequest,
-      testPerFile: isNullOrEmpty(inputGenerateRequest.testPerFile)
-        ? "1"
+      testPerFile: isNaN(inputGenerateRequest.testPerFile)
+        ? 1
         : inputGenerateRequest.testPerFile,
       fileName: isNullOrEmpty(inputGenerateRequest.fileName)
         ? "02_random_input"
@@ -189,8 +202,17 @@ export default function InputGenerator({ appState }) {
     setShowToast(false);
     if (validate()) {
       prepareRequest();
-      console.log(inputGenerateRequest);
+      setTimeout(() => {
+        console.log(inputGenerateRequest);
+        DataService.generateRandomTests(inputGenerateRequest).then(data => {
+          setGeneratorExecResult(data);
+        });
+      }, 300);
     }
+  };
+
+  const updateExecResultFromSocket = data => {
+    setGeneratorExecResult(data);
   };
 
   return (
@@ -207,9 +229,9 @@ export default function InputGenerator({ appState }) {
               <InputGroup.Checkbox
                 onChange={e => {
                   setIsForProblem(e.currentTarget.checked);
-                  setProblemUrl("");
                   setInputGenerateRequest({
                     ...inputGenerateRequest,
+                    problemUrl: "",
                     inputDirectoryPath: "",
                     fileName: e.currentTarget.checked
                       ? "02_random_input"
@@ -225,8 +247,13 @@ export default function InputGenerator({ appState }) {
                 autoCapitalize="none"
                 placeholder="Enter Problem URL [Codeforces, AtCoder]"
                 disabled={!isForProblem}
-                value={problemUrl}
-                onChange={e => setProblemUrl(e.target.value)}
+                value={inputGenerateRequest.problemUrl}
+                onChange={e =>
+                  setInputGenerateRequest({
+                    ...inputGenerateRequest,
+                    problemUrl: e.target.value
+                  })
+                }
                 onBlur={fetchIODirectories}
               />
             </InputGroup>
@@ -269,7 +296,7 @@ export default function InputGenerator({ appState }) {
               onChange={e =>
                 setInputGenerateRequest({
                   ...inputGenerateRequest,
-                  fileNum: e.currentTarget.value
+                  fileNum: Number(e.currentTarget.value)
                 })
               }
             >
@@ -324,7 +351,9 @@ export default function InputGenerator({ appState }) {
               onChange={e =>
                 setInputGenerateRequest({
                   ...inputGenerateRequest,
-                  testPerFile: e.target.value
+                  testPerFile: isNaN(e.target.value)
+                    ? 1
+                    : Number(e.target.value)
                 })
               }
             />
@@ -367,7 +396,7 @@ export default function InputGenerator({ appState }) {
               onChange={e =>
                 setInputGenerateRequest({
                   ...inputGenerateRequest,
-                  serialFrom: e.target.value
+                  serialFrom: Number(e.target.value)
                 })
               }
             >
@@ -438,12 +467,12 @@ export default function InputGenerator({ appState }) {
           )}
         </Col>
       </Row>
-      {inputGenerateRequest.generationProcess === "tgen_script" && (
-        <Row>
-          <Col xs={8}>
+      <Row>
+        {inputGenerateRequest.generationProcess === "tgen_script" && (
+          <Col xs={7}>
             <div
               style={{
-                height: "40vh",
+                height: "35vh",
                 overflowY: "auto",
                 overflowX: "auto",
                 border: "2px solid transparent",
@@ -465,9 +494,78 @@ export default function InputGenerator({ appState }) {
                 tabSize={4}
                 style={{
                   fontFamily: '"Fira code", "Fira Mono", monospace',
-                  fontSize: 14
+                  fontSize: 13
                 }}
               />
+            </div>
+          </Col>
+        )}
+        {generatorExecResult && generatorExecResult?.compilationError === "" && (
+          <Col
+            xs={
+              inputGenerateRequest.generationProcess === "tgen_script" ? 5 : 12
+            }
+          >
+            <div
+              style={{
+                height: "35vh",
+                overflowY: "auto",
+                overflowX: "auto",
+                border: "2px solid transparent",
+                borderColor: "black",
+                borderRadius: "5px"
+              }}
+            >
+              <Table bordered responsive="sm" size="sm">
+                <tbody>
+                  {generatorExecResult.testcaseExecutionDetailsList
+                    .filter(e => e.status === "success")
+                    .map((t, id) => (
+                      <tr
+                        key={id}
+                        className={
+                          t.testcaseExecutionResult.executionError !== ""
+                            ? "table-danger"
+                            : "table-success"
+                        }
+                      >
+                        <td>
+                          <pre>{t.testcase.execOutputFilePath}</pre>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </Table>
+            </div>
+          </Col>
+        )}
+      </Row>
+      {generatorExecResult && generatorExecResult?.compilationError && (
+        <Row>
+          <Col xs={7}>
+            <div
+              style={{
+                maxHeight: "30vh",
+                overflowY: "auto",
+                overflowX: "auto"
+              }}
+            >
+              <Table bordered responsive="sm" size="sm">
+                <tbody>
+                  <tr>
+                    <td
+                      style={{
+                        border: "2px solid transparent",
+                        borderColor: "black",
+                        borderRadius: "5px"
+                      }}
+                      className="table-danger"
+                    >
+                      <pre>{generatorExecResult?.compilationError}</pre>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
             </div>
           </Col>
         </Row>
@@ -482,12 +580,6 @@ export default function InputGenerator({ appState }) {
           >
             Generate Input
           </Button>
-        </Col>
-      </Row>
-      <Row>
-        <Col xs={12}>
-          <br />
-          <ProgressBar variant="success" animated now={45} />
         </Col>
       </Row>
       {showToast && (

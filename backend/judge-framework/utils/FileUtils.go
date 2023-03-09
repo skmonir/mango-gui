@@ -88,7 +88,10 @@ func OpenFile(filePath string) error {
 }
 
 func ReadFileContent(filePath string, maxRow int, maxCol int) string {
-	fmt.Println("Reading content from fileService " + filePath)
+	if !IsFileExist(filePath) {
+		return ""
+	}
+	fmt.Println("Reading content from file " + filePath)
 	file, err := os.Open(filePath)
 	defer file.Close()
 	if err != nil {

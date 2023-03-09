@@ -55,7 +55,11 @@ func PublishStatusMessage(topic string, message string, messageType string) {
 	})
 }
 
-func PublishExecutionResult(execResult dto.ProblemExecutionResult) {
+func PublishExecutionResult(execResult dto.ProblemExecutionResult, socketEvent string) {
+	if len(socketEvent) == 0 {
+		return
+	}
+
 	PublishPreviousRunStatus(execResult)
 
 	fmt.Println("publishing execution result.....")
@@ -67,7 +71,7 @@ func PublishExecutionResult(execResult dto.ProblemExecutionResult) {
 	}
 
 	broadcastMessage(Message{
-		Key:     "test_exec_result_event",
+		Key:     socketEvent,
 		Content: string(execResultJson),
 	})
 }

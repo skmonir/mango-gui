@@ -21,7 +21,7 @@ import (
 
 type executionResponse struct {
 	index          int
-	testExecResult models.TestcaseExecutionResult
+	testExecResult dto.TestcaseExecutionResult
 }
 
 var executionCompleteChan = make(chan executionResponse)
@@ -52,25 +52,34 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(testcase.TimeLimit+1)*time.Second)
 	defer cancel()
 
-	//inputBuffer := bytes.NewBuffer([]byte(testcase.Input))
+	inputBuffer := bytes.NewBuffer([]byte(testcase.Input))
 	var outputBuffer bytes.Buffer
-	cmd := exec.CommandContext(ctx, testcase.SourceBinaryPath)
-	stdin, _ := cmd.StdinPipe()
-	//stdout, _ := cmd.StdoutPipe()
-	//cmd.Stdin = inputBuffer
-	cmd.Stdout = &outputBuffer
 
-	inputFile, _ := os.Open(testcase.InputFilePath)
-	go func() {
-		io.Copy(stdin, inputFile)
-		defer stdin.Close()
-	}()
+	cmd := exec.CommandContext(ctx, testcase.ExecutionCommand[0], testcase.ExecutionCommand[1:]...)
 
-	//outputFile, _ := os.OpenFile(testcase.UserOutputFilePath, os.O_RDWR|os.O_CREATE, 0644)
+	if len(testcase.InputFilePath) == 0 {
+		cmd.Stdin = inputBuffer
+	} else {
+		stdin, _ := cmd.StdinPipe()
+		inputFile, _ := os.Open(testcase.InputFilePath)
+		go func() {
+			io.Copy(stdin, inputFile)
+			defer stdin.Close()
+		}()
+	}
+
+	var stdout io.ReadCloser
+	var outputFile *os.File
+	if len(testcase.ExecOutputFilePath) == 0 {
+		cmd.Stdout = &outputBuffer
+	} else {
+		stdout, _ = cmd.StdoutPipe()
+		outputFile, _ = os.OpenFile(testcase.ExecOutputFilePath, os.O_RDWR|os.O_CREATE, 0644)
+	}
 
 	execResponse := executionResponse{
 		index:          index,
-		testExecResult: models.TestcaseExecutionResult{},
+		testExecResult: dto.TestcaseExecutionResult{},
 	}
 
 	maxMemory := uint64(0)
@@ -89,7 +98,9 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 		return
 	}
 
-	//io.Copy(io.MultiWriter(outputFile, os.Stdout), stdout)
+	if len(testcase.ExecOutputFilePath) > 0 {
+		io.Copy(io.MultiWriter(outputFile, os.Stdout), stdout)
+	}
 
 	pid := int32(cmd.Process.Pid)
 	ch := make(chan error)
@@ -124,7 +135,7 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 	executionCompleteChan <- execResponse
 }
 
-func Execute(execResult dto.ProblemExecutionResult) dto.ProblemExecutionResult {
+func Execute(execResult dto.ProblemExecutionResult, socketEvent string) dto.ProblemExecutionResult {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
@@ -142,10 +153,12 @@ func Execute(execResult dto.ProblemExecutionResult) dto.ProblemExecutionResult {
 				execResult.TestcaseExecutionDetailsList[testExecutionResult.index] = getVerdict(
 					execResult.TestcaseExecutionDetailsList[testExecutionResult.index],
 					judgeOutputs[testExecutionResult.index])
-				execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult.Output = utils.ResizeIOContentForUI(
-					strings.NewReader(execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult.Output), constants.IO_MAX_ROW_FOR_UI, constants.IO_MAX_COL_FOR_UI)
 
-				socket.PublishExecutionResult(execResult)
+				if socketEvent == "test_exec_result_event" {
+					execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult.Output = utils.ResizeIOContentForUI(
+						strings.NewReader(execResult.TestcaseExecutionDetailsList[testExecutionResult.index].TestcaseExecutionResult.Output), constants.IO_MAX_ROW_FOR_UI, constants.IO_MAX_COL_FOR_UI)
+				}
+				socket.PublishExecutionResult(execResult, socketEvent)
 
 				untestedProblemExists := false
 				for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {

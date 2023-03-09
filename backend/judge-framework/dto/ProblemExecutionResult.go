@@ -3,9 +3,9 @@ package dto
 import "github.com/skmonir/mango-gui/backend/judge-framework/models"
 
 type TestcaseExecutionDetails struct {
-	Status                  string                         `json:"status"`
-	Testcase                models.Testcase                `json:"testcase"`
-	TestcaseExecutionResult models.TestcaseExecutionResult `json:"testcaseExecutionResult"`
+	Status                  string                  `json:"status"`
+	Testcase                models.Testcase         `json:"testcase"`
+	TestcaseExecutionResult TestcaseExecutionResult `json:"testcaseExecutionResult"`
 }
 
 type ProblemExecutionResult struct {

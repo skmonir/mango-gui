@@ -1,4 +1,4 @@
-package models
+package dto
 
 type TestcaseExecutionResult struct {
 	ExecutionError string `json:"executionError"`

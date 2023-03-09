@@ -42,7 +42,7 @@ func parseCommand(s string) (res []string) {
 	return
 }
 
-func compileSource(command string, showStdError bool) string {
+func CompileSource(command string, showStdError bool) string {
 	cmds := parseCommand(command)
 
 	// ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
@@ -76,5 +76,5 @@ func Compile(platform string, cid string, label string) string {
 
 	command := fmt.Sprintf("%v %v %v -o %v", judgeConfig.ActiveLanguage.CompilationCommand, judgeConfig.ActiveLanguage.CompilationArgs, filePathWithExt, filePathWithoutExt)
 
-	return compileSource(command, false)
+	return CompileSource(command, false)
 }

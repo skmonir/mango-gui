@@ -115,6 +115,10 @@ class DataService {
     return this.deleteData("testcase/custom/delete/", deleteCustomTestRequest);
   }
 
+  generateRandomTests(req) {
+    return this.postData("testcase/random/generate/", req);
+  }
+
   runTest(path) {
     return this.getData("test/" + path);
   }
