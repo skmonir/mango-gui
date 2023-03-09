@@ -21,7 +21,12 @@ import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faTerminal } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCog,
+  faPlus,
+  faSave,
+  faTerminal
+} from "@fortawesome/free-solid-svg-icons";
 import DataService from "../../services/DataService.js";
 import ShowToast from "../Toast/ShowToast.jsx";
 
@@ -73,7 +78,7 @@ export default function InputGenerator({ appState }) {
   });
 
   const [showToast, setShowToast] = useState(false);
-
+  const [isGeneratingInProgress, setIsGeneratingInProgress] = useState(false);
   const [isForProblem, setIsForProblem] = useState(false);
   const [selectedScriptKeyword, setSelectedScriptKeyword] = useState("<line>");
 
@@ -82,7 +87,7 @@ export default function InputGenerator({ appState }) {
     fileNum: 1,
     fileMode: "write",
     fileName: "02_random_input",
-    testPerFile: 1,
+    testPerFile: 0,
     serialFrom: 1,
     inputDirectoryPath: "",
     generationProcess: "tgen_script",
@@ -173,7 +178,7 @@ export default function InputGenerator({ appState }) {
     }
     if (
       !isNaN(inputGenerateRequest.testPerFile) &&
-      !isValidNum(inputGenerateRequest.testPerFile, 1, 1000)
+      !isValidNum(inputGenerateRequest.testPerFile, 0, 100000)
     ) {
       errMessage +=
         "Number of test on each file should be a number in the specified range\n";
@@ -204,8 +209,10 @@ export default function InputGenerator({ appState }) {
       prepareRequest();
       setTimeout(() => {
         console.log(inputGenerateRequest);
+        setIsGeneratingInProgress(true);
         DataService.generateRandomTests(inputGenerateRequest).then(data => {
           setGeneratorExecResult(data);
+          setIsGeneratingInProgress(false);
         });
       }, 300);
     }
@@ -324,12 +331,13 @@ export default function InputGenerator({ appState }) {
                     fileMode: e.target.value
                   })
                 }
+                disabled
               >
                 <option value="write">
-                  Write - Overwrite new or existing file
+                  Write - Overwrite existing or new file
                 </option>
                 <option value="append">
-                  Append - Append into new or existing file
+                  Append - Append into existing or new file
                 </option>
               </Form.Select>
             </Form.Group>
@@ -340,23 +348,23 @@ export default function InputGenerator({ appState }) {
                 <strong>Number of test on each file</strong>
               </Form.Label>
               <Form.Control
-                type="number"
-                min="1"
-                max="1000"
+                type="text"
                 size="sm"
                 autoCorrect="off"
                 autoComplete="off"
                 autoCapitalize="none"
-                placeholder="In between [1, 1000]. Default 1."
+                placeholder="In between [0, 100000]. Default 0."
                 value={inputGenerateRequest.testPerFile}
-                onChange={e =>
+                onChange={e => {
+                  console.log(e.target.value);
                   setInputGenerateRequest({
                     ...inputGenerateRequest,
-                    testPerFile: isNaN(e.target.value)
-                      ? 1
-                      : Number(e.target.value)
-                  })
-                }
+                    testPerFile:
+                      isNullOrEmpty(e.target.value) || isNaN(e.target.value)
+                        ? 0
+                        : parseInt(e.target.value.toString())
+                  });
+                }}
               />
             </Form.Group>
           </Col>
@@ -580,8 +588,22 @@ export default function InputGenerator({ appState }) {
               size="sm"
               variant="outline-success"
               onClick={generateInputTriggered}
+              disabled={isGeneratingInProgress}
             >
-              Generate Input
+              {!isGeneratingInProgress ? (
+                <FontAwesomeIcon icon={faCog} />
+              ) : (
+                <Spinner
+                  as="span"
+                  animation="grow"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              )}
+              {!isGeneratingInProgress
+                ? " Generate Input"
+                : " Generating Input"}
             </Button>
           </Col>
         </Row>
