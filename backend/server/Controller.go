@@ -188,12 +188,3 @@ func getExecutionResult(ctx *fiber.Ctx) error {
 	socket.PublishPreviousRunStatus(probExecResult)
 	return ctx.Status(fiber.StatusOK).JSON(probExecResult)
 }
-
-func getInputOutputDirectoriesByUrl(ctx *fiber.Ctx) error {
-	encodedUrl := ctx.Params("encoded_url")
-	inputDirectory, outputDirectory := services.GetInputOutputDirectoryByUrl(utils.DecodeBase64(encodedUrl))
-	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
-		"inputDirectory":  inputDirectory,
-		"outputDirectory": outputDirectory,
-	})
-}

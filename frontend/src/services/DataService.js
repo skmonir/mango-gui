@@ -130,6 +130,14 @@ class DataService {
   getInputOutputDirectoriesByUrl(encodedUrl) {
     return this.getData("directories/" + encodedUrl);
   }
+
+  checkDirectoryPathValidity(encodedPath) {
+    return this.getData("misc/directory/check/" + encodedPath);
+  }
+
+  checkFilePathValidity(encodedPath) {
+    return this.getData("misc/filepath/check/" + encodedPath);
+  }
 }
 
 export default new DataService();

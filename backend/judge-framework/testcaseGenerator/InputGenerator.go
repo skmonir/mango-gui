@@ -8,24 +8,43 @@ import (
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
+	"time"
 )
 
 func Generate(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
+	var execResult dto.ProblemExecutionResult
+
+	if request.GenerationProcess == "" {
+		execResult = generateWithTgenScript(request)
+	} else {
+		execResult = runGenerator(request, false)
+	}
+
+	return execResult
+}
+
+func generateWithTgenScript(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
 	if msg := runValidator(request.TgenScriptContent); msg != "OK" {
 		return dto.ProblemExecutionResult{
 			CompilationError: msg,
 		}
 	}
-	return runGenerator(request)
+
+	folderPath := getScriptDirectory()
+	request.GeneratorScriptPath = folderPath + "generator.cpp"
+
+	return runGenerator(request, true)
 }
 
 func runValidator(tgenScript string) string {
+	folderPath := getScriptDirectory()
+
 	// Step-1: Compile validator source
-	if err := compileScript("validator"); err != "" {
+	if err := compileScript(folderPath+"validator.cpp", true); err != "" {
 		fmt.Println(err)
 		return err
 	}
@@ -62,9 +81,9 @@ func validateScript(tgenScript string) string {
 	return execResult.TestcaseExecutionDetailsList[0].TestcaseExecutionResult.Output
 }
 
-func runGenerator(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
+func runGenerator(request dto.TestcaseGenerateRequest, skipIfCompiled bool) dto.ProblemExecutionResult {
 	// Step-1: Compile generator source
-	if err := compileScript("generator"); err != "" {
+	if err := compileScript(request.GeneratorScriptPath, skipIfCompiled); err != "" {
 		fmt.Println(err)
 		return dto.ProblemExecutionResult{
 			CompilationError: err,
@@ -85,14 +104,13 @@ func runGenerator(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResul
 }
 
 func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
-	folderPath := getScriptDirectory()
-	filePathWithoutExt := folderPath + "generator"
+	filePathWithoutExt := strings.TrimSuffix(request.GeneratorScriptPath, filepath.Ext(request.GeneratorScriptPath))
 
 	execResult := dto.ProblemExecutionResult{
 		TestcaseExecutionDetailsList: []dto.TestcaseExecutionDetails{},
 	}
 
-	paramId := rand.Intn(1234567890)
+	paramId := time.Now().UnixNano() / int64(time.Millisecond)
 	sn := request.SerialFrom - 1
 
 	for i := 0; i < request.FileNum; i++ {
@@ -106,7 +124,7 @@ func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResu
 				TimeLimit:          5,
 				MemoryLimit:        512,
 				ExecOutputFilePath: execOutputFilePath,
-				ExecutionCommand:   []string{filePathWithoutExt, strconv.Itoa(request.TestPerFile), strconv.Itoa(paramId)},
+				ExecutionCommand:   []string{filePathWithoutExt, strconv.Itoa(request.TestPerFile), strconv.FormatInt(paramId, 10)},
 			},
 		}
 		execResult.TestcaseExecutionDetailsList = append(execResult.TestcaseExecutionDetailsList, execDetail)
@@ -117,19 +135,17 @@ func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResu
 	return execResult
 }
 
-func compileScript(filename string) string {
-	fmt.Println("Compiling " + filename)
+func compileScript(filePathWithExt string, skipIfCompiled bool) string {
+	fmt.Println("Compiling " + filePathWithExt)
 	judgeConfig := config.GetJudgeConfigFromCache()
 
-	folderPath := getScriptDirectory()
-	filePathWithoutExt := folderPath + filename
-	filePathWithExt := folderPath + filename + ".cpp"
+	filePathWithoutExt := strings.TrimSuffix(filePathWithExt, filepath.Ext(filePathWithExt))
 
-	if utils.IsFileExist(filePathWithoutExt) {
+	if skipIfCompiled && utils.IsFileExist(filePathWithoutExt) {
 		return ""
 	}
 	if !utils.IsFileExist(filePathWithExt) {
-		return filename + " file not found!"
+		return filePathWithExt + ": file not found!"
 	}
 
 	command := fmt.Sprintf("%v %v %v -o %v", judgeConfig.ActiveLanguage.CompilationCommand, judgeConfig.ActiveLanguage.CompilationArgs, filePathWithExt, filePathWithoutExt)

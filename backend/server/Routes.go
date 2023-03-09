@@ -57,5 +57,9 @@ func SetRoutes(app fiber.Router) {
 	app.Get("/execresult/:platform/:cid/:label", getExecutionResult)
 
 	// Misc. Routes
-	app.Get("/directories/:encoded_url", getInputOutputDirectoriesByUrl)
+	app.Get("/directories/:encoded_url", controllers.GetInputOutputDirectoriesByUrl)
+
+	app.Get("/misc/directory/check/:encoded_path", controllers.CheckDirectoryPathValidity)
+
+	app.Get("/misc/filepath/check/:encoded_path", controllers.CheckFilePathValidity)
 }

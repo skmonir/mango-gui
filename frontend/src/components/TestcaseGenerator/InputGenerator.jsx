@@ -22,6 +22,7 @@ import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCode,
   faCog,
   faPlus,
   faSave,
@@ -29,6 +30,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import DataService from "../../services/DataService.js";
 import ShowToast from "../Toast/ShowToast.jsx";
+import ViewCodeModal from "../modals/ViewCodeModal.jsx";
 
 export default function InputGenerator({ appState }) {
   const socketClient = new SocketClient();
@@ -77,6 +79,7 @@ export default function InputGenerator({ appState }) {
     message: ""
   });
 
+  const [showCodeModal, setShowCodeModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [isGeneratingInProgress, setIsGeneratingInProgress] = useState(false);
   const [isForProblem, setIsForProblem] = useState(false);
@@ -134,6 +137,28 @@ export default function InputGenerator({ appState }) {
     }
   };
 
+  const checkDirectoryPathValidity = dirPath => {
+    if (!isNullOrEmpty(dirPath)) {
+      DataService.checkDirectoryPathValidity(window.btoa(dirPath)).then(
+        resp => {
+          if (resp.isExist === false) {
+            showToastMessage("Error", `${dirPath} is not a valid directory`);
+          }
+        }
+      );
+    }
+  };
+
+  const checkFilePathValidity = filePath => {
+    if (!isNullOrEmpty(filePath)) {
+      DataService.checkFilePathValidity(window.btoa(filePath)).then(resp => {
+        if (resp.isExist === false) {
+          showToastMessage("Error", `${filePath} is not a valid file`);
+        }
+      });
+    }
+  };
+
   const isNullOrEmpty = obj => {
     return (
       obj === null || obj === undefined || obj.trim() === "" || obj.length === 0
@@ -168,6 +193,12 @@ export default function InputGenerator({ appState }) {
       isNullOrEmpty(inputGenerateRequest.tgenScriptContent)
     ) {
       errMessage += "TGen script can't be empty\n";
+    }
+    if (
+      inputGenerateRequest.generationProcess !== "tgen_script" &&
+      isNullOrEmpty(inputGenerateRequest.generatorScriptPath)
+    ) {
+      errMessage += "Generator script path can't be empty\n";
     }
     if (
       new RegExp("^[a-zA-Z 0-9_]*$").test(inputGenerateRequest.fileName) ===
@@ -287,6 +318,11 @@ export default function InputGenerator({ appState }) {
                     inputDirectoryPath: e.target.value
                   })
                 }
+                onBlur={() =>
+                  checkDirectoryPathValidity(
+                    inputGenerateRequest.inputDirectoryPath
+                  )
+                }
               />
             </Form.Group>
           </Col>
@@ -308,7 +344,7 @@ export default function InputGenerator({ appState }) {
                   })
                 }
               >
-                {[...Array(100).keys()].map(idx => (
+                {[...Array(50).keys()].map(idx => (
                   <option key={idx} value={idx + 1}>
                     {idx + 1}
                   </option>
@@ -440,9 +476,38 @@ export default function InputGenerator({ appState }) {
             {inputGenerateRequest.generationProcess !== "tgen_script" ? (
               <Form.Group controlId="formFileSm" className="mb-3">
                 <Form.Label>
-                  <strong>Generator script source</strong>
+                  <strong>Generator script source path</strong>
                 </Form.Label>
-                <Form.Control type="file" size="sm" />
+                <InputGroup className="mb-3">
+                  <Form.Control
+                    type="text"
+                    size="sm"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    placeholder="Example: /Users/user/Desktop/generator.cpp"
+                    value={inputGenerateRequest.generatorScriptPath}
+                    onChange={e =>
+                      setInputGenerateRequest({
+                        ...inputGenerateRequest,
+                        generatorScriptPath: e.target.value
+                      })
+                    }
+                    onBlur={() =>
+                      checkFilePathValidity(
+                        inputGenerateRequest.generatorScriptPath
+                      )
+                    }
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    disabled={!inputGenerateRequest.generatorScriptPath}
+                    onClick={() => setShowCodeModal(true)}
+                  >
+                    <FontAwesomeIcon icon={faCode} /> View Code
+                  </Button>
+                </InputGroup>
               </Form.Group>
             ) : (
               <Form.Group controlId="formFileSm" className="mb-3">
@@ -610,6 +675,12 @@ export default function InputGenerator({ appState }) {
       </Card>
       {showToast && (
         <ShowToast toastMsgObj={toastMsgObj} setShowToast={setShowToast} />
+      )}
+      {showCodeModal && (
+        <ViewCodeModal
+          codePath={inputGenerateRequest.generatorScriptPath}
+          setShowCodeModal={setShowCodeModal}
+        />
       )}
     </div>
   );

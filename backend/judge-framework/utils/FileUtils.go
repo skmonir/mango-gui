@@ -23,6 +23,9 @@ func IsFileExist(filePath string) bool {
 }
 
 func IsDirExist(folderPath string) bool {
+	if IsFileExist(folderPath) {
+		return false
+	}
 	_, err := os.Stat(folderPath)
 	if err != nil || os.IsNotExist(err) {
 		return false
