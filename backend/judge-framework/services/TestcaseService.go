@@ -42,3 +42,11 @@ func DeleteCustomTestcaseFromFile(platform, cid, label, inputFilePath string) {
 	utils.RemoveFile(inputFilePath)
 	GetProblemExecutionResult(platform, cid, label, true, true)
 }
+
+func GetInputOutputDirectoryByUrl(url string) (string, string) {
+	probs := GetProblemListByUrl(url)
+	if len(probs) == 0 {
+		return "", ""
+	}
+	return fileService.GetInputOutputDirectories(probs[0].Platform, probs[0].ContestId, probs[0].Label)
+}

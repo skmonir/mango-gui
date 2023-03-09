@@ -24,6 +24,7 @@ import {
 import { useEffect, useState } from "react";
 import Settings from "./components/Settings.jsx";
 import { Route, Routes, useNavigate } from "react-router-dom";
+import TestcaseGenerator from "./components/TestcaseGenerator/TestcaseGenerator.jsx";
 
 function App() {
   const [state, setState] = useState({
@@ -44,7 +45,7 @@ function App() {
                   <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
-                      placement="right"
+                      placement="bottom"
                       overlay={<Tooltip id="parser">Testcase Parser</Tooltip>}
                     >
                       <Nav.Link eventKey="parser">
@@ -55,7 +56,7 @@ function App() {
                   <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
-                      placement="right"
+                      placement="bottom"
                       overlay={<Tooltip id="tester">Problem Tester</Tooltip>}
                     >
                       <Nav.Link eventKey="tester">
@@ -66,7 +67,7 @@ function App() {
                   <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
-                      placement="right"
+                      placement="bottom"
                       overlay={
                         <Tooltip id="testcase_generator">
                           Testcase Generator
@@ -81,7 +82,7 @@ function App() {
                   <Nav.Item className="text-center">
                     <OverlayTrigger
                       key={"right"}
-                      placement="right"
+                      placement="bottom"
                       overlay={<Tooltip id="settings">Settings</Tooltip>}
                     >
                       <Nav.Link eventKey="settings">
@@ -115,8 +116,9 @@ function App() {
                 <Tab.Pane eventKey="tester">
                   <Tester appState={{ ...state }} />
                 </Tab.Pane>
-                {/*<Tab.Pane eventKey="testcase_generator">*/}
-                {/*</Tab.Pane>*/}
+                <Tab.Pane eventKey="testcase_generator">
+                  <TestcaseGenerator appState={{ ...state }} />
+                </Tab.Pane>
                 <Tab.Pane eventKey="settings">
                   <Settings appState={{ ...state }} setAppState={setState} />
                 </Tab.Pane>
