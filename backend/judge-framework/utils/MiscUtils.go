@@ -7,6 +7,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -89,4 +92,24 @@ func ParseMemoryInMb(memory uint64) string {
 
 func ParseMemoryInKb(memory uint64) string {
 	return fmt.Sprintf("%v KB", memory/1024)
+}
+
+func GetAppDataDirectoryPath() string {
+	configPath := ""
+	switch runtime.GOOS {
+	case "linux":
+		if os.Getenv("XDG_CONFIG_HOME") != "" {
+			configPath = os.Getenv("XDG_CONFIG_HOME")
+		} else {
+			configPath = filepath.Join(os.Getenv("HOME"), ".mango")
+		}
+	case "windows":
+		configPath = filepath.Join(os.Getenv("APPDATA"), "mango")
+	case "darwin":
+		configPath = filepath.Join(os.Getenv("HOME"), ".mango")
+	default:
+		configPath = ""
+	}
+
+	return configPath
 }

@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"sync"
 )
 
@@ -59,32 +59,12 @@ func SaveConfigIntoJsonFile(config JudgeConfig) error {
 	return nil
 }
 
-func getConfigFolderPath() string {
-	configPath := ""
-	switch runtime.GOOS {
-	case "linux":
-		if os.Getenv("XDG_CONFIG_HOME") != "" {
-			configPath = os.Getenv("XDG_CONFIG_HOME")
-		} else {
-			configPath = filepath.Join(os.Getenv("HOME"), ".mango")
-		}
-	case "windows":
-		configPath = filepath.Join(os.Getenv("APPDATA"), "mango")
-	case "darwin":
-		configPath = filepath.Join(os.Getenv("HOME"), ".mango")
-	default:
-		configPath = ""
-	}
-
-	return configPath
-}
-
 func getConfigFilePath() string {
-	return filepath.Join(getConfigFolderPath(), "config.json")
+	return filepath.Join(utils.GetAppDataDirectoryPath(), "config.json")
 }
 
 func isConfigDirExist() bool {
-	_, err := os.Stat(getConfigFolderPath())
+	_, err := os.Stat(utils.GetAppDataDirectoryPath())
 	if err != nil || os.IsNotExist(err) {
 		return false
 	}
@@ -93,8 +73,8 @@ func isConfigDirExist() bool {
 
 func createConfigDir() error {
 	if !isConfigDirExist() {
-		fmt.Println("Creating config directory " + getConfigFolderPath())
-		if err := os.MkdirAll(getConfigFolderPath(), os.ModePerm); err != nil {
+		fmt.Println("Creating config directory " + utils.GetAppDataDirectoryPath())
+		if err := os.MkdirAll(utils.GetAppDataDirectoryPath(), os.ModePerm); err != nil {
 			fmt.Println(err)
 			return err
 		}

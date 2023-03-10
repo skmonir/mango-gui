@@ -7,8 +7,8 @@ import (
 	"github.com/skmonir/mango-gui/backend/judge-framework/executor"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
+	"github.com/skmonir/mango-gui/backend/judge-framework/testcaseGenerator/tgenScripts"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -17,6 +17,8 @@ import (
 
 func GenerateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
 	var execResult dto.ProblemExecutionResult
+
+	tgenScripts.CreateIfScriptsAreNotAvailable()
 
 	if request.GenerationProcess == "tgen_script" {
 		execResult = generateWithTgenScript(request)
@@ -35,7 +37,7 @@ func generateWithTgenScript(request dto.TestcaseGenerateRequest) dto.ProblemExec
 	}
 
 	folderPath := getScriptDirectory()
-	request.GeneratorScriptPath = folderPath + "generator.cpp"
+	request.GeneratorScriptPath = filepath.Join(folderPath, "generator.cpp")
 
 	return runGenerator(request, false)
 }
@@ -44,7 +46,7 @@ func runValidator(tgenScript string) string {
 	folderPath := getScriptDirectory()
 
 	// Step-1: Compile validator source
-	if err := compileScript(folderPath+"validator.cpp", false); err != "" {
+	if err := compileScript(filepath.Join(folderPath, "validator.cpp"), false); err != "" {
 		fmt.Println(err)
 		return err
 	}
@@ -60,7 +62,7 @@ func runValidator(tgenScript string) string {
 
 func validateScript(tgenScript string) string {
 	folderPath := getScriptDirectory()
-	filePathWithoutExt := folderPath + "validator"
+	filePathWithoutExt := filepath.Join(folderPath, "validator")
 
 	execResult := dto.ProblemExecutionResult{
 		TestcaseExecutionDetailsList: []dto.TestcaseExecutionDetails{
@@ -162,6 +164,7 @@ func compileScript(filePathWithExt string, skipIfCompiled bool) string {
 }
 
 func getScriptDirectory() string {
-	projectBasePath, _ := os.Getwd()
-	return projectBasePath + "/backend/judge-framework/testcaseGenerator/scripts/"
+	appdataDirectory := utils.GetAppDataDirectoryPath()
+	scriptDirectory := filepath.Join(appdataDirectory, "tgen_scripts")
+	return scriptDirectory
 }
