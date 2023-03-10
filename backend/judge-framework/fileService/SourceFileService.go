@@ -108,21 +108,27 @@ func OpenSourceByPath(filePath string) {
 }
 
 func OpenSourceByMetadata(platform string, cid string, label string) {
-	filePath := getSourceFilePath(platform, cid, label)
+	filePath := GetSourceFilePath(platform, cid, label)
 	if utils.IsFileExist(filePath) {
 		OpenSourceByPath(filePath)
 	}
 }
 
 func GetCodeByMetadata(platform string, cid string, label string) string {
-	filePath := getSourceFilePath(platform, cid, label)
+	filePath := GetSourceFilePath(platform, cid, label)
 	if utils.IsFileExist(filePath) {
 		return utils.ReadFileContent(filePath, 123456, 123456)
 	}
 	return ""
 }
 
-func getSourceFilePath(platform string, cid string, label string) string {
+func UpdateCodeByProblemPath(platform, cid, label, code string) {
+	filePath := GetSourceFilePath(platform, cid, label)
+	directory, filename := filepath.Split(filePath)
+	utils.WriteFileContent(directory, filename, []byte(code))
+}
+
+func GetSourceFilePath(platform string, cid string, label string) string {
 	judgeConfig := config.GetJudgeConfigFromCache()
 
 	folderPath := fmt.Sprintf("%v/%v/%v/source", strings.TrimRight(judgeConfig.WorkspaceDirectory, "/"), platform, cid)

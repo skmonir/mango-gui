@@ -8,10 +8,10 @@ class DataService {
     url = BASE_URL + url;
 
     let requestConfig = {
-      params: params,
+      params: params
     };
 
-    return axios.get(url, requestConfig).then((response) => response.data);
+    return axios.get(url, requestConfig).then(response => response.data);
   }
 
   postData(url, payload) {
@@ -19,13 +19,13 @@ class DataService {
 
     let requestConfig = {
       headers: {
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     };
 
     return axios
       .post(url, payload, requestConfig)
-      .then((response) => response.data);
+      .then(response => response.data);
   }
 
   putData(url, payload) {
@@ -33,13 +33,13 @@ class DataService {
 
     let requestConfig = {
       headers: {
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     };
 
     return axios
       .put(url, payload, requestConfig)
-      .then((response) => response.data);
+      .then(response => response.data);
   }
 
   deleteData(url, data) {
@@ -47,12 +47,12 @@ class DataService {
 
     let requestConfig = {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
-      data: data,
+      data: data
     };
 
-    return axios.delete(url, requestConfig).then((response) => response.data);
+    return axios.delete(url, requestConfig).then(response => response.data);
   }
 
   parse(encodedUrl) {
@@ -75,16 +75,24 @@ class DataService {
     return this.putData("config/", config);
   }
 
-  getCodeByMetadata(metadata) {
-    return this.getData("code/" + metadata);
+  getCodeByMetadata(path) {
+    return this.getData("code/" + path);
   }
 
   getCodeByPath(codeRequest) {
     return this.putData("code/", codeRequest);
   }
 
-  openSourceByMetadata(metadata) {
-    return this.getData("source/open/" + metadata);
+  updateCodeByFilePath(updateRequest) {
+    return this.putData("code/update/", updateRequest);
+  }
+
+  updateCodeByProblemPath(prob_path, updateRequest) {
+    return this.putData("code/update/" + prob_path, updateRequest);
+  }
+
+  openSourceByMetadata(path) {
+    return this.getData("source/open/" + path);
   }
 
   openSourceByPath(openSourceRequest) {
@@ -107,12 +115,32 @@ class DataService {
     return this.deleteData("testcase/custom/delete/", deleteCustomTestRequest);
   }
 
+  generateRandomTests(req) {
+    return this.postData("testcase/random/input/generate/", req);
+  }
+
+  generateOutput(req) {
+    return this.postData("testcase/random/output/generate/", req);
+  }
+
   runTest(path) {
     return this.getData("test/" + path);
   }
 
   getExecutionResult(path) {
     return this.getData("execresult/" + path);
+  }
+
+  getInputOutputDirectoriesByUrl(encodedUrl) {
+    return this.getData("directories/" + encodedUrl);
+  }
+
+  checkDirectoryPathValidity(encodedPath) {
+    return this.getData("misc/directory/check/" + encodedPath);
+  }
+
+  checkFilePathValidity(encodedPath) {
+    return this.getData("misc/filepath/check/" + encodedPath);
   }
 }
 

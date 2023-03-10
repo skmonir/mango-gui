@@ -3,7 +3,6 @@ package services
 import (
 	"fmt"
 	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
-	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"time"
 
 	"github.com/skmonir/mango-gui/backend/judge-framework/cacheServices"
@@ -21,7 +20,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	execResult.CompilationError = ""
 	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
 		execResult.TestcaseExecutionDetailsList[i].Status = "none"
-		execResult.TestcaseExecutionDetailsList[i].TestcaseExecutionResult = models.TestcaseExecutionResult{}
+		execResult.TestcaseExecutionDetailsList[i].TestcaseExecutionResult = dto.TestcaseExecutionResult{}
 	}
 
 	// Step 1: Compile the source
@@ -34,7 +33,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 		return execResult
 	}
 	socket.PublishStatusMessage("test_status", "Compilation successful!", "success")
-	socket.PublishExecutionResult(execResult)
+	socket.PublishExecutionResult(execResult, "test_exec_result_event")
 
 	time.Sleep(500 * time.Millisecond)
 
@@ -52,18 +51,18 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 		execResult.TestcaseExecutionDetailsList[i].Testcase.TimeLimit = prob.TimeLimit
 		execResult.TestcaseExecutionDetailsList[i].Testcase.MemoryLimit = prob.MemoryLimit
 	}
-	socket.PublishExecutionResult(execResult)
+	socket.PublishExecutionResult(execResult, "test_exec_result_event")
 
 	// Step 4: Run the binary and check testcases
 	//socket.PublishStatusMessage("test_status", "Running testcases", "info")
-	execResult = executor.Execute(execResult)
+	execResult = executor.Execute(execResult, "test_exec_result_event")
 	cacheServices.SaveExecutionResult(platform, cid, label, execResult)
 
 	return execResult
 }
 
 func GetProblemExecutionResult(platform string, cid string, label string, isForUI bool, isSkipCache bool) dto.ProblemExecutionResult {
-	fmt.Println("Fetching execution result for", platform, cid, label)
+	fmt.Println("Fetching execution result for", platform, cid, label, isForUI, isSkipCache)
 
 	maxRow, maxCol := constants.IO_MAX_ROW_FOR_TEST, constants.IO_MAX_COL_FOR_TEST
 	if isForUI {

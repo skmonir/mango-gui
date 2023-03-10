@@ -5,7 +5,7 @@ import {
   Col,
   InputGroup,
   Row,
-  Spinner,
+  Spinner
 } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -22,7 +22,7 @@ export default function Settings({ appState, setAppState }) {
     lang: "",
     compilationCommand: "",
     compilationArgs: "",
-    templatePath: "",
+    templatePath: ""
   });
 
   const [showCodeModal, setShowCodeModal] = useState(false);
@@ -34,7 +34,7 @@ export default function Settings({ appState, setAppState }) {
   }, []);
 
   const fetchConfig = () => {
-    DataService.getConfig().then((config) => {
+    DataService.getConfig().then(config => {
       saveConfigToUI(config);
     });
   };
@@ -63,17 +63,17 @@ export default function Settings({ appState, setAppState }) {
     console.log(configToSave);
     setSavingInProgress(true);
     DataService.updateConfig(configToSave)
-      .then((config) => {
+      .then(config => {
         saveConfigToUI(config);
         setSaveAlert("Settings saved successfully!");
       })
-      .catch((e) => {
+      .catch(e => {
         setSaveAlert("Oops! Something went wrong while saving the config!");
       })
       .finally(() => setSavingInProgress(false));
   };
 
-  const saveConfigToUI = (config) => {
+  const saveConfigToUI = config => {
     console.log(config);
     setConfig({
       workspaceDirectory: config.workspaceDirectory,
@@ -82,13 +82,13 @@ export default function Settings({ appState, setAppState }) {
       lang: config.activeLanguage.lang,
       compilationCommand: config.activeLanguage.compilationCommand,
       compilationArgs: config.activeLanguage.compilationArgs,
-      templatePath: config.activeLanguage.templatePath,
+      templatePath: config.activeLanguage.templatePath
     });
     setAppState({ ...appState, config: config });
     console.log(appState.config);
   };
 
-  const changeLanguage = (lang) => {
+  const changeLanguage = lang => {
     setConfig({ ...config, lang: lang });
   };
 
@@ -105,9 +105,9 @@ export default function Settings({ appState, setAppState }) {
             autoCorrect="off"
             autoComplete="off"
             autoCapitalize="none"
-            placeholder="Enter your workspace directory absolute path"
+            placeholder="Enter your workspace directory absolute path. All the testcases and sources will be saved here."
             value={config.workspaceDirectory}
-            onChange={(e) =>
+            onChange={e =>
               setConfig({ ...config, workspaceDirectory: e.target.value })
             }
           />
@@ -123,7 +123,7 @@ export default function Settings({ appState, setAppState }) {
               size="sm"
               aria-label="Default select example"
               value={config.lang}
-              onChange={(e) => changeLanguage(e.target.value)}
+              onChange={e => changeLanguage(e.target.value)}
             >
               {/*<option value="">Select language</option>*/}
               <option value="c++">C++</option>
@@ -144,7 +144,7 @@ export default function Settings({ appState, setAppState }) {
               autoCapitalize="none"
               placeholder="Example: g++"
               value={config.compilationCommand}
-              onChange={(e) =>
+              onChange={e =>
                 setConfig({ ...config, compilationCommand: e.target.value })
               }
             />
@@ -163,7 +163,7 @@ export default function Settings({ appState, setAppState }) {
               autoCapitalize="none"
               placeholder="Example: -std=c++20"
               value={config.compilationArgs}
-              onChange={(e) =>
+              onChange={e =>
                 setConfig({ ...config, compilationArgs: e.target.value })
               }
             />
@@ -184,7 +184,7 @@ export default function Settings({ appState, setAppState }) {
               autoCapitalize="none"
               placeholder="Enter your name"
               value={config.author}
-              onChange={(e) => setConfig({ ...config, author: e.target.value })}
+              onChange={e => setConfig({ ...config, author: e.target.value })}
             />
           </Form.Group>
         </Col>
@@ -201,7 +201,7 @@ export default function Settings({ appState, setAppState }) {
                 autoComplete="off"
                 autoCapitalize="none"
                 value={config.templatePath}
-                onChange={(e) =>
+                onChange={e =>
                   setConfig({ ...config, templatePath: e.target.value })
                 }
                 placeholder={
@@ -210,7 +210,7 @@ export default function Settings({ appState, setAppState }) {
               />
               <Button
                 size="sm"
-                variant="outline-secondary"
+                variant="outline-success"
                 disabled={!config.templatePath}
                 onClick={() => setShowCodeModal(true)}
               >
@@ -219,8 +219,6 @@ export default function Settings({ appState, setAppState }) {
             </InputGroup>
           </Form.Group>
         </Col>
-        {/*<Col sm={2}>*/}
-        {/*</Col>*/}
       </Row>
       <Row>
         <Col md={{ span: 4, offset: 5 }}>

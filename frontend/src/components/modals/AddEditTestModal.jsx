@@ -1,11 +1,7 @@
-import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
-import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
 import { useEffect, useState } from "react";
-import { Alert, Button, Col, Modal, ModalHeader, Row } from "react-bootstrap";
+import { Alert, Button, Col, Modal, Row } from "react-bootstrap";
 import DataService from "../../services/DataService.js";
 import Form from "react-bootstrap/Form";
-
-SyntaxHighlighter.registerLanguage("jsx", jsx);
 
 export default function AddEditTestModal({
   metadata,

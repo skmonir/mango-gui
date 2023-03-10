@@ -49,29 +49,6 @@ func updateConfig(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(judgeConfig)
 }
 
-func getCodeByPath(ctx *fiber.Ctx) error {
-	codeRequest := struct {
-		FilePath string `json:"filePath"`
-	}{}
-	err := ctx.BodyParser(&codeRequest)
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-	}
-	fmt.Println(codeRequest)
-	code := utils.ReadFileContent(codeRequest.FilePath, 123456, 123456)
-	return ctx.Status(fiber.StatusOK).JSON(code)
-}
-
-func getCodeByMetadata(ctx *fiber.Ctx) error {
-	platform := ctx.Params("platform")
-	cid := ctx.Params("cid")
-	label := ctx.Params("label")
-	code := fileService.GetCodeByMetadata(platform, cid, label)
-	return ctx.Status(fiber.StatusOK).JSON(code)
-}
-
 func openSourceByPath(ctx *fiber.Ctx) error {
 	openSourceRequest := struct {
 		FilePath string `json:"filePath"`

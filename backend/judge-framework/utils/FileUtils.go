@@ -23,6 +23,9 @@ func IsFileExist(filePath string) bool {
 }
 
 func IsDirExist(folderPath string) bool {
+	if IsFileExist(folderPath) {
+		return false
+	}
 	_, err := os.Stat(folderPath)
 	if err != nil || os.IsNotExist(err) {
 		return false
@@ -88,7 +91,10 @@ func OpenFile(filePath string) error {
 }
 
 func ReadFileContent(filePath string, maxRow int, maxCol int) string {
-	fmt.Println("Reading content from fileService " + filePath)
+	if !IsFileExist(filePath) {
+		return ""
+	}
+	fmt.Println("Reading content from file " + filePath)
 	file, err := os.Open(filePath)
 	defer file.Close()
 	if err != nil {
