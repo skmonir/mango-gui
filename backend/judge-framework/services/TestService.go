@@ -62,7 +62,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 }
 
 func GetProblemExecutionResult(platform string, cid string, label string, isForUI bool, isSkipCache bool) dto.ProblemExecutionResult {
-	fmt.Println("Fetching execution result for", platform, cid, label)
+	fmt.Println("Fetching execution result for", platform, cid, label, isForUI, isSkipCache)
 
 	maxRow, maxCol := constants.IO_MAX_ROW_FOR_TEST, constants.IO_MAX_COL_FOR_TEST
 	if isForUI {

@@ -116,7 +116,11 @@ class DataService {
   }
 
   generateRandomTests(req) {
-    return this.postData("testcase/random/generate/", req);
+    return this.postData("testcase/random/input/generate/", req);
+  }
+
+  generateOutput(req) {
+    return this.postData("testcase/random/output/generate/", req);
   }
 
   runTest(path) {

@@ -49,7 +49,9 @@ func SetRoutes(app fiber.Router) {
 
 	app.Delete("/testcase/custom/delete", deleteCustomTest)
 
-	app.Post("/testcase/random/generate", controllers.GenerateRandomTests)
+	app.Post("/testcase/random/input/generate", controllers.GenerateRandomTests)
+
+	app.Post("/testcase/random/output/generate", controllers.GenerateOutputs)
 
 	// Test Routes
 	app.Get("/test/:platform/:cid/:label", testProblem)

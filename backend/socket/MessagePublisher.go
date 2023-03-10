@@ -60,7 +60,9 @@ func PublishExecutionResult(execResult dto.ProblemExecutionResult, socketEvent s
 		return
 	}
 
-	PublishPreviousRunStatus(execResult)
+	if socketEvent == "test_exec_result_event" {
+		PublishPreviousRunStatus(execResult)
+	}
 
 	fmt.Println("publishing execution result.....")
 

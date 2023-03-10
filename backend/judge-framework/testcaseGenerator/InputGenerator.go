@@ -15,10 +15,10 @@ import (
 	"time"
 )
 
-func Generate(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
+func GenerateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
 	var execResult dto.ProblemExecutionResult
 
-	if request.GenerationProcess == "" {
+	if request.GenerationProcess == "tgen_script" {
 		execResult = generateWithTgenScript(request)
 	} else {
 		execResult = runGenerator(request, false)
@@ -37,14 +37,14 @@ func generateWithTgenScript(request dto.TestcaseGenerateRequest) dto.ProblemExec
 	folderPath := getScriptDirectory()
 	request.GeneratorScriptPath = folderPath + "generator.cpp"
 
-	return runGenerator(request, true)
+	return runGenerator(request, false)
 }
 
 func runValidator(tgenScript string) string {
 	folderPath := getScriptDirectory()
 
 	// Step-1: Compile validator source
-	if err := compileScript(folderPath+"validator.cpp", true); err != "" {
+	if err := compileScript(folderPath+"validator.cpp", false); err != "" {
 		fmt.Println(err)
 		return err
 	}
@@ -93,10 +93,13 @@ func runGenerator(request dto.TestcaseGenerateRequest, skipIfCompiled bool) dto.
 	// Step-2: Validate the script
 	execResult := generateInput(request)
 
-	if len(request.ProblemUrl) > 0 {
+	if execResult.CompilationError == "" && len(request.ProblemUrl) > 0 {
+		fmt.Println("Updating cache after input generation")
 		ps := services.GetProblemListByUrl(request.ProblemUrl)
 		if len(ps) > 0 {
 			services.GetProblemExecutionResult(ps[0].Platform, ps[0].ContestId, ps[0].Label, true, true)
+		} else {
+			fmt.Println("No parsed problem found for", request.ProblemUrl)
 		}
 	}
 
@@ -104,7 +107,12 @@ func runGenerator(request dto.TestcaseGenerateRequest, skipIfCompiled bool) dto.
 }
 
 func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
-	filePathWithoutExt := strings.TrimSuffix(request.GeneratorScriptPath, filepath.Ext(request.GeneratorScriptPath))
+	scriptBinaryPathWithoutExt := strings.TrimSuffix(request.GeneratorScriptPath, filepath.Ext(request.GeneratorScriptPath))
+	if !utils.IsFileExist(scriptBinaryPathWithoutExt) {
+		return dto.ProblemExecutionResult{
+			CompilationError: "Generator script binary not found!",
+		}
+	}
 
 	execResult := dto.ProblemExecutionResult{
 		TestcaseExecutionDetailsList: []dto.TestcaseExecutionDetails{},
@@ -124,7 +132,7 @@ func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResu
 				TimeLimit:          5,
 				MemoryLimit:        512,
 				ExecOutputFilePath: execOutputFilePath,
-				ExecutionCommand:   []string{filePathWithoutExt, strconv.Itoa(request.TestPerFile), strconv.FormatInt(paramId, 10)},
+				ExecutionCommand:   []string{scriptBinaryPathWithoutExt, strconv.Itoa(request.TestPerFile), strconv.FormatInt(paramId, 10)},
 			},
 		}
 		execResult.TestcaseExecutionDetailsList = append(execResult.TestcaseExecutionDetailsList, execDetail)

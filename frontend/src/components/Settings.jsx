@@ -105,7 +105,7 @@ export default function Settings({ appState, setAppState }) {
             autoCorrect="off"
             autoComplete="off"
             autoCapitalize="none"
-            placeholder="Enter your workspace directory absolute path"
+            placeholder="Enter your workspace directory absolute path. All the testcases and sources will be saved here."
             value={config.workspaceDirectory}
             onChange={e =>
               setConfig({ ...config, workspaceDirectory: e.target.value })
@@ -210,7 +210,7 @@ export default function Settings({ appState, setAppState }) {
               />
               <Button
                 size="sm"
-                variant="outline-secondary"
+                variant="outline-success"
                 disabled={!config.templatePath}
                 onClick={() => setShowCodeModal(true)}
               >

@@ -83,7 +83,7 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 	}
 
 	maxMemory := uint64(0)
-	completeExecution := func(err error) {
+	completeExecutionFunc := func(err error) {
 		if err != nil {
 			fmt.Println(err.Error())
 			execResponse.testExecResult.ExecutionError = err.Error()
@@ -93,7 +93,7 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 	}
 
 	if err := cmd.Start(); err != nil {
-		completeExecution(err)
+		completeExecutionFunc(err)
 		executionCompleteChan <- execResponse
 		return
 	}
@@ -111,7 +111,7 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 	for running {
 		select {
 		case err := <-ch:
-			completeExecution(err)
+			completeExecutionFunc(err)
 			if err != nil {
 				executionCompleteChan <- execResponse
 				return

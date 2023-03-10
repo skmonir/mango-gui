@@ -8,6 +8,7 @@ type TestcaseGenerateRequest struct {
 	TestPerFile         int    `json:"testPerFile"`
 	SerialFrom          int    `json:"serialFrom"`
 	InputDirectoryPath  string `json:"inputDirectoryPath"`
+	OutputDirectoryPath string `json:"outputDirectoryPath"`
 	GenerationProcess   string `json:"generationProcess"`
 	GeneratorScriptPath string `json:"generatorScriptPath"`
 	TgenScriptContent   string `json:"tgenScriptContent"`

@@ -234,6 +234,12 @@ export default function InputGenerator({ appState }) {
     });
   };
 
+  const scrollToId = id => {
+    document.getElementById(id).scrollIntoView({
+      behavior: "smooth"
+    });
+  };
+
   const generateInputTriggered = () => {
     setShowToast(false);
     if (validate()) {
@@ -243,6 +249,7 @@ export default function InputGenerator({ appState }) {
         setIsGeneratingInProgress(true);
         DataService.generateRandomTests(inputGenerateRequest).then(data => {
           setGeneratorExecResult(data);
+          scrollToId("input_logs");
           setIsGeneratingInProgress(false);
         });
       }, 300);
@@ -251,6 +258,7 @@ export default function InputGenerator({ appState }) {
 
   const updateExecResultFromSocket = data => {
     setGeneratorExecResult(data);
+    scrollToId("input_logs");
   };
 
   return (
@@ -331,7 +339,7 @@ export default function InputGenerator({ appState }) {
           <Col xs={3}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Number of files to generate</strong>
+                <strong>Number of input files to generate</strong>
               </Form.Label>
               <Form.Select
                 size="sm"
@@ -381,7 +389,7 @@ export default function InputGenerator({ appState }) {
           <Col xs={3}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Number of test on each file</strong>
+                <strong>Test per file [For multi-test input]</strong>
               </Form.Label>
               <Form.Control
                 type="text"
@@ -407,7 +415,7 @@ export default function InputGenerator({ appState }) {
           <Col xs={3}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>File name [without extension]</strong>
+                <strong>File name [Without extension]</strong>
               </Form.Label>
               <Form.Control
                 type="text"
@@ -574,7 +582,7 @@ export default function InputGenerator({ appState }) {
               </div>
             </Col>
           )}
-          {generatorExecResult && generatorExecResult?.compilationError === "" && (
+          {generatorExecResult && generatorExecResult?.compilationError && (
             <Col
               xs={
                 inputGenerateRequest.generationProcess === "tgen_script"
@@ -582,43 +590,6 @@ export default function InputGenerator({ appState }) {
                   : 12
               }
             >
-              <div
-                style={{
-                  height: "35vh",
-                  overflowY: "auto",
-                  overflowX: "auto",
-                  border: "2px solid transparent",
-                  borderColor: "black",
-                  borderRadius: "5px"
-                }}
-              >
-                <Table bordered responsive="sm" size="sm">
-                  <tbody>
-                    {generatorExecResult.testcaseExecutionDetailsList
-                      .filter(e => e.status === "success")
-                      .map((t, id) => (
-                        <tr
-                          key={id}
-                          className={
-                            t.testcaseExecutionResult.executionError !== ""
-                              ? "table-danger"
-                              : "table-success"
-                          }
-                        >
-                          <td>
-                            <pre>{t.testcase.execOutputFilePath}</pre>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </Table>
-              </div>
-            </Col>
-          )}
-        </Row>
-        {generatorExecResult && generatorExecResult?.compilationError && (
-          <Row>
-            <Col xs={7}>
               <div
                 style={{
                   maxHeight: "30vh",
@@ -644,10 +615,51 @@ export default function InputGenerator({ appState }) {
                 </Table>
               </div>
             </Col>
-          </Row>
-        )}
+          )}
+        </Row>
         <Row>
-          <Col md={{ span: 4, offset: 5 }}>
+          <Col xs={12} id="input_logs">
+            {generatorExecResult &&
+              generatorExecResult?.compilationError === "" && (
+                <div
+                  style={{
+                    marginTop: "10px",
+                    height: "35vh",
+                    overflowY: "auto",
+                    overflowX: "auto",
+                    border: "2px solid transparent",
+                    borderColor: "black",
+                    borderRadius: "5px"
+                  }}
+                >
+                  <Table bordered responsive="sm" size="sm">
+                    <tbody>
+                      {generatorExecResult.testcaseExecutionDetailsList
+                        .filter(e => e.status === "success")
+                        .slice(0)
+                        .reverse()
+                        .map((t, id) => (
+                          <tr
+                            key={id}
+                            className={
+                              t.testcaseExecutionResult.executionError !== ""
+                                ? "table-danger"
+                                : "table-success"
+                            }
+                          >
+                            <td>
+                              <pre>{t.testcase.execOutputFilePath}</pre>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </Table>
+                </div>
+              )}
+          </Col>
+        </Row>
+        <Row>
+          <Col md={{ span: 2, offset: 5 }}>
             <br />
             <Button
               size="sm"
