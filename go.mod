@@ -1,13 +1,13 @@
 module github.com/skmonir/mango-gui
 
-go 1.19
+go 1.20
 
 require (
 	github.com/anaskhan96/soup v1.2.5
 	github.com/gofiber/fiber/v2 v2.42.0
 	github.com/gofiber/websocket/v2 v2.1.4
 	github.com/shirou/gopsutil/v3 v3.23.2
-	github.com/wailsapp/wails/v2 v2.3.1
+	github.com/wailsapp/wails/v2 v2.4.0
 )
 
 require (
@@ -16,7 +16,6 @@ require (
 	github.com/fasthttp/websocket v1.5.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/klauspost/compress v1.15.15 // indirect
 	github.com/labstack/echo/v4 v4.9.0 // indirect
@@ -46,12 +45,11 @@ require (
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
+	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
-	golang.org/x/net v0.3.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 )
 
 // replace github.com/wailsapp/wails/v2 v2.3.1 => /Users/mdmoniruzzaman/go/pkg/mod
