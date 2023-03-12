@@ -44,7 +44,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	// Step 2: Check if binary is available for the source
 	binaryPath := fileService.GetSourceBinaryPath(platform, cid, label)
 	if !utils.IsFileExist(binaryPath) {
-		logger.Error(fmt.Sprintf("Binary file not found for %v %v %v", platform, cid, label))
+		logger.Error(fmt.Sprintf("Binary file not found for %v", binaryPath))
 		socket.PublishStatusMessage("test_status", "Binary file not found!", "error")
 		return execResult
 	}
