@@ -1,31 +1,32 @@
 package logger
 
 import (
-	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"log"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
 
-func Info(logStr string) {
+func Info(message string) {
 	fileInfo, err := getLogFile()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	infoLog := log.New(fileInfo, "[info] ", log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
-	infoLog.Println(logStr)
+	infoLog.Println(message)
 }
 
-func Error(logStr string) {
+func Error(message string) {
 	fileInfo, err := getLogFile()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	infoLog := log.New(fileInfo, "[error] ", log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
-	infoLog.Println(logStr)
+	infoLog.Println(message)
 }
 
 func getLogFile() (*os.File, error) {
