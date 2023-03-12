@@ -3,11 +3,12 @@ package executor
 import (
 	"bytes"
 	"fmt"
-	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"unicode"
+
+	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 
 	"github.com/skmonir/mango-gui/backend/judge-framework/config"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
@@ -54,9 +55,11 @@ func CompileSource(command string, showStdError bool) string {
 	cmd := exec.Command(cmds[0], cmds[1:]...)
 	if showStdError {
 		cmd.Stderr = os.Stderr
+	} else {
+		cmd.Stderr = &stderr_buffer
 	}
-	cmd.Stderr = &stderr_buffer
 	if err := cmd.Run(); err != nil {
+		logger.Error(err.Error())
 		logger.Error(stderr_buffer.String())
 		return stderr_buffer.String()
 	}
