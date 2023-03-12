@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
+	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"time"
 
 	"github.com/skmonir/mango-gui/backend/judge-framework/cacheServices"
@@ -15,6 +16,7 @@ import (
 )
 
 func RunTest(platform string, cid string, label string) dto.ProblemExecutionResult {
+	logger.Info(fmt.Sprintf("Run test request received for %v %v %v", platform, cid, label))
 	// Step 0: Fetch new/previous execution result object and reset necessary fields
 	execResult := GetProblemExecutionResult(platform, cid, label, true, false)
 	execResult.CompilationError = ""
@@ -27,11 +29,13 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	socket.PublishStatusMessage("test_status", "Compiling source code", "info")
 	err := executor.Compile(platform, cid, label)
 	if err != "" {
+		logger.Info("Compilation error!")
 		socket.PublishStatusMessage("test_status", "Compilation error!", "error")
 		execResult.CompilationError = err
 		cacheServices.SaveExecutionResult(platform, cid, label, execResult)
 		return execResult
 	}
+	logger.Info("Compilation successful!")
 	socket.PublishStatusMessage("test_status", "Compilation successful!", "success")
 	socket.PublishExecutionResult(execResult, "test_exec_result_event")
 
@@ -40,6 +44,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	// Step 2: Check if binary is available for the source
 	binaryPath := fileService.GetSourceBinaryPath(platform, cid, label)
 	if !utils.IsFileExist(binaryPath) {
+		logger.Error(fmt.Sprintf("Binary file not found for %v %v %v", platform, cid, label))
 		socket.PublishStatusMessage("test_status", "Binary file not found!", "error")
 		return execResult
 	}
@@ -58,11 +63,12 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	execResult = executor.Execute(execResult, "test_exec_result_event")
 	cacheServices.SaveExecutionResult(platform, cid, label, execResult)
 
+	logger.Info("Execution complete")
 	return execResult
 }
 
 func GetProblemExecutionResult(platform string, cid string, label string, isForUI bool, isSkipCache bool) dto.ProblemExecutionResult {
-	fmt.Println("Fetching execution result for", platform, cid, label, isForUI, isSkipCache)
+	logger.Info(fmt.Sprintf("Fetching execution result for %v %v %v %v %v", platform, cid, label, isForUI, isSkipCache))
 
 	maxRow, maxCol := constants.IO_MAX_ROW_FOR_TEST, constants.IO_MAX_COL_FOR_TEST
 	if isForUI {

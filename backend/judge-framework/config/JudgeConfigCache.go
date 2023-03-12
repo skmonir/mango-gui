@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fmt"
+	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"sync"
 )
 
@@ -10,12 +10,12 @@ var judgeConfig *JudgeConfig
 
 func GetJudgeConfigFromCache() *JudgeConfig {
 	if judgeConfig == nil {
-		fmt.Println("Config not available in cache")
+		logger.Info("Config not available in cache")
 		once.Do(func() {
 			judgeConfig = GetJudgeConfigFromFile()
 		})
 	} else {
-		fmt.Println("Returning config from cache")
+		logger.Info("Returning config from cache")
 	}
 	return judgeConfig
 }

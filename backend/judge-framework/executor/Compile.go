@@ -3,9 +3,10 @@ package executor
 import (
 	"bytes"
 	"fmt"
+	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"os"
 	"os/exec"
-	"strings"
+	"path/filepath"
 	"unicode"
 
 	"github.com/skmonir/mango-gui/backend/judge-framework/config"
@@ -56,21 +57,22 @@ func CompileSource(command string, showStdError bool) string {
 	}
 	cmd.Stderr = &stderr_buffer
 	if err := cmd.Run(); err != nil {
-		fmt.Println(stderr_buffer.String())
+		logger.Error(stderr_buffer.String())
 		return stderr_buffer.String()
 	}
 	return ""
 }
 
 func Compile(platform string, cid string, label string) string {
-	fmt.Println("Compiling source...")
+	logger.Info(fmt.Sprintf("Compiling source for %v %v %v", platform, cid, label))
 	judgeConfig := config.GetJudgeConfigFromCache()
 
-	folderPath := fmt.Sprintf("%v/%v/%v/source", strings.TrimRight(judgeConfig.WorkspaceDirectory, "/"), platform, cid)
-	filePathWithoutExt := folderPath + "/" + label
-	filePathWithExt := folderPath + "/" + label + judgeConfig.ActiveLanguage.FileExtension
+	folderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
+	filePathWithoutExt := filepath.Join(folderPath, label)
+	filePathWithExt := filePathWithoutExt + judgeConfig.ActiveLanguage.FileExtension
 
 	if !utils.IsFileExist(filePathWithExt) {
+		logger.Error("Source file not found!")
 		return "Source file not found!"
 	}
 

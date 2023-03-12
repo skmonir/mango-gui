@@ -131,7 +131,7 @@ func UpdateCodeByProblemPath(platform, cid, label, code string) {
 func GetSourceFilePath(platform string, cid string, label string) string {
 	judgeConfig := config.GetJudgeConfigFromCache()
 
-	folderPath := fmt.Sprintf("%v/%v/%v/source", strings.TrimRight(judgeConfig.WorkspaceDirectory, "/"), platform, cid)
+	folderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
 	fileName := label + judgeConfig.ActiveLanguage.FileExtension
 	filePath := filepath.Join(folderPath, fileName)
 
@@ -140,9 +140,7 @@ func GetSourceFilePath(platform string, cid string, label string) string {
 
 func GetSourceBinaryPath(platform string, cid string, label string) string {
 	judgeConfig := config.GetJudgeConfigFromCache()
-
-	folderPath := fmt.Sprintf("%v/%v/%v/source", strings.TrimRight(judgeConfig.WorkspaceDirectory, "/"), platform, cid)
+	folderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
 	binaryPath := filepath.Join(folderPath, label)
-
 	return binaryPath
 }
