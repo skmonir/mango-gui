@@ -59,9 +59,12 @@ func CompileSource(command string, showStdError bool) string {
 		cmd.Stderr = &stderr_buffer
 	}
 	if err := cmd.Run(); err != nil {
+		if stderr_buffer.String() != "" {
+			logger.Error(stderr_buffer.String())
+			return stderr_buffer.String()
+		}
 		logger.Error(err.Error())
-		logger.Error(stderr_buffer.String())
-		return stderr_buffer.String()
+		return err.Error()
 	}
 	return ""
 }
