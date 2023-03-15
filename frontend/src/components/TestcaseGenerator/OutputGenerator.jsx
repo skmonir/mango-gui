@@ -15,6 +15,7 @@ import ShowToast from "../Toast/ShowToast.jsx";
 import ViewCodeModal from "../modals/ViewCodeModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faCog } from "@fortawesome/free-solid-svg-icons";
+import Utils from "../../Utils.js";
 
 export default function OutputGenerator({ appState }) {
   const socketClient = new SocketClient();
@@ -271,27 +272,31 @@ export default function OutputGenerator({ appState }) {
         </Row>
         <Row>
           <Col md={{ span: 2, offset: 5 }}>
-            <Button
-              size="sm"
-              variant="outline-success"
-              onClick={generateOutputTriggered}
-              disabled={isGeneratingInProgress}
-            >
-              {!isGeneratingInProgress ? (
-                <FontAwesomeIcon icon={faCog} />
-              ) : (
-                <Spinner
-                  as="span"
-                  animation="grow"
+            <Row>
+              <Col xs={12} className="d-flex justify-content-center">
+                <Button
                   size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-              )}
-              {!isGeneratingInProgress
-                ? " Generate Output"
-                : " Generating Output"}
-            </Button>
+                  variant="outline-success"
+                  onClick={generateOutputTriggered}
+                  disabled={isGeneratingInProgress}
+                >
+                  {!isGeneratingInProgress ? (
+                    <FontAwesomeIcon icon={faCog} />
+                  ) : (
+                    <Spinner
+                      as="span"
+                      animation="grow"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {!isGeneratingInProgress
+                    ? " Generate Output"
+                    : " Generating Output"}
+                </Button>
+              </Col>
+            </Row>
           </Col>
         </Row>
         <Row>

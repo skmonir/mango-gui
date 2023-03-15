@@ -25,6 +25,11 @@ import SocketClient from "../socket/SocketClient.js";
 import DataService from "../services/DataService.js";
 import ViewCodeModal from "./modals/ViewCodeModal.jsx";
 import AddEditTestModal from "./modals/AddEditTestModal.jsx";
+import AC from "../assets/icons/AC.svg";
+import CE from "../assets/icons/CE.svg";
+import RE from "../assets/icons/RE.svg";
+import TLE from "../assets/icons/TLE.svg";
+import WA from "../assets/icons/WA.svg";
 
 export default function Tester({ appState }) {
   const socketClient = new SocketClient();
@@ -38,6 +43,14 @@ export default function Tester({ appState }) {
     { label: "Time Limit Exceeded", value: "TLE" },
     { label: "Memory Limit Exceeded", value: "MLE" }
   ];
+  const verdictIcons = {
+    AC: AC,
+    WA: WA,
+    CE: CE,
+    RE: RE,
+    TLE: TLE
+  };
+
   const [selectedVerdictKey, setSelectedVerdictKey] = useState("");
 
   const [testContestUrl, setTestContestUrl] = useState("");
@@ -215,31 +228,29 @@ export default function Tester({ appState }) {
     if (testcaseExecutionDetails?.status === "running") {
       return <Spinner animation="border" variant="primary" size="sm" />;
     } else if (testcaseExecutionDetails?.status !== "none") {
-      if (testcaseExecutionDetails?.testcaseExecutionResult?.verdict === "AC") {
-        return (
-          <pre style={{ color: "green" }}>
-            <img
-              src={`/src/assets/icons/${testcaseExecutionDetails?.testcaseExecutionResult?.verdict}.svg`}
-              style={{ maxWidth: "30px" }}
-            />{" "}
-            <strong>
-              {testcaseExecutionDetails?.testcaseExecutionResult?.verdict}
-            </strong>
-          </pre>
-        );
-      } else {
-        return (
-          <pre style={{ color: "red" }}>
-            <img
-              src={`/src/assets/icons/${testcaseExecutionDetails?.testcaseExecutionResult?.verdict}.svg`}
-              style={{ maxWidth: "30px" }}
-            />{" "}
-            <strong>
-              {testcaseExecutionDetails?.testcaseExecutionResult?.verdict}
-            </strong>
-          </pre>
-        );
-      }
+      return (
+        <pre
+          style={{
+            color:
+              testcaseExecutionDetails?.testcaseExecutionResult?.verdict ===
+              "AC"
+                ? "green"
+                : "red"
+          }}
+        >
+          <img
+            src={
+              verdictIcons[
+                testcaseExecutionDetails?.testcaseExecutionResult?.verdict
+              ]
+            }
+            style={{ maxWidth: "30px" }}
+          />{" "}
+          <strong>
+            {testcaseExecutionDetails?.testcaseExecutionResult?.verdict}
+          </strong>
+        </pre>
+      );
     }
   };
 

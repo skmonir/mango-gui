@@ -99,7 +99,7 @@ export default function InputGenerator({ appState }) {
     tgenScriptContent: ""
   });
 
-  const [generatorExecResult, setGeneratorExecResult] = useState({});
+  const [generatorExecResult, setGeneratorExecResult] = useState(null);
 
   useEffect(() => {
     let socketConnGenerator = socketClient.initSocketConnection(
@@ -610,7 +610,7 @@ export default function InputGenerator({ appState }) {
                       >
                         <pre>
                           {generatorExecResult?.compilationError === ""
-                            ? "Compilation Successful!"
+                            ? "Tgen Script Compiled Successfully!"
                             : generatorExecResult?.compilationError}
                         </pre>
                       </td>
@@ -621,30 +621,34 @@ export default function InputGenerator({ appState }) {
             </Col>
           )}
         </Row>
+        <br />
         <Row>
           <Col md={{ span: 2, offset: 5 }}>
-            <br />
-            <Button
-              size="sm"
-              variant="outline-success"
-              onClick={generateInputTriggered}
-              disabled={isGeneratingInProgress}
-            >
-              {!isGeneratingInProgress ? (
-                <FontAwesomeIcon icon={faCog} />
-              ) : (
-                <Spinner
-                  as="span"
-                  animation="grow"
+            <Row>
+              <Col xs={12} className="d-flex justify-content-center">
+                <Button
                   size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-              )}
-              {!isGeneratingInProgress
-                ? " Generate Input"
-                : " Generating Input"}
-            </Button>
+                  variant="outline-success"
+                  onClick={generateInputTriggered}
+                  disabled={isGeneratingInProgress}
+                >
+                  {!isGeneratingInProgress ? (
+                    <FontAwesomeIcon icon={faCog} />
+                  ) : (
+                    <Spinner
+                      as="span"
+                      animation="grow"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {!isGeneratingInProgress
+                    ? " Generate Input"
+                    : " Generating Input"}
+                </Button>
+              </Col>
+            </Row>
           </Col>
         </Row>
         <Row>

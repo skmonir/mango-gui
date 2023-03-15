@@ -264,26 +264,30 @@ export default function Settings({ appState, setAppState }) {
           </Col>
         </Row>
         <Row>
-          <Col md={{ span: 4, offset: 5 }}>
-            <Button
-              size="sm"
-              variant="outline-success"
-              onClick={() => triggerSave()}
-              disabled={savingInProgress}
-            >
-              {!savingInProgress ? (
-                <FontAwesomeIcon icon={faSave} />
-              ) : (
-                <Spinner
-                  as="span"
-                  animation="grow"
+          <Col md={{ span: 2, offset: 5 }}>
+            <Row>
+              <Col xs={12} className="d-flex justify-content-center">
+                <Button
                   size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-              )}
-              {savingInProgress ? " Saving Settings" : " Save Settings"}
-            </Button>
+                  variant="outline-success"
+                  onClick={() => triggerSave()}
+                  disabled={savingInProgress}
+                >
+                  {!savingInProgress ? (
+                    <FontAwesomeIcon icon={faSave} />
+                  ) : (
+                    <Spinner
+                      as="span"
+                      animation="grow"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {savingInProgress ? " Saving Settings" : " Save Settings"}
+                </Button>
+              </Col>
+            </Row>
           </Col>
         </Row>
       </Card>
