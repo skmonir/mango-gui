@@ -1,12 +1,4 @@
-import {
-  Alert,
-  Button,
-  Card,
-  Col,
-  InputGroup,
-  Row,
-  Spinner
-} from "react-bootstrap";
+import { Button, Card, Col, InputGroup, Row, Spinner } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faSave } from "@fortawesome/free-solid-svg-icons";
@@ -14,6 +6,7 @@ import { useEffect, useState } from "react";
 import DataService from "../services/DataService.js";
 import ViewCodeModal from "./modals/ViewCodeModal.jsx";
 import ShowToast from "./Toast/ShowToast.jsx";
+import Utils from "../Utils.js";
 
 export default function Settings({ appState, setAppState }) {
   const [config, setConfig] = useState({
@@ -115,6 +108,28 @@ export default function Settings({ appState, setAppState }) {
     });
   };
 
+  const checkDirectoryPathValidity = dirPath => {
+    if (!Utils.isStrNullOrEmpty(dirPath)) {
+      DataService.checkDirectoryPathValidity(window.btoa(dirPath)).then(
+        resp => {
+          if (resp.isExist === false) {
+            showToastMessage("Error", `${dirPath} is not a valid directory`);
+          }
+        }
+      );
+    }
+  };
+
+  const checkFilePathValidity = filePath => {
+    if (!Utils.isStrNullOrEmpty(filePath)) {
+      DataService.checkFilePathValidity(window.btoa(filePath)).then(resp => {
+        if (resp.isExist === false) {
+          showToastMessage("Error", `${filePath} is not a valid file`);
+        }
+      });
+    }
+  };
+
   return (
     <div>
       <Card body bg="light">
@@ -133,6 +148,9 @@ export default function Settings({ appState, setAppState }) {
               value={config.workspaceDirectory}
               onChange={e =>
                 setConfig({ ...config, workspaceDirectory: e.target.value })
+              }
+              onBlur={() =>
+                checkDirectoryPathValidity(config.workspaceDirectory)
               }
             />
           </Form.Group>
@@ -228,6 +246,7 @@ export default function Settings({ appState, setAppState }) {
                   onChange={e =>
                     setConfig({ ...config, templatePath: e.target.value })
                   }
+                  onBlur={() => checkFilePathValidity(config.templatePath)}
                   placeholder={
                     "Template file ends with extension(.cpp). The template will be used to create source files."
                   }

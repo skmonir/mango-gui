@@ -50,7 +50,7 @@ export default function OutputGenerator({ appState }) {
   }, []);
 
   const fetchIODirectories = () => {
-    if (!isNullOrEmpty(outputGenerateRequest.problemUrl)) {
+    if (!Utils.isStrNullOrEmpty(outputGenerateRequest.problemUrl)) {
       DataService.getInputOutputDirectoriesByUrl(
         window.btoa(outputGenerateRequest.problemUrl)
       ).then(dir => {
@@ -64,7 +64,7 @@ export default function OutputGenerator({ appState }) {
   };
 
   const checkDirectoryPathValidity = dirPath => {
-    if (!isNullOrEmpty(dirPath)) {
+    if (!Utils.isStrNullOrEmpty(dirPath)) {
       DataService.checkDirectoryPathValidity(window.btoa(dirPath)).then(
         resp => {
           if (resp.isExist === false) {
@@ -76,19 +76,13 @@ export default function OutputGenerator({ appState }) {
   };
 
   const checkFilePathValidity = filePath => {
-    if (!isNullOrEmpty(filePath)) {
+    if (!Utils.isStrNullOrEmpty(filePath)) {
       DataService.checkFilePathValidity(window.btoa(filePath)).then(resp => {
         if (resp.isExist === false) {
           showToastMessage("Error", `${filePath} is not a valid file`);
         }
       });
     }
-  };
-
-  const isNullOrEmpty = obj => {
-    return (
-      obj === null || obj === undefined || obj.trim() === "" || obj.length === 0
-    );
   };
 
   const showToastMessage = (variant, message) => {
@@ -101,16 +95,16 @@ export default function OutputGenerator({ appState }) {
 
   const validate = () => {
     let errMessage = "";
-    if (isNullOrEmpty(outputGenerateRequest.inputDirectoryPath)) {
+    if (Utils.isStrNullOrEmpty(outputGenerateRequest.inputDirectoryPath)) {
       errMessage += "Input directory path can't be empty\n";
     }
-    if (isNullOrEmpty(outputGenerateRequest.outputDirectoryPath)) {
+    if (Utils.isStrNullOrEmpty(outputGenerateRequest.outputDirectoryPath)) {
       errMessage += "Output directory path can't be empty\n";
     }
-    if (isNullOrEmpty(outputGenerateRequest.generatorScriptPath)) {
+    if (Utils.isStrNullOrEmpty(outputGenerateRequest.generatorScriptPath)) {
       errMessage += "Generator script path can't be empty\n";
     }
-    if (isNullOrEmpty(errMessage)) {
+    if (Utils.isStrNullOrEmpty(errMessage)) {
       return true;
     } else {
       showToastMessage("Error", errMessage);
