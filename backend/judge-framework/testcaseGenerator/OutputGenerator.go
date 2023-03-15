@@ -24,8 +24,8 @@ func GenerateOutput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionRes
 	}
 
 	// Step-2: Check if generator binary is created
-	scriptBinaryPathWithoutExt := strings.TrimSuffix(request.GeneratorScriptPath, filepath.Ext(request.GeneratorScriptPath))
-	if !utils.IsFileExist(scriptBinaryPathWithoutExt) {
+	scriptBinaryPath := strings.TrimSuffix(request.GeneratorScriptPath, filepath.Ext(request.GeneratorScriptPath)) + utils.GetBinaryFileExt()
+	if !utils.IsFileExist(scriptBinaryPath) {
 		execResult.CompilationError = "Solution script binary not found!"
 		return execResult
 	}
@@ -43,7 +43,7 @@ func GenerateOutput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionRes
 				MemoryLimit:        512,
 				InputFilePath:      inputFilepath,
 				ExecOutputFilePath: outputFilepath,
-				ExecutionCommand:   []string{scriptBinaryPathWithoutExt},
+				ExecutionCommand:   []string{scriptBinaryPath},
 			},
 		}
 		execResult.TestcaseExecutionDetailsList = append(execResult.TestcaseExecutionDetailsList, execDetail)

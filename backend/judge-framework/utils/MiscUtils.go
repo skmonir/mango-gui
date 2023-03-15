@@ -113,3 +113,10 @@ func GetAppDataDirectoryPath() string {
 
 	return configPath
 }
+
+func GetBinaryFileExt() string {
+	if runtime.GOOS == "windows" {
+		return ".exe"
+	}
+	return ""
+}
