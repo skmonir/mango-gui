@@ -95,14 +95,8 @@ func runGenerator(request dto.TestcaseGenerateRequest, skipIfCompiled bool) dto.
 	// Step-2: Validate the script
 	execResult := generateInput(request)
 
-	if execResult.CompilationError == "" && len(request.ProblemUrl) > 0 {
-		fmt.Println("Updating cache after input generation")
-		ps := services.GetProblemListByUrl(request.ProblemUrl)
-		if len(ps) > 0 {
-			services.GetProblemExecutionResult(ps[0].Platform, ps[0].ContestId, ps[0].Label, true, true)
-		} else {
-			fmt.Println("No parsed problem found for", request.ProblemUrl)
-		}
+	if execResult.CompilationError == "" {
+		services.UpdateProblemExecutionResultInCacheByUrl(request.ProblemUrl)
 	}
 
 	return execResult

@@ -582,7 +582,7 @@ export default function InputGenerator({ appState }) {
               </div>
             </Col>
           )}
-          {generatorExecResult && generatorExecResult?.compilationError && (
+          {generatorExecResult && (
             <Col
               xs={
                 inputGenerateRequest.generationProcess === "tgen_script"
@@ -606,9 +606,17 @@ export default function InputGenerator({ appState }) {
                           borderColor: "black",
                           borderRadius: "5px"
                         }}
-                        className="table-danger"
+                        className={
+                          generatorExecResult?.compilationError === ""
+                            ? "table-success"
+                            : "table-danger"
+                        }
                       >
-                        <pre>{generatorExecResult?.compilationError}</pre>
+                        <pre>
+                          {generatorExecResult?.compilationError === ""
+                            ? "Compilation Successful!"
+                            : generatorExecResult?.compilationError}
+                        </pre>
                       </td>
                     </tr>
                   </tbody>
@@ -616,6 +624,32 @@ export default function InputGenerator({ appState }) {
               </div>
             </Col>
           )}
+        </Row>
+        <Row>
+          <Col md={{ span: 2, offset: 5 }}>
+            <br />
+            <Button
+              size="sm"
+              variant="outline-success"
+              onClick={generateInputTriggered}
+              disabled={isGeneratingInProgress}
+            >
+              {!isGeneratingInProgress ? (
+                <FontAwesomeIcon icon={faCog} />
+              ) : (
+                <Spinner
+                  as="span"
+                  animation="grow"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              )}
+              {!isGeneratingInProgress
+                ? " Generate Input"
+                : " Generating Input"}
+            </Button>
+          </Col>
         </Row>
         <Row>
           <Col xs={12} id="input_logs">
@@ -656,32 +690,6 @@ export default function InputGenerator({ appState }) {
                   </Table>
                 </div>
               )}
-          </Col>
-        </Row>
-        <Row>
-          <Col md={{ span: 2, offset: 5 }}>
-            <br />
-            <Button
-              size="sm"
-              variant="outline-success"
-              onClick={generateInputTriggered}
-              disabled={isGeneratingInProgress}
-            >
-              {!isGeneratingInProgress ? (
-                <FontAwesomeIcon icon={faCog} />
-              ) : (
-                <Spinner
-                  as="span"
-                  animation="grow"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-              )}
-              {!isGeneratingInProgress
-                ? " Generate Input"
-                : " Generating Input"}
-            </Button>
           </Col>
         </Row>
       </Card>

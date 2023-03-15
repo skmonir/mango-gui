@@ -98,3 +98,15 @@ func GetProblemExecutionResult(platform string, cid string, label string, isForU
 
 	return execResult
 }
+
+func UpdateProblemExecutionResultInCacheByUrl(url string) {
+	if len(url) > 0 {
+		fmt.Println("Updating cache after output generation")
+		ps := GetProblemListByUrl(url)
+		if len(ps) > 0 {
+			GetProblemExecutionResult(ps[0].Platform, ps[0].ContestId, ps[0].Label, true, true)
+		} else {
+			fmt.Println("No parsed problem found for", url)
+		}
+	}
+}

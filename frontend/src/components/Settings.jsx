@@ -13,6 +13,7 @@ import { faCode, faSave } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import DataService from "../services/DataService.js";
 import ViewCodeModal from "./modals/ViewCodeModal.jsx";
+import ShowToast from "./Toast/ShowToast.jsx";
 
 export default function Settings({ appState, setAppState }) {
   const [config, setConfig] = useState({
@@ -25,8 +26,12 @@ export default function Settings({ appState, setAppState }) {
     templatePath: ""
   });
 
+  const [toastMsgObj, setToastMsgObj] = useState({
+    variant: "",
+    message: ""
+  });
+  const [showToast, setShowToast] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
-  const [saveAlert, setSaveAlert] = useState("");
   const [savingInProgress, setSavingInProgress] = useState(false);
 
   useEffect(() => {
@@ -34,9 +39,16 @@ export default function Settings({ appState, setAppState }) {
   }, []);
 
   const fetchConfig = () => {
-    DataService.getConfig().then(config => {
-      saveConfigToUI(config);
-    });
+    DataService.getConfig()
+      .then(config => {
+        saveConfigToUI(config);
+      })
+      .catch(e => {
+        showToastMessage(
+          "Error",
+          "Oops! Something went wrong while fetching the config!"
+        );
+      });
   };
 
   const triggerSave = () => {
@@ -65,10 +77,13 @@ export default function Settings({ appState, setAppState }) {
     DataService.updateConfig(configToSave)
       .then(config => {
         saveConfigToUI(config);
-        setSaveAlert("Settings saved successfully!");
+        showToastMessage("Success", "Settings saved successfully!");
       })
       .catch(e => {
-        setSaveAlert("Oops! Something went wrong while saving the config!");
+        showToastMessage(
+          "Error",
+          "Oops! Something went wrong while saving the config!"
+        );
       })
       .finally(() => setSavingInProgress(false));
   };
@@ -92,49 +107,21 @@ export default function Settings({ appState, setAppState }) {
     setConfig({ ...config, lang: lang });
   };
 
+  const showToastMessage = (variant, message) => {
+    setShowToast(true);
+    setToastMsgObj({
+      variant: variant,
+      message: message
+    });
+  };
+
   return (
-    <Card body bg="light">
-      <Row>
-        <Form.Group className="mb-3">
-          <Form.Label>
-            <strong>Workspace Directory</strong>
-          </Form.Label>
-          <Form.Control
-            type="text"
-            size="sm"
-            autoCorrect="off"
-            autoComplete="off"
-            autoCapitalize="none"
-            placeholder="Enter your workspace directory absolute path. All the testcases and sources will be saved here."
-            value={config.workspaceDirectory}
-            onChange={e =>
-              setConfig({ ...config, workspaceDirectory: e.target.value })
-            }
-          />
-        </Form.Group>
-      </Row>
-      <Row>
-        <Col sm={3}>
+    <div>
+      <Card body bg="light">
+        <Row>
           <Form.Group className="mb-3">
             <Form.Label>
-              <strong>Language</strong>
-            </Form.Label>
-            <Form.Select
-              size="sm"
-              aria-label="Default select example"
-              value={config.lang}
-              onChange={e => changeLanguage(e.target.value)}
-            >
-              {/*<option value="">Select language</option>*/}
-              <option value="c++">C++</option>
-              {/*<option value="java">Java</option>*/}
-            </Form.Select>
-          </Form.Group>
-        </Col>
-        <Col sm={4}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>Compilation Command</strong>
+              <strong>Workspace Directory</strong>
             </Form.Label>
             <Form.Control
               type="text"
@@ -142,123 +129,147 @@ export default function Settings({ appState, setAppState }) {
               autoCorrect="off"
               autoComplete="off"
               autoCapitalize="none"
-              placeholder="Example: g++"
-              value={config.compilationCommand}
+              placeholder="Enter your workspace directory absolute path. All the testcases and sources will be saved here."
+              value={config.workspaceDirectory}
               onChange={e =>
-                setConfig({ ...config, compilationCommand: e.target.value })
+                setConfig({ ...config, workspaceDirectory: e.target.value })
               }
             />
           </Form.Group>
-        </Col>
-        <Col sm={5}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>Compilation Args</strong>
-            </Form.Label>
-            <Form.Control
-              type="text"
-              size="sm"
-              autoCorrect="off"
-              autoComplete="off"
-              autoCapitalize="none"
-              placeholder="Example: -std=c++20"
-              value={config.compilationArgs}
-              onChange={e =>
-                setConfig({ ...config, compilationArgs: e.target.value })
-              }
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-      <Row>
-        <Col sm={3}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>Author Name</strong>
-            </Form.Label>
-            <Form.Control
-              type="text"
-              size="sm"
-              autoCorrect="off"
-              autoComplete="off"
-              autoCapitalize="none"
-              placeholder="Enter your name"
-              value={config.author}
-              onChange={e => setConfig({ ...config, author: e.target.value })}
-            />
-          </Form.Group>
-        </Col>
-        <Col sm={9}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>Template File Path</strong>
-            </Form.Label>
-            <InputGroup className="mb-3">
+        </Row>
+        <Row>
+          <Col sm={3}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Language</strong>
+              </Form.Label>
+              <Form.Select
+                size="sm"
+                aria-label="Default select example"
+                value={config.lang}
+                onChange={e => changeLanguage(e.target.value)}
+              >
+                {/*<option value="">Select language</option>*/}
+                <option value="c++">C++</option>
+                {/*<option value="java">Java</option>*/}
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col sm={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Compilation Command</strong>
+              </Form.Label>
               <Form.Control
                 type="text"
                 size="sm"
                 autoCorrect="off"
                 autoComplete="off"
                 autoCapitalize="none"
-                value={config.templatePath}
+                placeholder="Example: g++"
+                value={config.compilationCommand}
                 onChange={e =>
-                  setConfig({ ...config, templatePath: e.target.value })
-                }
-                placeholder={
-                  "Template file ends with extension(.cpp). The template will be used to create source files."
+                  setConfig({ ...config, compilationCommand: e.target.value })
                 }
               />
-              <Button
+            </Form.Group>
+          </Col>
+          <Col sm={5}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Compilation Args</strong>
+              </Form.Label>
+              <Form.Control
+                type="text"
                 size="sm"
-                variant="outline-success"
-                disabled={!config.templatePath}
-                onClick={() => setShowCodeModal(true)}
-              >
-                <FontAwesomeIcon icon={faCode} /> View Code{" "}
-              </Button>
-            </InputGroup>
-          </Form.Group>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={{ span: 4, offset: 5 }}>
-          <Button
-            size="sm"
-            variant="outline-success"
-            onClick={() => triggerSave()}
-            disabled={savingInProgress}
-          >
-            {!savingInProgress ? (
-              <FontAwesomeIcon icon={faSave} />
-            ) : (
-              <Spinner
-                as="span"
-                animation="grow"
-                size="sm"
-                role="status"
-                aria-hidden="true"
+                autoCorrect="off"
+                autoComplete="off"
+                autoCapitalize="none"
+                placeholder="Example: -std=c++20"
+                value={config.compilationArgs}
+                onChange={e =>
+                  setConfig({ ...config, compilationArgs: e.target.value })
+                }
               />
-            )}
-            {savingInProgress ? " Saving Settings" : " Save Settings"}
-          </Button>
-        </Col>
-      </Row>
-      {saveAlert !== "" && (
-        <Row>
-          <Col>
-            <br />
-            <Alert
-              variant={
-                saveAlert === "Settings saved successfully!"
-                  ? "success"
-                  : "danger"
-              }
-              className="text-center"
-            >
-              {saveAlert}
-            </Alert>
+            </Form.Group>
           </Col>
         </Row>
+        <Row>
+          <Col sm={3}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Author Name</strong>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                size="sm"
+                autoCorrect="off"
+                autoComplete="off"
+                autoCapitalize="none"
+                placeholder="Enter your name"
+                value={config.author}
+                onChange={e => setConfig({ ...config, author: e.target.value })}
+              />
+            </Form.Group>
+          </Col>
+          <Col sm={9}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Template File Path</strong>
+              </Form.Label>
+              <InputGroup className="mb-3">
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  value={config.templatePath}
+                  onChange={e =>
+                    setConfig({ ...config, templatePath: e.target.value })
+                  }
+                  placeholder={
+                    "Template file ends with extension(.cpp). The template will be used to create source files."
+                  }
+                />
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  disabled={!config.templatePath}
+                  onClick={() => setShowCodeModal(true)}
+                >
+                  <FontAwesomeIcon icon={faCode} /> View Code{" "}
+                </Button>
+              </InputGroup>
+            </Form.Group>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={{ span: 4, offset: 5 }}>
+            <Button
+              size="sm"
+              variant="outline-success"
+              onClick={() => triggerSave()}
+              disabled={savingInProgress}
+            >
+              {!savingInProgress ? (
+                <FontAwesomeIcon icon={faSave} />
+              ) : (
+                <Spinner
+                  as="span"
+                  animation="grow"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              )}
+              {savingInProgress ? " Saving Settings" : " Save Settings"}
+            </Button>
+          </Col>
+        </Row>
+      </Card>
+      {showToast && (
+        <ShowToast toastMsgObj={toastMsgObj} setShowToast={setShowToast} />
       )}
       {showCodeModal && (
         <ViewCodeModal
@@ -266,6 +277,6 @@ export default function Settings({ appState, setAppState }) {
           setShowCodeModal={setShowCodeModal}
         />
       )}
-    </Card>
+    </div>
   );
 }

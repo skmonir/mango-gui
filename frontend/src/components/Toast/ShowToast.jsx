@@ -6,7 +6,9 @@ export default function ShowToast({ toastMsgObj, setShowToast }) {
       <Toast
         onClose={() => setShowToast(false)}
         show={true}
-        bg={toastMsgObj.variant === "Error" ? "danger" : "success"}
+        bg={
+          toastMsgObj.variant.toLowerCase() === "error" ? "danger" : "success"
+        }
         delay={toastMsgObj.variant === "Error" ? 10000 : 3000}
         autohide={toastMsgObj.variant !== "Error"}
       >

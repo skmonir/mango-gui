@@ -276,7 +276,33 @@ export default function OutputGenerator({ appState }) {
           </Col>
         </Row>
         <Row>
+          <Col md={{ span: 2, offset: 5 }}>
+            <Button
+              size="sm"
+              variant="outline-success"
+              onClick={generateOutputTriggered}
+              disabled={isGeneratingInProgress}
+            >
+              {!isGeneratingInProgress ? (
+                <FontAwesomeIcon icon={faCog} />
+              ) : (
+                <Spinner
+                  as="span"
+                  animation="grow"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              )}
+              {!isGeneratingInProgress
+                ? " Generate Output"
+                : " Generating Output"}
+            </Button>
+          </Col>
+        </Row>
+        <Row>
           <Col xs={12}>
+            <br />
             {generatorExecResult &&
               generatorExecResult?.compilationError === "" && (
                 <div
@@ -339,32 +365,6 @@ export default function OutputGenerator({ appState }) {
                 </Table>
               </div>
             )}
-          </Col>
-        </Row>
-        <Row>
-          <Col md={{ span: 2, offset: 5 }}>
-            <br />
-            <Button
-              size="sm"
-              variant="outline-success"
-              onClick={generateOutputTriggered}
-              disabled={isGeneratingInProgress}
-            >
-              {!isGeneratingInProgress ? (
-                <FontAwesomeIcon icon={faCog} />
-              ) : (
-                <Spinner
-                  as="span"
-                  animation="grow"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-              )}
-              {!isGeneratingInProgress
-                ? " Generate Output"
-                : " Generating Output"}
-            </Button>
           </Col>
         </Row>
       </Card>

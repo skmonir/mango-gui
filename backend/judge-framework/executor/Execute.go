@@ -74,7 +74,7 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 		cmd.Stdout = &outputBuffer
 	} else {
 		stdout, _ = cmd.StdoutPipe()
-		outputFile, _ = os.OpenFile(testcase.ExecOutputFilePath, os.O_RDWR|os.O_CREATE, 0644)
+		outputFile, _ = os.OpenFile(testcase.ExecOutputFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	}
 
 	execResponse := executionResponse{
