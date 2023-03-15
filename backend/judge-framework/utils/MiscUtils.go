@@ -45,7 +45,7 @@ func PanicRecovery() {
 
 func ExtractInfoFromUrl(url string) (string, string, string) {
 	platform, cid, pid := "", "", ""
-	if strings.Contains(url, "atcoder.jp") {
+	if strings.Contains(url, "atcoder.jp/contests") {
 		platform = "atcoder"
 		index := strings.Index(url, "atcoder.jp/contests")
 		path := strings.Trim(url[index+len("atcoder.jp/contests"):], "/")
@@ -63,8 +63,16 @@ func ExtractInfoFromUrl(url string) (string, string, string) {
 		}
 	} else if strings.Contains(url, "codeforces.com") {
 		platform = "codeforces"
-		index := strings.Index(url, "codeforces.com/contest")
-		path := strings.Trim(url[index+len("codeforces.com/contest"):], "/")
+		ctype := ""
+		if strings.Contains(url, "codeforces.com/contest") {
+			ctype = "contest"
+		} else if strings.Contains(url, "codeforces.com/gym") {
+			ctype = "gym"
+		} else {
+			return platform, cid, pid
+		}
+		index := strings.Index(url, "codeforces.com/"+ctype)
+		path := strings.Trim(url[index+len("codeforces.com/"+ctype):], "/")
 		var values []string
 		for _, p := range strings.Split(path, "/") {
 			if len(strings.TrimSpace(p)) > 0 {
