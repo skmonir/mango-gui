@@ -15,6 +15,7 @@ import ShowToast from "../Toast/ShowToast.jsx";
 import ViewCodeModal from "../modals/ViewCodeModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faCog } from "@fortawesome/free-solid-svg-icons";
+import Utils from "../../Utils.js";
 
 export default function OutputGenerator({ appState }) {
   const socketClient = new SocketClient();
@@ -50,7 +51,7 @@ export default function OutputGenerator({ appState }) {
   }, []);
 
   const fetchIODirectories = () => {
-    if (!isNullOrEmpty(outputGenerateRequest.problemUrl)) {
+    if (!Utils.isStrNullOrEmpty(outputGenerateRequest.problemUrl)) {
       DataService.getInputOutputDirectoriesByUrl(
         window.btoa(outputGenerateRequest.problemUrl)
       ).then(dir => {
@@ -64,7 +65,7 @@ export default function OutputGenerator({ appState }) {
   };
 
   const checkDirectoryPathValidity = dirPath => {
-    if (!isNullOrEmpty(dirPath)) {
+    if (!Utils.isStrNullOrEmpty(dirPath)) {
       DataService.checkDirectoryPathValidity(window.btoa(dirPath)).then(
         resp => {
           if (resp.isExist === false) {
@@ -76,19 +77,13 @@ export default function OutputGenerator({ appState }) {
   };
 
   const checkFilePathValidity = filePath => {
-    if (!isNullOrEmpty(filePath)) {
+    if (!Utils.isStrNullOrEmpty(filePath)) {
       DataService.checkFilePathValidity(window.btoa(filePath)).then(resp => {
         if (resp.isExist === false) {
           showToastMessage("Error", `${filePath} is not a valid file`);
         }
       });
     }
-  };
-
-  const isNullOrEmpty = obj => {
-    return (
-      obj === null || obj === undefined || obj.trim() === "" || obj.length === 0
-    );
   };
 
   const showToastMessage = (variant, message) => {
@@ -101,16 +96,16 @@ export default function OutputGenerator({ appState }) {
 
   const validate = () => {
     let errMessage = "";
-    if (isNullOrEmpty(outputGenerateRequest.inputDirectoryPath)) {
+    if (Utils.isStrNullOrEmpty(outputGenerateRequest.inputDirectoryPath)) {
       errMessage += "Input directory path can't be empty\n";
     }
-    if (isNullOrEmpty(outputGenerateRequest.outputDirectoryPath)) {
+    if (Utils.isStrNullOrEmpty(outputGenerateRequest.outputDirectoryPath)) {
       errMessage += "Output directory path can't be empty\n";
     }
-    if (isNullOrEmpty(outputGenerateRequest.generatorScriptPath)) {
+    if (Utils.isStrNullOrEmpty(outputGenerateRequest.generatorScriptPath)) {
       errMessage += "Generator script path can't be empty\n";
     }
-    if (isNullOrEmpty(errMessage)) {
+    if (Utils.isStrNullOrEmpty(errMessage)) {
       return true;
     } else {
       showToastMessage("Error", errMessage);
@@ -276,7 +271,37 @@ export default function OutputGenerator({ appState }) {
           </Col>
         </Row>
         <Row>
+          <Col md={{ span: 2, offset: 5 }}>
+            <Row>
+              <Col xs={12} className="d-flex justify-content-center">
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  onClick={generateOutputTriggered}
+                  disabled={isGeneratingInProgress}
+                >
+                  {!isGeneratingInProgress ? (
+                    <FontAwesomeIcon icon={faCog} />
+                  ) : (
+                    <Spinner
+                      as="span"
+                      animation="grow"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {!isGeneratingInProgress
+                    ? " Generate Output"
+                    : " Generating Output"}
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <Row>
           <Col xs={12}>
+            <br />
             {generatorExecResult &&
               generatorExecResult?.compilationError === "" && (
                 <div
@@ -339,32 +364,6 @@ export default function OutputGenerator({ appState }) {
                 </Table>
               </div>
             )}
-          </Col>
-        </Row>
-        <Row>
-          <Col md={{ span: 2, offset: 5 }}>
-            <br />
-            <Button
-              size="sm"
-              variant="outline-success"
-              onClick={generateOutputTriggered}
-              disabled={isGeneratingInProgress}
-            >
-              {!isGeneratingInProgress ? (
-                <FontAwesomeIcon icon={faCog} />
-              ) : (
-                <Spinner
-                  as="span"
-                  animation="grow"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-              )}
-              {!isGeneratingInProgress
-                ? " Generate Output"
-                : " Generating Output"}
-            </Button>
           </Col>
         </Row>
       </Card>

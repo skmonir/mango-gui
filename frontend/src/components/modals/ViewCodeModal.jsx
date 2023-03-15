@@ -7,6 +7,7 @@ import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import Editor from "react-simple-code-editor";
+import ShowToast from "../Toast/ShowToast.jsx";
 
 export default function ViewCodeModal({
   codePath,
@@ -16,6 +17,11 @@ export default function ViewCodeModal({
   const [isCodeUpdated, setIsCodeUpdated] = useState(false);
   const [code, setCode] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [toastMsgObj, setToastMsgObj] = useState({
+    variant: "",
+    message: ""
+  });
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     if (codePath) {
@@ -31,6 +37,12 @@ export default function ViewCodeModal({
         setCode(code);
         setShowModal(true);
       })
+      .catch(e => {
+        showToastMessage(
+          "Error",
+          "Oops! Something went wrong while fetching the code!"
+        );
+      })
       .finally(() => {
         setShowModal(true);
         setTimeout(() => Prism.highlightAll(), 100);
@@ -42,6 +54,12 @@ export default function ViewCodeModal({
       .then(code => {
         setCode(code);
         setShowModal(true);
+      })
+      .catch(e => {
+        showToastMessage(
+          "Error",
+          "Oops! Something went wrong while fetching the code!"
+        );
       })
       .finally(() => {
         setShowModal(true);
@@ -59,9 +77,23 @@ export default function ViewCodeModal({
 
   const updateAndCloseModal = () => {
     if (codePath) {
-      updateCodeByFilePath().then(resp => closeModal());
+      updateCodeByFilePath()
+        .then(resp => closeModal())
+        .catch(e => {
+          showToastMessage(
+            "Error",
+            "Oops! Something went wrong while saving the code!"
+          );
+        });
     } else if (metadata) {
-      updateCodeByProblemPath().then(resp => closeModal());
+      updateCodeByProblemPath()
+        .then(resp => closeModal())
+        .catch(e => {
+          showToastMessage(
+            "Error",
+            "Oops! Something went wrong while saving the code!"
+          );
+        });
     }
   };
 
@@ -70,46 +102,63 @@ export default function ViewCodeModal({
     setTimeout(() => setShowCodeModal(false), 500);
   };
 
+  const showToastMessage = (variant, message) => {
+    setShowToast(true);
+    setToastMsgObj({
+      variant: variant,
+      message: message
+    });
+  };
+
   return (
-    <Modal
-      show={showModal}
-      onHide={closeModal}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-      fullscreen={true}
-    >
-      <Modal.Header />
-      <Modal.Body style={{ height: "80vh", overflowY: "auto" }}>
-        <Editor
-          value={code}
-          highlight={code => highlight(code, languages.js)}
-          onValueChange={code => {
-            setCode(code);
-            setIsCodeUpdated(true);
-          }}
-          padding={10}
-          tabSize={4}
-          style={{
-            fontFamily: '"Fira code", "Fira Mono", monospace',
-            fontSize: 13
-          }}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        {isCodeUpdated && (
+    <div>
+      <Modal
+        show={showModal}
+        onHide={closeModal}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+        fullscreen={true}
+      >
+        <Modal.Header />
+        <Modal.Body style={{ height: "80vh", overflowY: "auto" }}>
+          <Editor
+            value={code}
+            highlight={code => highlight(code, languages.js)}
+            onValueChange={code => {
+              setCode(code);
+              setIsCodeUpdated(true);
+            }}
+            padding={10}
+            tabSize={4}
+            style={{
+              fontFamily: '"Fira code", "Fira Mono", monospace',
+              fontSize: 13
+            }}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          {isCodeUpdated && (
+            <Button
+              size="sm"
+              variant="outline-success"
+              onClick={() => updateAndCloseModal()}
+            >
+              Save Changes and Close
+            </Button>
+          )}
           <Button
             size="sm"
-            variant="outline-success"
-            onClick={() => updateAndCloseModal()}
+            variant="outline-danger"
+            onClick={() => closeModal()}
           >
-            Save Changes and Close
+            Close
           </Button>
-        )}
-        <Button size="sm" variant="outline-danger" onClick={() => closeModal()}>
-          Close
-        </Button>
-      </Modal.Footer>
-    </Modal>
+        </Modal.Footer>
+      </Modal>
+      {showToast && (
+        <ShowToast toastMsgObj={toastMsgObj} setShowToast={setShowToast} />
+      )}
+    </div>
   );
 }

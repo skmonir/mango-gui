@@ -82,7 +82,7 @@ func Compile(platform string, cid string, label string) string {
 		return "Source file not found!"
 	}
 
-	command := fmt.Sprintf("%v %v %v -o %v", judgeConfig.ActiveLanguage.CompilationCommand, judgeConfig.ActiveLanguage.CompilationArgs, filePathWithExt, filePathWithoutExt)
+	command := fmt.Sprintf("%v %v %v -o %v%v", judgeConfig.ActiveLanguage.CompilationCommand, judgeConfig.ActiveLanguage.CompilationArgs, filePathWithExt, filePathWithoutExt, utils.GetBinaryFileExt())
 
 	return CompileSource(command, false)
 }

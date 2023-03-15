@@ -44,7 +44,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	// Step 2: Check if binary is available for the source
 	binaryPath := fileService.GetSourceBinaryPath(platform, cid, label)
 	if !utils.IsFileExist(binaryPath) {
-		logger.Error(fmt.Sprintf("Binary file not found for %v %v %v", platform, cid, label))
+		logger.Error(fmt.Sprintf("Binary file not found for %v", binaryPath))
 		socket.PublishStatusMessage("test_status", "Binary file not found!", "error")
 		return execResult
 	}
@@ -97,4 +97,16 @@ func GetProblemExecutionResult(platform string, cid string, label string, isForU
 	cacheServices.SaveExecutionResult(platform, cid, label, execResult)
 
 	return execResult
+}
+
+func UpdateProblemExecutionResultInCacheByUrl(url string) {
+	if len(url) > 0 {
+		fmt.Println("Updating cache after output generation")
+		ps := GetProblemListByUrl(url)
+		if len(ps) > 0 {
+			GetProblemExecutionResult(ps[0].Platform, ps[0].ContestId, ps[0].Label, true, true)
+		} else {
+			fmt.Println("No parsed problem found for", url)
+		}
+	}
 }

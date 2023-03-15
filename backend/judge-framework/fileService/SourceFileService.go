@@ -141,6 +141,6 @@ func GetSourceFilePath(platform string, cid string, label string) string {
 func GetSourceBinaryPath(platform string, cid string, label string) string {
 	judgeConfig := config.GetJudgeConfigFromCache()
 	folderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
-	binaryPath := filepath.Join(folderPath, label)
+	binaryPath := fmt.Sprintf("%v%v", filepath.Join(folderPath, label), utils.GetBinaryFileExt())
 	return binaryPath
 }

@@ -147,6 +147,6 @@ func Parse(url string) []models.Problem {
 
 	services.UpdateProblemList(parsedProblemList)
 	fileService.CreateSourceFiles(parsedProblemList)
-
+	services.UpdateProblemExecutionResultInCacheByUrl(url)
 	return parsedProblemList
 }

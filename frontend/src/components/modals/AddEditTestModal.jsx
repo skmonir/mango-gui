@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, Button, Col, Modal, Row } from "react-bootstrap";
 import DataService from "../../services/DataService.js";
 import Form from "react-bootstrap/Form";
+import ShowToast from "../Toast/ShowToast.jsx";
 
 export default function AddEditTestModal({
   metadata,
@@ -14,7 +15,11 @@ export default function AddEditTestModal({
     output: ""
   });
   const [showModal, setShowModal] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [toastMsgObj, setToastMsgObj] = useState({
+    variant: "",
+    message: ""
+  });
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     console.log(testcaseFilePath);
@@ -38,6 +43,12 @@ export default function AddEditTestModal({
           });
         }, 0);
       })
+      .catch(e => {
+        showToastMessage(
+          "Error",
+          "Oops! Something went wrong while fetching the testcase!"
+        );
+      })
       .finally(() => setShowModal(true));
   };
 
@@ -54,10 +65,7 @@ export default function AddEditTestModal({
       DataService.addCustomTest(req)
         .then(resp => {
           if (resp.message === "success") {
-            setMessage({
-              type: "success",
-              text: "Saved custom testcase successfully!"
-            });
+            showToastMessage("Success", "Saved custom testcase successfully!");
             if (isCloseAfterSave) {
               setTimeout(() => closeModal(), 1000);
             } else {
@@ -67,12 +75,10 @@ export default function AddEditTestModal({
               });
             }
           } else {
-            setMessage({ type: "danger", text: "Error from server!" });
+            showToastMessage("Error", "Error from server!");
           }
         })
-        .catch(() =>
-          setMessage({ type: "danger", text: "Error from server!" })
-        );
+        .catch(() => showToastMessage("Error", "Error from server!"));
     } else if (eventType === "Update") {
       DataService.updateCustomTest({
         ...req,
@@ -81,18 +87,16 @@ export default function AddEditTestModal({
       })
         .then(resp => {
           if (resp.message === "success") {
-            setMessage({
-              type: "success",
-              text: `${eventType}d custom testcase successfully!`
-            });
+            showToastMessage(
+              "Success",
+              `${eventType}d custom testcase successfully!`
+            );
             setTimeout(() => closeModal(), 1000);
           } else {
-            setMessage({ type: "danger", text: "Error from server!" });
+            showToastMessage("Error", "Error from server!");
           }
         })
-        .catch(() =>
-          setMessage({ type: "danger", text: "Error from server!" })
-        );
+        .catch(() => showToastMessage("Error", "Error from server!"));
     }
   };
 
@@ -101,104 +105,113 @@ export default function AddEditTestModal({
     setTimeout(() => closeAddEditTestModal(), 500);
   };
 
+  const showToastMessage = (variant, message) => {
+    setShowToast(true);
+    setToastMsgObj({
+      variant: variant,
+      message: message
+    });
+  };
+
   return (
-    <Modal
-      show={showModal}
-      onHide={closeModal}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-      fullscreen={true}
-    >
-      <Modal.Body style={{ height: "80vh", overflowY: "auto" }}>
-        <Row>
-          <Col xs={6}>
-            <Form>
-              <Form.Label>
-                <strong>INPUT</strong>
-              </Form.Label>
-              <pre>
-                <Form.Control
-                  value={inputOutputObj.input}
-                  onChange={e =>
-                    setInputOutputObj({
-                      ...inputOutputObj,
-                      input: e.target.value
-                    })
-                  }
-                  autoCorrect="off"
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  as="textarea"
-                  aria-label="With textarea"
-                  rows={23}
-                />
-              </pre>
-            </Form>
-          </Col>
-          <Col xs={6}>
-            <Form>
-              <Form.Label>
-                <strong>EXPECTED OUTPUT</strong>
-              </Form.Label>
-              <pre>
-                <Form.Control
-                  value={inputOutputObj.output}
-                  onChange={e =>
-                    setInputOutputObj({
-                      ...inputOutputObj,
-                      output: e.target.value
-                    })
-                  }
-                  autoCorrect="off"
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  as="textarea"
-                  aria-label="With textarea"
-                  rows={23}
-                />
-              </pre>
-            </Form>
-          </Col>
-        </Row>
-        <br />
-        {message && (
+    <div>
+      <Modal
+        show={showModal}
+        onHide={closeModal}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+        fullscreen={true}
+      >
+        <Modal.Body style={{ height: "80vh", overflowY: "auto" }}>
           <Row>
-            <Col xs={12}>
-              <Alert variant={message.type} className="text-center">
-                {message.text}
-              </Alert>
+            <Col xs={6}>
+              <Form>
+                <Form.Label>
+                  <strong>INPUT</strong>
+                </Form.Label>
+                <pre>
+                  <Form.Control
+                    value={inputOutputObj.input}
+                    onChange={e =>
+                      setInputOutputObj({
+                        ...inputOutputObj,
+                        input: e.target.value
+                      })
+                    }
+                    autoCorrect="off"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    as="textarea"
+                    aria-label="With textarea"
+                    rows={23}
+                  />
+                </pre>
+              </Form>
+            </Col>
+            <Col xs={6}>
+              <Form>
+                <Form.Label>
+                  <strong>EXPECTED OUTPUT</strong>
+                </Form.Label>
+                <pre>
+                  <Form.Control
+                    value={inputOutputObj.output}
+                    onChange={e =>
+                      setInputOutputObj({
+                        ...inputOutputObj,
+                        output: e.target.value
+                      })
+                    }
+                    autoCorrect="off"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    as="textarea"
+                    aria-label="With textarea"
+                    rows={23}
+                  />
+                </pre>
+              </Form>
             </Col>
           </Row>
-        )}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          size="sm"
-          variant="outline-primary"
-          disabled={
-            !inputOutputObj || !inputOutputObj.input || !inputOutputObj.output
-          }
-          onClick={() => saveTriggered(true)}
-        >
-          {`${eventType} and Close`}
-        </Button>
-        {eventType === "Save" && (
+        </Modal.Body>
+        <Modal.Footer>
           <Button
             size="sm"
-            variant="outline-success"
+            variant="outline-primary"
             disabled={
               !inputOutputObj || !inputOutputObj.input || !inputOutputObj.output
             }
-            onClick={() => saveTriggered(false)}
+            onClick={() => saveTriggered(true)}
           >
-            {`Save and Add Another One`}
+            {`${eventType} and Close`}
           </Button>
-        )}
-        <Button size="sm" variant="outline-danger" onClick={() => closeModal()}>
-          Close
-        </Button>
-      </Modal.Footer>
-    </Modal>
+          {eventType === "Save" && (
+            <Button
+              size="sm"
+              variant="outline-success"
+              disabled={
+                !inputOutputObj ||
+                !inputOutputObj.input ||
+                !inputOutputObj.output
+              }
+              onClick={() => saveTriggered(false)}
+            >
+              {`Save and Add Another One`}
+            </Button>
+          )}
+          <Button
+            size="sm"
+            variant="outline-danger"
+            onClick={() => closeModal()}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {showToast && (
+        <ShowToast toastMsgObj={toastMsgObj} setShowToast={setShowToast} />
+      )}
+    </div>
   );
 }

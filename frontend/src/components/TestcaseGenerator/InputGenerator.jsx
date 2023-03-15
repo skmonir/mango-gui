@@ -31,6 +31,7 @@ import {
 import DataService from "../../services/DataService.js";
 import ShowToast from "../Toast/ShowToast.jsx";
 import ViewCodeModal from "../modals/ViewCodeModal.jsx";
+import Utils from "../../Utils.js";
 
 export default function InputGenerator({ appState }) {
   const socketClient = new SocketClient();
@@ -98,7 +99,7 @@ export default function InputGenerator({ appState }) {
     tgenScriptContent: ""
   });
 
-  const [generatorExecResult, setGeneratorExecResult] = useState({});
+  const [generatorExecResult, setGeneratorExecResult] = useState(null);
 
   useEffect(() => {
     let socketConnGenerator = socketClient.initSocketConnection(
@@ -125,7 +126,7 @@ export default function InputGenerator({ appState }) {
   };
 
   const fetchIODirectories = () => {
-    if (!isNullOrEmpty(inputGenerateRequest.problemUrl)) {
+    if (!Utils.isStrNullOrEmpty(inputGenerateRequest.problemUrl)) {
       DataService.getInputOutputDirectoriesByUrl(
         window.btoa(inputGenerateRequest.problemUrl)
       ).then(dir => {
@@ -138,7 +139,7 @@ export default function InputGenerator({ appState }) {
   };
 
   const checkDirectoryPathValidity = dirPath => {
-    if (!isNullOrEmpty(dirPath)) {
+    if (!Utils.isStrNullOrEmpty(dirPath)) {
       DataService.checkDirectoryPathValidity(window.btoa(dirPath)).then(
         resp => {
           if (resp.isExist === false) {
@@ -150,19 +151,13 @@ export default function InputGenerator({ appState }) {
   };
 
   const checkFilePathValidity = filePath => {
-    if (!isNullOrEmpty(filePath)) {
+    if (!Utils.isStrNullOrEmpty(filePath)) {
       DataService.checkFilePathValidity(window.btoa(filePath)).then(resp => {
         if (resp.isExist === false) {
           showToastMessage("Error", `${filePath} is not a valid file`);
         }
       });
     }
-  };
-
-  const isNullOrEmpty = obj => {
-    return (
-      obj === null || obj === undefined || obj.trim() === "" || obj.length === 0
-    );
   };
 
   const isValidNum = (n, min, max) => {
@@ -185,18 +180,18 @@ export default function InputGenerator({ appState }) {
 
   const validate = () => {
     let errMessage = "";
-    if (isNullOrEmpty(inputGenerateRequest.inputDirectoryPath)) {
+    if (Utils.isStrNullOrEmpty(inputGenerateRequest.inputDirectoryPath)) {
       errMessage += "Input directory path can't be empty\n";
     }
     if (
       inputGenerateRequest.generationProcess === "tgen_script" &&
-      isNullOrEmpty(inputGenerateRequest.tgenScriptContent)
+      Utils.isStrNullOrEmpty(inputGenerateRequest.tgenScriptContent)
     ) {
       errMessage += "TGen script can't be empty\n";
     }
     if (
       inputGenerateRequest.generationProcess !== "tgen_script" &&
-      isNullOrEmpty(inputGenerateRequest.generatorScriptPath)
+      Utils.isStrNullOrEmpty(inputGenerateRequest.generatorScriptPath)
     ) {
       errMessage += "Generator script path can't be empty\n";
     }
@@ -214,7 +209,7 @@ export default function InputGenerator({ appState }) {
       errMessage +=
         "Number of test on each file should be a number in the specified range\n";
     }
-    if (isNullOrEmpty(errMessage)) {
+    if (Utils.isStrNullOrEmpty(errMessage)) {
       return true;
     } else {
       showToastMessage("Error", errMessage);
@@ -228,7 +223,7 @@ export default function InputGenerator({ appState }) {
       testPerFile: isNaN(inputGenerateRequest.testPerFile)
         ? 1
         : inputGenerateRequest.testPerFile,
-      fileName: isNullOrEmpty(inputGenerateRequest.fileName)
+      fileName: Utils.isStrNullOrEmpty(inputGenerateRequest.fileName)
         ? "02_random_input"
         : inputGenerateRequest.fileName
     });
@@ -404,7 +399,8 @@ export default function InputGenerator({ appState }) {
                   setInputGenerateRequest({
                     ...inputGenerateRequest,
                     testPerFile:
-                      isNullOrEmpty(e.target.value) || isNaN(e.target.value)
+                      Utils.isStrNullOrEmpty(e.target.value) ||
+                      isNaN(e.target.value)
                         ? 0
                         : parseInt(e.target.value.toString())
                   });
@@ -582,7 +578,7 @@ export default function InputGenerator({ appState }) {
               </div>
             </Col>
           )}
-          {generatorExecResult && generatorExecResult?.compilationError && (
+          {generatorExecResult && (
             <Col
               xs={
                 inputGenerateRequest.generationProcess === "tgen_script"
@@ -606,9 +602,17 @@ export default function InputGenerator({ appState }) {
                           borderColor: "black",
                           borderRadius: "5px"
                         }}
-                        className="table-danger"
+                        className={
+                          generatorExecResult?.compilationError === ""
+                            ? "table-success"
+                            : "table-danger"
+                        }
                       >
-                        <pre>{generatorExecResult?.compilationError}</pre>
+                        <pre>
+                          {generatorExecResult?.compilationError === ""
+                            ? "Tgen Script Compiled Successfully!"
+                            : generatorExecResult?.compilationError}
+                        </pre>
                       </td>
                     </tr>
                   </tbody>
@@ -616,6 +620,36 @@ export default function InputGenerator({ appState }) {
               </div>
             </Col>
           )}
+        </Row>
+        <br />
+        <Row>
+          <Col md={{ span: 2, offset: 5 }}>
+            <Row>
+              <Col xs={12} className="d-flex justify-content-center">
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  onClick={generateInputTriggered}
+                  disabled={isGeneratingInProgress}
+                >
+                  {!isGeneratingInProgress ? (
+                    <FontAwesomeIcon icon={faCog} />
+                  ) : (
+                    <Spinner
+                      as="span"
+                      animation="grow"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {!isGeneratingInProgress
+                    ? " Generate Input"
+                    : " Generating Input"}
+                </Button>
+              </Col>
+            </Row>
+          </Col>
         </Row>
         <Row>
           <Col xs={12} id="input_logs">
@@ -656,32 +690,6 @@ export default function InputGenerator({ appState }) {
                   </Table>
                 </div>
               )}
-          </Col>
-        </Row>
-        <Row>
-          <Col md={{ span: 2, offset: 5 }}>
-            <br />
-            <Button
-              size="sm"
-              variant="outline-success"
-              onClick={generateInputTriggered}
-              disabled={isGeneratingInProgress}
-            >
-              {!isGeneratingInProgress ? (
-                <FontAwesomeIcon icon={faCog} />
-              ) : (
-                <Spinner
-                  as="span"
-                  animation="grow"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-              )}
-              {!isGeneratingInProgress
-                ? " Generate Input"
-                : " Generating Input"}
-            </Button>
           </Col>
         </Row>
       </Card>

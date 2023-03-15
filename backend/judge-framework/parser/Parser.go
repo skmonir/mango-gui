@@ -22,11 +22,10 @@ type IParser interface {
 }
 
 type Parser struct {
-	url              string
-	isContest        bool
-	platform         string
-	contestId        string
-	problemListCache []models.Problem
+	url       string
+	isContest bool
+	platform  string
+	contestId string
 }
 
 func (parser *Parser) ExtractUrlAndSetVars(url string) error {
@@ -58,8 +57,6 @@ func (parser *Parser) GetPlatformAndContestId() (string, string) {
 
 func (parser *Parser) FilterProblemsToParse(problemList []models.Problem) []models.Problem {
 	defer utils.PanicRecovery()
-
-	parser.problemListCache = problemList
 
 	var problemsToParse []models.Problem
 	for _, prob := range problemList {

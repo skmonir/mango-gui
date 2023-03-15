@@ -62,7 +62,7 @@ func runValidator(tgenScript string) string {
 
 func validateScript(tgenScript string) string {
 	folderPath := getScriptDirectory()
-	filePathWithoutExt := filepath.Join(folderPath, "validator")
+	binaryFilePath := fmt.Sprintf("%v%v", filepath.Join(folderPath, "validator"), utils.GetBinaryFileExt())
 
 	execResult := dto.ProblemExecutionResult{
 		TestcaseExecutionDetailsList: []dto.TestcaseExecutionDetails{
@@ -72,7 +72,7 @@ func validateScript(tgenScript string) string {
 					Input:            utils.TrimIO(tgenScript + "\nEND"),
 					TimeLimit:        5,
 					MemoryLimit:      512,
-					ExecutionCommand: []string{filePathWithoutExt},
+					ExecutionCommand: []string{binaryFilePath},
 				},
 			},
 		},
@@ -95,22 +95,16 @@ func runGenerator(request dto.TestcaseGenerateRequest, skipIfCompiled bool) dto.
 	// Step-2: Validate the script
 	execResult := generateInput(request)
 
-	if execResult.CompilationError == "" && len(request.ProblemUrl) > 0 {
-		fmt.Println("Updating cache after input generation")
-		ps := services.GetProblemListByUrl(request.ProblemUrl)
-		if len(ps) > 0 {
-			services.GetProblemExecutionResult(ps[0].Platform, ps[0].ContestId, ps[0].Label, true, true)
-		} else {
-			fmt.Println("No parsed problem found for", request.ProblemUrl)
-		}
+	if execResult.CompilationError == "" {
+		services.UpdateProblemExecutionResultInCacheByUrl(request.ProblemUrl)
 	}
 
 	return execResult
 }
 
 func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
-	scriptBinaryPathWithoutExt := strings.TrimSuffix(request.GeneratorScriptPath, filepath.Ext(request.GeneratorScriptPath))
-	if !utils.IsFileExist(scriptBinaryPathWithoutExt) {
+	scriptBinaryPath := strings.TrimSuffix(request.GeneratorScriptPath, filepath.Ext(request.GeneratorScriptPath)) + utils.GetBinaryFileExt()
+	if !utils.IsFileExist(scriptBinaryPath) {
 		return dto.ProblemExecutionResult{
 			CompilationError: "Generator script binary not found!",
 		}
@@ -134,7 +128,7 @@ func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResu
 				TimeLimit:          5,
 				MemoryLimit:        512,
 				ExecOutputFilePath: execOutputFilePath,
-				ExecutionCommand:   []string{scriptBinaryPathWithoutExt, strconv.Itoa(request.TestPerFile), strconv.FormatInt(paramId, 10)},
+				ExecutionCommand:   []string{scriptBinaryPath, strconv.Itoa(request.TestPerFile), strconv.FormatInt(paramId, 10)},
 			},
 		}
 		execResult.TestcaseExecutionDetailsList = append(execResult.TestcaseExecutionDetailsList, execDetail)
@@ -158,7 +152,7 @@ func compileScript(filePathWithExt string, skipIfCompiled bool) string {
 		return filePathWithExt + ": file not found!"
 	}
 
-	command := fmt.Sprintf("%v %v %v -o %v", judgeConfig.ActiveLanguage.CompilationCommand, judgeConfig.ActiveLanguage.CompilationArgs, filePathWithExt, filePathWithoutExt)
+	command := fmt.Sprintf("%v %v %v -o %v%v", judgeConfig.ActiveLanguage.CompilationCommand, judgeConfig.ActiveLanguage.CompilationArgs, filePathWithExt, filePathWithoutExt, utils.GetBinaryFileExt())
 
 	return executor.CompileSource(command, false)
 }

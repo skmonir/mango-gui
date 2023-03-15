@@ -120,6 +120,10 @@ func (parser *CodeforcesParser) extractSamples(sampleElement soup.Root, ioType s
 }
 
 func (parser *CodeforcesParser) getContestUrl() string {
+	cid, _ := strconv.Atoi(parser.contestId)
+	if cid > 100000 {
+		return cfHost + "/gym" + "/" + parser.contestId
+	}
 	return cfHost + "/contest" + "/" + parser.contestId
 }
 
