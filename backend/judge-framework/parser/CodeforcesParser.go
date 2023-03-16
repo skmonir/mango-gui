@@ -40,16 +40,14 @@ func (parser *CodeforcesParser) ParseProblemListOnContestPage() []models.Problem
 			name := strings.TrimSpace(fullName[dividerIndex+1:])
 			url := parser.getProblemUrl(label)
 			fmt.Println(label, name, url)
-			if parser.isContest || parser.url == url {
-				problemList = append(problemList, models.Problem{
-					Platform:  "codeforces",
-					ContestId: parser.contestId,
-					Label:     label,
-					Name:      name,
-					Url:       url,
-					Status:    "none",
-				})
-			}
+			problemList = append(problemList, models.Problem{
+				Platform:  "codeforces",
+				ContestId: parser.contestId,
+				Label:     label,
+				Name:      name,
+				Url:       url,
+				Status:    "none",
+			})
 		}
 	}
 	return problemList

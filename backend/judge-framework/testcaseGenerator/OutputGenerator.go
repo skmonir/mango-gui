@@ -49,7 +49,7 @@ func GenerateOutput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionRes
 		execResult.TestcaseExecutionDetailsList = append(execResult.TestcaseExecutionDetailsList, execDetail)
 	}
 
-	execResult = executor.Execute(execResult, "output_generate_result_event")
+	execResult = executor.Execute(execResult, "output_generate_result_event", true)
 
 	services.UpdateProblemExecutionResultInCacheByUrl(request.ProblemUrl)
 

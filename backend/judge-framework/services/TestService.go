@@ -60,7 +60,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 
 	// Step 4: Run the binary and check testcases
 	//socket.PublishStatusMessage("test_status", "Running testcases", "info")
-	execResult = executor.Execute(execResult, "test_exec_result_event")
+	execResult = executor.Execute(execResult, "test_exec_result_event", false)
 	cacheServices.SaveExecutionResult(platform, cid, label, execResult)
 
 	logger.Info("Execution complete")

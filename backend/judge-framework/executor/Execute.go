@@ -135,7 +135,7 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 	executionCompleteChan <- execResponse
 }
 
-func Execute(execResult dto.ProblemExecutionResult, socketEvent string) dto.ProblemExecutionResult {
+func Execute(execResult dto.ProblemExecutionResult, socketEvent string, runAsync bool) dto.ProblemExecutionResult {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
@@ -177,7 +177,11 @@ func Execute(execResult dto.ProblemExecutionResult, socketEvent string) dto.Prob
 	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
 		judgeOutputs[i] = utils.TrimIO(utils.ReadFileContent(
 			execResult.TestcaseExecutionDetailsList[i].Testcase.OutputFilePath, constants.IO_MAX_ROW_FOR_TEST, constants.IO_MAX_COL_FOR_TEST))
-		go executeSourceBinary(i, execResult.TestcaseExecutionDetailsList[i].Testcase)
+		if runAsync {
+			go executeSourceBinary(i, execResult.TestcaseExecutionDetailsList[i].Testcase)
+		} else {
+			executeSourceBinary(i, execResult.TestcaseExecutionDetailsList[i].Testcase)
+		}
 	}
 	wg.Wait()
 	return execResult

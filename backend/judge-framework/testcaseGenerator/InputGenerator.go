@@ -78,7 +78,7 @@ func validateScript(tgenScript string) string {
 		},
 	}
 
-	execResult = executor.Execute(execResult, "input_generate_result_event")
+	execResult = executor.Execute(execResult, "input_generate_result_event", true)
 
 	return execResult.TestcaseExecutionDetailsList[0].TestcaseExecutionResult.Output
 }
@@ -134,7 +134,7 @@ func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResu
 		execResult.TestcaseExecutionDetailsList = append(execResult.TestcaseExecutionDetailsList, execDetail)
 	}
 
-	execResult = executor.Execute(execResult, "input_generate_result_event")
+	execResult = executor.Execute(execResult, "input_generate_result_event", true)
 
 	return execResult
 }
