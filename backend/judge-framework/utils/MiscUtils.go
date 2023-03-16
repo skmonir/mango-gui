@@ -85,6 +85,22 @@ func ExtractInfoFromUrl(url string) (string, string, string) {
 		if len(values) >= 3 {
 			pid = values[2]
 		}
+	} else if strings.Contains(url, "algo.codemarshal.org/contests") {
+		platform = "codemarshal"
+		index := strings.Index(url, "algo.codemarshal.org/contests")
+		path := strings.Trim(url[index+len("algo.codemarshal.org/contests"):], "/")
+		var values []string
+		for _, p := range strings.Split(path, "/") {
+			if len(strings.TrimSpace(p)) > 0 {
+				values = append(values, p)
+			}
+		}
+		if len(values) > 0 {
+			cid = values[0]
+		}
+		if len(values) >= 3 {
+			pid = values[2]
+		}
 	}
 	fmt.Println("Extracted", url, ", got", platform, cid, pid)
 	return platform, cid, pid
