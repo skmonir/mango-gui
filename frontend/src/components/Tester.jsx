@@ -1,5 +1,4 @@
 import {
-  Accordion,
   Alert,
   Button,
   ButtonGroup,
@@ -30,6 +29,7 @@ import CE from "../assets/icons/CE.svg";
 import RE from "../assets/icons/RE.svg";
 import TLE from "../assets/icons/TLE.svg";
 import WA from "../assets/icons/WA.svg";
+import Utils from "../Utils.js";
 
 export default function Tester({ appState }) {
   const socketClient = new SocketClient();
@@ -287,12 +287,7 @@ export default function Tester({ appState }) {
   };
 
   const disableActionButtons = () => {
-    return (
-      !testContestUrl ||
-      testContestUrl === "" ||
-      loadingInProgress ||
-      !appState.config.workspaceDirectory
-    );
+    return loadingInProgress || !appState.config.workspaceDirectory;
   };
 
   const getExecutionTable = () => {
@@ -424,6 +419,9 @@ export default function Tester({ appState }) {
               <Form.Control
                 type="text"
                 size="sm"
+                autoCorrect="off"
+                autoComplete="off"
+                autoCapitalize="none"
                 placeholder="Enter Contest/Problem URL [Codeforces, AtCoder]"
                 value={testContestUrl}
                 disabled={!appState.config.workspaceDirectory}
@@ -437,7 +435,10 @@ export default function Tester({ appState }) {
                 size="sm"
                 variant="outline-success"
                 onClick={() => getProblemList()}
-                disabled={disableActionButtons()}
+                disabled={
+                  disableActionButtons() ||
+                  Utils.isStrNullOrEmpty(testContestUrl)
+                }
               >
                 <FontAwesomeIcon icon={faTasks} /> Load Problems
               </Button>

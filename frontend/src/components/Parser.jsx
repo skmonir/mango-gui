@@ -4,13 +4,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
   faDownload,
+  faFileCirclePlus,
   faSyncAlt,
-  faTimesCircle,
+  faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import SocketClient from "../socket/SocketClient.js";
 import DataService from "../services/DataService.js";
 import Loading from "./Loading.jsx";
+import AddEditTestModal from "./modals/AddEditTestModal.jsx";
+import Utils from "../Utils.js";
+import AddCustomProblemModal from "./modals/AddCustomProblemModal.jsx";
 
 function Parser({ appState }) {
   const socketClient = new SocketClient();
@@ -20,6 +24,9 @@ function Parser({ appState }) {
   const [parsingInProgress, setParsingInProgress] = useState(false);
   const [parsingSingleProblem, setParsingSingleProblem] = useState(false);
   const [parsedProblemList, setParsedProblemList] = useState([]);
+  const [showAddCustomProblemModal, setShowAddCustomProblemModal] = useState(
+    false
+  );
 
   useEffect(() => {
     let socketConn = socketClient.initSocketConnection(
@@ -34,7 +41,7 @@ function Parser({ appState }) {
   const parseTriggerred = () => {
     setParsingInProgress(true);
     setTimeout(() => {
-      DataService.parse(window.btoa(parseUrl)).then((data) => {
+      DataService.parse(window.btoa(parseUrl)).then(data => {
         setParsedProblemList(data);
         setParsingInProgress(false);
         setInitAlert(true);
@@ -50,13 +57,13 @@ function Parser({ appState }) {
         i === index
           ? {
               ...prob,
-              status: "running",
+              status: "running"
             }
           : prob
       )
     );
     console.log(parsedProblemList);
-    DataService.parse(window.btoa(url)).then((data) => {
+    DataService.parse(window.btoa(url)).then(data => {
       setParsedProblemList(
         parsedProblemList.map((prob, i) => (i === index ? data[0] : prob))
       );
@@ -65,7 +72,7 @@ function Parser({ appState }) {
     });
   };
 
-  const updateParseStatusFromSocket = (data) => {
+  const updateParseStatusFromSocket = data => {
     console.log(data);
     if (data.length > 1) {
       setParsedProblemList(data);
@@ -73,7 +80,15 @@ function Parser({ appState }) {
     }
   };
 
-  const getProblemStatusIcon = (status) => {
+  const createCustomProblem = () => {
+    setShowAddCustomProblemModal(true);
+  };
+
+  const closeAddCustomProblemModal = () => {
+    setShowAddCustomProblemModal(false);
+  };
+
+  const getProblemStatusIcon = status => {
     if (!status || status === "running") {
       return <Spinner animation="border" variant="primary" size="sm" />;
     } else if (status === "failed") {
@@ -86,12 +101,7 @@ function Parser({ appState }) {
   };
 
   const disableActionButtons = () => {
-    return (
-      !parseUrl ||
-      parseUrl === "" ||
-      parsingInProgress ||
-      !appState.config.workspaceDirectory
-    );
+    return parsingInProgress || !appState.config.workspaceDirectory;
   };
 
   const getParsingTable = () => {
@@ -159,14 +169,17 @@ function Parser({ appState }) {
     <div>
       <Card body bg="light">
         <Row>
-          <Col xs={9}>
+          <Col xs={6}>
             <Form.Control
               type="text"
               size="sm"
+              autoCorrect="off"
+              autoComplete="off"
+              autoCapitalize="none"
               placeholder="Enter Contest/Problem URL [Codeforces, AtCoder]"
               value={parseUrl}
               disabled={!appState.config.workspaceDirectory}
-              onChange={(e) => setParseUrl(e.target.value)}
+              onChange={e => setParseUrl(e.target.value)}
             />
           </Col>
           <Col>
@@ -175,9 +188,24 @@ function Parser({ appState }) {
                 size="sm"
                 variant="outline-success"
                 onClick={() => parseTriggerred()}
-                disabled={disableActionButtons()}
+                disabled={
+                  disableActionButtons() || Utils.isStrNullOrEmpty(parseUrl)
+                }
               >
                 <FontAwesomeIcon icon={faDownload} /> Parse Testcases
+              </Button>
+            </div>
+          </Col>
+          <Col xs={3}>
+            <div className="d-grid gap-2">
+              <Button
+                size="sm"
+                variant="outline-success"
+                onClick={() => createCustomProblem()}
+                disabled={disableActionButtons()}
+              >
+                <FontAwesomeIcon icon={faFileCirclePlus} /> Create Custom
+                Problem
               </Button>
             </div>
           </Col>
@@ -196,6 +224,11 @@ function Parser({ appState }) {
           </Row>
         )}
       </Card>
+      {showAddCustomProblemModal && (
+        <AddCustomProblemModal
+          closeAddCustomProblemModal={closeAddCustomProblemModal}
+        />
+      )}
     </div>
   );
 }
