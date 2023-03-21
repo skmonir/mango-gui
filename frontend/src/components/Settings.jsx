@@ -44,41 +44,60 @@ export default function Settings({ appState, setAppState }) {
       });
   };
 
+  const validate = () => {
+    let errMessage = "";
+    if (Utils.isStrNullOrEmpty(config.workspaceDirectory)) {
+      errMessage += "Workspace directory path can't be empty\n";
+    }
+    if (Utils.isStrNullOrEmpty(config.compilationCommand)) {
+      errMessage += "Compilation command can't be empty\n";
+    }
+    if (Utils.isStrNullOrEmpty(errMessage)) {
+      return true;
+    } else {
+      showToastMessage("Error", errMessage);
+      return false;
+    }
+  };
+
   const triggerSave = () => {
-    console.log("save triggerred");
-    let configToSave = { ...appState.config };
-    configToSave.author = config.author;
-    configToSave.sourceDirectory = config.sourceDirectory;
-    configToSave.workspaceDirectory = config.workspaceDirectory;
-    configToSave.activeLanguage.lang = config.lang;
-    configToSave.activeLanguage.compilationCommand = config.compilationCommand;
-    configToSave.activeLanguage.compilationArgs = config.compilationArgs;
-    configToSave.activeLanguage.templatePath = config.templatePath;
-    let isFound = false;
-    for (let i = 0; i < configToSave.languageConfigs.length; i++) {
-      if (configToSave.languageConfigs[i].lang === config.lang) {
-        isFound = true;
-        configToSave.languageConfigs[i] = { ...configToSave.activeLanguage };
-        break;
+    if (validate()) {
+      console.log("save triggerred");
+      let configToSave = { ...appState.config };
+      configToSave.author = config.author;
+      configToSave.sourceDirectory = config.sourceDirectory;
+      configToSave.workspaceDirectory = config.workspaceDirectory;
+      configToSave.activeLanguage.lang = config.lang;
+      configToSave.activeLanguage.compilationCommand =
+        config.compilationCommand;
+      configToSave.activeLanguage.compilationArgs = config.compilationArgs;
+      configToSave.activeLanguage.templatePath = config.templatePath;
+      let isFound = false;
+      for (let i = 0; i < configToSave.languageConfigs.length; i++) {
+        if (configToSave.languageConfigs[i].lang === config.lang) {
+          isFound = true;
+          configToSave.languageConfigs[i] = { ...configToSave.activeLanguage };
+          break;
+        }
       }
+      if (!isFound) {
+        configToSave.languageConfigs.push({ ...configToSave.activeLanguage });
+      }
+      console.log(configToSave);
+      setSavingInProgress(true);
+      DataService.updateConfig(configToSave)
+        .then(config => {
+          saveConfigToUI(config);
+          showToastMessage("Success", "Settings saved successfully!");
+        })
+        .catch(e => {
+          showToastMessage(
+            "Error",
+            "Oops! Something went wrong while saving the config!"
+          );
+        })
+        .finally(() => setSavingInProgress(false));
     }
-    if (!isFound) {
-      configToSave.languageConfigs.push({ ...configToSave.activeLanguage });
-    }
-    console.log(configToSave);
-    setSavingInProgress(true);
-    DataService.updateConfig(configToSave)
-      .then(config => {
-        saveConfigToUI(config);
-        showToastMessage("Success", "Settings saved successfully!");
-      })
-      .catch(e => {
-        showToastMessage(
-          "Error",
-          "Oops! Something went wrong while saving the config!"
-        );
-      })
-      .finally(() => setSavingInProgress(false));
   };
 
   const saveConfigToUI = config => {

@@ -399,8 +399,7 @@ export default function Tester({ appState }) {
     if (
       !appState.config.workspaceDirectory ||
       !appState.config.activeLanguage.lang ||
-      !appState.config.activeLanguage.compilationCommand ||
-      !appState.config.activeLanguage.compilationArgs
+      !appState.config.activeLanguage.compilationCommand
     ) {
       return (
         <Row>
