@@ -455,7 +455,7 @@ export default function Tester({ appState }) {
                 autoCorrect="off"
                 autoComplete="off"
                 autoCapitalize="none"
-                placeholder="Enter Contest/Problem URL [Codeforces, AtCoder]"
+                placeholder="Enter Contest/Problem URL [Codeforces, AtCoder, Custom]"
                 value={testContestUrl}
                 disabled={!appState.config.workspaceDirectory}
                 onChange={e => setTestContestUrl(e.target.value)}
@@ -478,88 +478,74 @@ export default function Tester({ appState }) {
             </div>
           </Col>
         </Row>
-        <Row>
-          <Col xs={4}>
-            <Form.Group className="mb-3">
-              <Form.Select
-                size="sm"
-                aria-label="Default select example"
-                value={selectedProblemMetadata}
-                onChange={e =>
-                  changeSelectedProblemMetadata(e.currentTarget.value)
-                }
-              >
-                {problemList.map((problem, id) => (
-                  <option
-                    key={id}
-                    value={
-                      problem.platform +
-                      "/" +
-                      problem.contestId +
-                      "/" +
-                      problem.label
-                    }
-                  >
-                    {problem.label.toUpperCase() + " - " + problem.name}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col xs={2}>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => runTest()}
-                disabled={!selectedProblemFilteredExecResult}
-              >
-                <FontAwesomeIcon icon={faTerminal} /> Run Test
-              </Button>
-            </div>
-          </Col>
-          <Col xs={2}>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => openSource()}
-                disabled={!selectedProblemFilteredExecResult}
-              >
-                <FontAwesomeIcon icon={faFileCode} /> Open Code
-              </Button>
-            </div>
-          </Col>
-          <Col xs={2}>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => setShowCodeModal(true)}
-                disabled={!selectedProblemFilteredExecResult}
-              >
-                <FontAwesomeIcon icon={faCode} /> View Code
-              </Button>
-            </div>
-          </Col>
-          <Col xs={2}>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={generateSourceCode}
-                disabled={!selectedProblemFilteredExecResult}
-              >
-                <FontAwesomeIcon icon={faFileCirclePlus} /> Generate Code
-              </Button>
-            </div>
-          </Col>
-        </Row>
         {/*<hr />*/}
         {selectedProblem && (
           <>
             <Row>
-              <Col xs={3}>
+              <Col xs={4}>
+                <Form.Group className="mb-3">
+                  <Form.Select
+                    size="sm"
+                    aria-label="Default select example"
+                    value={selectedProblemMetadata}
+                    onChange={e =>
+                      changeSelectedProblemMetadata(e.currentTarget.value)
+                    }
+                  >
+                    {problemList.map((problem, id) => (
+                      <option
+                        key={id}
+                        value={
+                          problem.platform +
+                          "/" +
+                          problem.contestId +
+                          "/" +
+                          problem.label
+                        }
+                      >
+                        {problem.label.toUpperCase() + " - " + problem.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col xs={6}>
+                <Form.Group className="mb-3">
+                  <Form.Control
+                    type="text"
+                    size="sm"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    value={
+                      selectedProblemFilteredExecResult &&
+                      selectedProblemFilteredExecResult.testcaseExecutionDetailsList &&
+                      selectedProblemFilteredExecResult
+                        .testcaseExecutionDetailsList.length > 0
+                        ? selectedProblemFilteredExecResult
+                            .testcaseExecutionDetailsList[0]?.testcase
+                            ?.sourceBinaryPath
+                        : ""
+                    }
+                    disabled={true}
+                  />
+                </Form.Group>
+              </Col>
+              <Col xs={2}>
+                <div className="d-grid gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    onClick={() => runTest()}
+                    disabled={!selectedProblemFilteredExecResult}
+                  >
+                    <FontAwesomeIcon icon={faTerminal} /> Run Test
+                  </Button>
+                </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col xs={4}>
                 <Form.Group className="mb-3">
                   <Form.Select
                     size="sm"
@@ -583,6 +569,42 @@ export default function Tester({ appState }) {
                     onClick={() => addCustomTest()}
                   >
                     <FontAwesomeIcon icon={faPlus} /> Add Custom Test
+                  </Button>
+                </div>
+              </Col>
+              <Col xs={2}>
+                <div className="d-grid gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    onClick={() => setShowCodeModal(true)}
+                    disabled={!selectedProblemFilteredExecResult}
+                  >
+                    <FontAwesomeIcon icon={faCode} /> View Code
+                  </Button>
+                </div>
+              </Col>
+              <Col xs={2}>
+                <div className="d-grid gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    onClick={() => openSource()}
+                    disabled={!selectedProblemFilteredExecResult}
+                  >
+                    <FontAwesomeIcon icon={faFileCode} /> Open Source
+                  </Button>
+                </div>
+              </Col>
+              <Col xs={2}>
+                <div className="d-grid gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    onClick={generateSourceCode}
+                    disabled={!selectedProblemFilteredExecResult}
+                  >
+                    <FontAwesomeIcon icon={faFileCirclePlus} /> Generate Source
                   </Button>
                 </div>
               </Col>

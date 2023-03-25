@@ -160,7 +160,7 @@ export default function OutputGenerator({ appState }) {
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  placeholder="Enter Problem URL [Codeforces, AtCoder]"
+                  placeholder="Enter Problem URL [Codeforces, AtCoder, Custom]"
                   disabled={!isForProblem}
                   value={outputGenerateRequest.problemUrl}
                   onChange={e =>

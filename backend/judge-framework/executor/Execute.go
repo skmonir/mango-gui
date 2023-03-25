@@ -136,6 +136,7 @@ func executeSourceBinary(index int, testcase models.Testcase) {
 }
 
 func Execute(execResult dto.ProblemExecutionResult, socketEvent string, runAsync bool) dto.ProblemExecutionResult {
+	defer utils.PanicRecovery()
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 

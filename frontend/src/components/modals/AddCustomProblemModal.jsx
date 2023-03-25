@@ -96,7 +96,30 @@ export default function AddCustomProblemModal({
         </Modal.Header>
         <Modal.Body style={{ height: "55vh", overflowY: "auto" }}>
           <Row>
-            <Col xs={6}>
+            <Col xs={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Platform</strong>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  placeholder="Example. 1502, abc123"
+                  value={customProblem.platform}
+                  disabled={true}
+                  onChange={e =>
+                    setCustomProblem({
+                      ...customProblem,
+                      platform: e.target.value
+                    })
+                  }
+                />
+              </Form.Group>
+            </Col>
+            <Col xs={3}>
               <Form.Group className="mb-3">
                 <Form.Label>
                   <strong>Contest ID</strong>

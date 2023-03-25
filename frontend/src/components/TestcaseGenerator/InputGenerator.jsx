@@ -277,7 +277,7 @@ export default function InputGenerator({ appState }) {
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  placeholder="Enter Problem URL [Codeforces, AtCoder]"
+                  placeholder="Enter Problem URL [Codeforces, AtCoder, Custom]"
                   disabled={!isForProblem}
                   value={inputGenerateRequest.problemUrl}
                   onChange={e =>
