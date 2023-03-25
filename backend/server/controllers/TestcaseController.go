@@ -1,40 +1,12 @@
-package server
+package controllers
 
 import (
 	"fmt"
-	"github.com/skmonir/mango-gui/backend/socket"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/skmonir/mango-gui/backend/judge-framework/config"
-	"github.com/skmonir/mango-gui/backend/judge-framework/parser"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
-	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
 
-func parse(ctx *fiber.Ctx) error {
-	encodedUrl := ctx.Params("encoded_url")
-	parseResponseList := parser.Parse(utils.DecodeBase64(encodedUrl))
-	return ctx.Status(fiber.StatusOK).JSON(parseResponseList)
-}
-
-func getConfig(ctx *fiber.Ctx) error {
-	judgeConfig := config.GetJudgeConfigFromCache()
-	return ctx.Status(fiber.StatusOK).JSON(judgeConfig)
-}
-
-func updateConfig(ctx *fiber.Ctx) error {
-	var configToUpdate config.JudgeConfig
-	err := ctx.BodyParser(&configToUpdate)
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-	}
-	judgeConfig := config.UpdateJudgeConfigIntoCache(configToUpdate)
-	return ctx.Status(fiber.StatusOK).JSON(judgeConfig)
-}
-
-func getCustomTestByPath(ctx *fiber.Ctx) error {
+func GetCustomTestByPath(ctx *fiber.Ctx) error {
 	getCustomTestRequest := struct {
 		InputFilePath  string `json:"inputFilePath"`
 		OutputFilePath string `json:"outputFilePath"`
@@ -50,7 +22,7 @@ func getCustomTestByPath(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(testcase)
 }
 
-func addCustomTest(ctx *fiber.Ctx) error {
+func AddCustomTest(ctx *fiber.Ctx) error {
 	addCustomTestRequest := struct {
 		Platform  string `json:"platform"`
 		ContestId string `json:"contestId"`
@@ -76,7 +48,7 @@ func addCustomTest(ctx *fiber.Ctx) error {
 	})
 }
 
-func updateCustomTest(ctx *fiber.Ctx) error {
+func UpdateCustomTest(ctx *fiber.Ctx) error {
 	updateCustomTestRequest := struct {
 		Platform       string `json:"platform"`
 		ContestId      string `json:"contestId"`
@@ -106,7 +78,7 @@ func updateCustomTest(ctx *fiber.Ctx) error {
 	})
 }
 
-func deleteCustomTest(ctx *fiber.Ctx) error {
+func DeleteCustomTest(ctx *fiber.Ctx) error {
 	updateCustomTestRequest := struct {
 		Platform      string `json:"platform"`
 		ContestId     string `json:"contestId"`
@@ -128,21 +100,4 @@ func deleteCustomTest(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",
 	})
-}
-
-func testProblem(ctx *fiber.Ctx) error {
-	platform := ctx.Params("platform")
-	cid := ctx.Params("cid")
-	label := ctx.Params("label")
-	probExecResult := services.RunTest(platform, cid, label)
-	return ctx.Status(fiber.StatusOK).JSON(probExecResult)
-}
-
-func getExecutionResult(ctx *fiber.Ctx) error {
-	platform := ctx.Params("platform")
-	cid := ctx.Params("cid")
-	label := ctx.Params("label")
-	probExecResult := services.GetProblemExecutionResult(platform, cid, label, true, false)
-	socket.PublishPreviousRunStatus(probExecResult)
-	return ctx.Status(fiber.StatusOK).JSON(probExecResult)
 }
