@@ -14,7 +14,7 @@ func SetRoutes(app fiber.Router) {
 	}))
 
 	// Parse Routes
-	app.Get("/parse/:encoded_url", parse)
+	app.Get("/parse/:encoded_url", controllers.Parse)
 
 	// Problem Routes
 	app.Get("/problem/:encoded_url", controllers.GetProblemList)
@@ -24,9 +24,9 @@ func SetRoutes(app fiber.Router) {
 	app.Post("/problem/custom/add", controllers.AddCustomProblem)
 
 	// Config Routes
-	app.Get("/config", getConfig)
+	app.Get("/config", controllers.GetConfig)
 
-	app.Put("/config", updateConfig)
+	app.Put("/config", controllers.UpdateConfig)
 
 	// Code Routes
 	app.Get("/code/:platform/:cid/:label", controllers.GetCodeByProblemPath)
@@ -45,22 +45,22 @@ func SetRoutes(app fiber.Router) {
 	app.Get("/source/generate/:platform/:cid/:label", controllers.GenerateSourceByProblemPath)
 
 	// Testcase Routes
-	app.Put("/testcase/custom", getCustomTestByPath)
+	app.Put("/testcase/custom", controllers.GetCustomTestByPath)
 
-	app.Post("/testcase/custom/add", addCustomTest)
+	app.Post("/testcase/custom/add", controllers.AddCustomTest)
 
-	app.Put("/testcase/custom/update", updateCustomTest)
+	app.Put("/testcase/custom/update", controllers.UpdateCustomTest)
 
-	app.Delete("/testcase/custom/delete", deleteCustomTest)
+	app.Delete("/testcase/custom/delete", controllers.DeleteCustomTest)
 
 	app.Post("/testcase/random/input/generate", controllers.GenerateRandomTests)
 
 	app.Post("/testcase/random/output/generate", controllers.GenerateOutputs)
 
 	// Test Routes
-	app.Get("/test/:platform/:cid/:label", testProblem)
+	app.Get("/test/:platform/:cid/:label", controllers.TestProblem)
 
-	app.Get("/execresult/:platform/:cid/:label", getExecutionResult)
+	app.Get("/execresult/:platform/:cid/:label", controllers.GetExecutionResult)
 
 	// Misc. Routes
 	app.Get("/directories/:encoded_url", controllers.GetInputOutputDirectoriesByUrl)
