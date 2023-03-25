@@ -214,7 +214,7 @@ export default function Settings({ appState, setAppState }) {
           <Col sm={5}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Compilation Args</strong>
+                <strong>Compilation Flags</strong>
               </Form.Label>
               <Form.Control
                 type="text"
