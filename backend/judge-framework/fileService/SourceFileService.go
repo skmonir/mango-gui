@@ -3,16 +3,15 @@ package fileService
 import (
 	"errors"
 	"fmt"
+	"github.com/skmonir/mango-gui/backend/judge-framework/config"
 	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
-
-	"github.com/skmonir/mango-gui/backend/judge-framework/config"
-	"github.com/skmonir/mango-gui/backend/judge-framework/models"
-	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
 
 func CreateSourceFiles(problems []models.Problem) {
@@ -35,10 +34,8 @@ func saveSourceIntoFile(judgeConfig *config.JudgeConfig, problem models.Problem)
 	}
 }
 
-func getTemplate(judgeConfig *config.JudgeConfig, meta models.Problem) string {
-	header := getTemplateHeader(judgeConfig.Author, strings.ToUpper(meta.Label)+" - "+meta.Name)
+func getTemplate(judgeConfig *config.JudgeConfig, problem models.Problem) string {
 	body := ""
-
 	if len(judgeConfig.ActiveLanguage.TemplatePath) > 0 {
 		body = utils.ReadFileContent(judgeConfig.ActiveLanguage.TemplatePath, 123456, 123456)
 		if len(body) == 0 {
@@ -48,22 +45,27 @@ func getTemplate(judgeConfig *config.JudgeConfig, meta models.Problem) string {
 		body = getGenericTemplateBody()
 	}
 
-	return header + body
+	body = strings.Replace(body, "{%AUTHOR%}", judgeConfig.Author, 1)
+	body = strings.Replace(body, "{%CREATED_DATETIME%}", time.Now().Local().Format("2-Jan-2006 15:04:05"), 1)
+	body = strings.Replace(body, "{%PROBLEM_NAME%}", strings.ToUpper(problem.Label)+" - "+problem.Name, 1)
+
+	return body
 }
 
-func getTemplateHeader(author string, problemName string) string {
+func getTemplateHeader() string {
 	header := "/**\n"
-	header += fmt.Sprintf(" *     author:  %v\n", author)
-	header += fmt.Sprintf(" *    created:  %v\n", time.Now().Local().Format("2-Jan-2006 15:04:05"))
-	header += fmt.Sprintf(" *    problem:  %v\n", problemName)
+	header += " *     author:  {%AUTHOR%}\n"
+	header += " *    created:  {%CREATED_DATETIME%}\n"
+	header += " *    problem:  {%PROBLEM_NAME%}\n"
 	header += "**/\n\n"
 
 	return header
 }
 
 func getGenericTemplateBody() string {
-	body := ""
+	header := getTemplateHeader()
 
+	body := ""
 	body += "#include <bits/stdc++.h>\n"
 	body += "\n"
 	body += "using namespace std;\n"
@@ -82,15 +84,14 @@ func getGenericTemplateBody() string {
 	body += "int main() {\n"
 	body += "\tios::sync_with_stdio(0), cin.tie(0);\n"
 	body += "\tint tt = 1;\n"
-	body += "\t// cin >> tt;\n"
+	body += "\tcin >> tt;\n"
 	body += "\tfor (int t = 1; t <= tt; ++t) {\n"
-	body += "\t\t// cout << \"Case \" << t << \": \";\n"
 	body += "\t\tsolver();\n"
 	body += "\t}\n"
 	body += "\treturn 0;\n"
 	body += "}"
 
-	return body
+	return header + body
 }
 
 func OpenSourceByPath(filePath string) {
