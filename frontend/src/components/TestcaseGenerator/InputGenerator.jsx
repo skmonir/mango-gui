@@ -160,16 +160,6 @@ export default function InputGenerator({ appState }) {
     }
   };
 
-  const isValidNum = (n, min, max) => {
-    console.log("isValidNum: " + n);
-    return (
-      !isNaN(n) &&
-      new RegExp("^[0-9]*$").test(n) &&
-      min <= Number(n) &&
-      Number(n) <= max
-    );
-  };
-
   const showToastMessage = (variant, message) => {
     setShowToast(true);
     setToastMsgObj({
@@ -204,7 +194,7 @@ export default function InputGenerator({ appState }) {
     }
     if (
       !isNaN(inputGenerateRequest.testPerFile) &&
-      !isValidNum(inputGenerateRequest.testPerFile, 0, 100000)
+      !Utils.isValidNum(inputGenerateRequest.testPerFile, 0, 100000)
     ) {
       errMessage +=
         "Number of test on each file should be a number in the specified range\n";

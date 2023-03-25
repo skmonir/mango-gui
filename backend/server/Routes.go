@@ -17,9 +17,11 @@ func SetRoutes(app fiber.Router) {
 	app.Get("/parse/:encoded_url", parse)
 
 	// Problem Routes
-	app.Get("/problem/:encoded_url", getProblemList)
+	app.Get("/problem/:encoded_url", controllers.GetProblemList)
 
-	app.Get("/problem/:platform/:cid/:label", getProblem)
+	app.Get("/problem/:platform/:cid/:label", controllers.GetProblem)
+
+	app.Post("/problem/custom/add", controllers.AddCustomProblem)
 
 	// Config Routes
 	app.Get("/config", getConfig)
@@ -36,9 +38,11 @@ func SetRoutes(app fiber.Router) {
 	app.Put("/code/update/:platform/:cid/:label", controllers.UpdateCodeByProblemPath)
 
 	// Source Routes
-	app.Get("/source/open/:platform/:cid/:label", openSourceByMetadata)
+	app.Get("/source/open/:platform/:cid/:label", controllers.OpenSourceByMetadata)
 
-	app.Put("/source/open", openSourceByPath)
+	app.Put("/source/open", controllers.OpenSourceByPath)
+
+	app.Get("/source/generate/:platform/:cid/:label", controllers.GenerateSourceByProblemPath)
 
 	// Testcase Routes
 	app.Put("/testcase/custom", getCustomTestByPath)

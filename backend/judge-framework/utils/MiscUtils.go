@@ -43,18 +43,32 @@ func PanicRecovery() {
 	}
 }
 
+func splitUrlPath(path string) []string {
+	var values []string
+	for _, p := range strings.Split(strings.Trim(path, "/"), "/") {
+		if len(strings.TrimSpace(p)) > 0 {
+			values = append(values, p)
+		}
+	}
+	return values
+}
+
 func ExtractInfoFromUrl(url string) (string, string, string) {
 	platform, cid, pid := "", "", ""
-	if strings.Contains(url, "atcoder.jp/contests") {
+	if strings.HasPrefix(url, "custom/") {
+		values := splitUrlPath(url)
+		platform = "custom"
+		if len(values) > 1 {
+			cid = values[1]
+		}
+		if len(values) > 2 {
+			pid = values[2]
+		}
+	} else if strings.Contains(url, "atcoder.jp/contests") {
 		platform = "atcoder"
 		index := strings.Index(url, "atcoder.jp/contests")
 		path := strings.Trim(url[index+len("atcoder.jp/contests"):], "/")
-		var values []string
-		for _, p := range strings.Split(path, "/") {
-			if len(strings.TrimSpace(p)) > 0 {
-				values = append(values, p)
-			}
-		}
+		values := splitUrlPath(path)
 		if len(values) > 0 {
 			cid = values[0]
 		}
@@ -73,12 +87,7 @@ func ExtractInfoFromUrl(url string) (string, string, string) {
 		}
 		index := strings.Index(url, "codeforces.com/"+ctype)
 		path := strings.Trim(url[index+len("codeforces.com/"+ctype):], "/")
-		var values []string
-		for _, p := range strings.Split(path, "/") {
-			if len(strings.TrimSpace(p)) > 0 {
-				values = append(values, p)
-			}
-		}
+		values := splitUrlPath(path)
 		if len(values) > 0 {
 			cid = values[0]
 		}

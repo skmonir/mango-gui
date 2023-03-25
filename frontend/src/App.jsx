@@ -10,8 +10,10 @@ import {
   faAngleDoubleLeft,
   faAngleDoubleRight,
   faCog,
+  faDiagramProject,
   faDownload,
   faLaptopCode,
+  faMicrochip,
   faTools
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
@@ -57,28 +59,21 @@ function App() {
                       </Nav.Link>
                     </Nav.Item>
                     <Nav.Item className="text-center">
-                      <NavDropdown
-                        title={
-                          <>
-                            <FontAwesomeIcon icon={faCog} /> Testcase Generator
-                          </>
-                        }
-                        id="basic-nav-dropdown"
+                      <Nav.Link
+                        onClick={() => setCurrentTab("input_generator")}
+                        eventKey="input_generator"
                       >
-                        <NavDropdown.Item
-                          onClick={() => setCurrentTab("input_generator")}
-                        >
-                          <FontAwesomeIcon icon={faAngleDoubleRight} /> Input
-                          Generator
-                        </NavDropdown.Item>
-                        <NavDropdown.Divider />
-                        <NavDropdown.Item
-                          onClick={() => setCurrentTab("output_generator")}
-                        >
-                          <FontAwesomeIcon icon={faAngleDoubleLeft} /> Output
-                          Generator
-                        </NavDropdown.Item>
-                      </NavDropdown>
+                        <FontAwesomeIcon icon={faDiagramProject} /> Input
+                        Generator
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item className="text-center">
+                      <Nav.Link
+                        onClick={() => setCurrentTab("output_generator")}
+                        eventKey="output_generator"
+                      >
+                        <FontAwesomeIcon icon={faMicrochip} /> Output Generator
+                      </Nav.Link>
                     </Nav.Item>
                     <Nav.Item className="text-center">
                       <Nav.Link

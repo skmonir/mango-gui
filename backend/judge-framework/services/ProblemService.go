@@ -27,7 +27,7 @@ func GetProblemListByUrl(url string) []models.Problem {
 	if len(problems) == 0 || pid == "" {
 		return problems
 	}
-
+	fmt.Println(problems)
 	var response []models.Problem
 	for _, problem := range problems {
 		if strings.Contains(problem.Url, url) {
@@ -79,4 +79,13 @@ func UpdateProblemList(newProblemList []models.Problem) {
 		}
 		SaveProblemList(oldProblemList)
 	}
+}
+
+func AddCustomProblem(problem models.Problem) []models.Problem {
+	problem.Url = strings.ToLower(fmt.Sprintf("custom/%v/%v", problem.ContestId, problem.Label))
+	problem.Status = "success"
+	problems := []models.Problem{problem}
+	UpdateProblemList(problems)
+	fileService.CreateSourceFiles(problems)
+	return problems
 }

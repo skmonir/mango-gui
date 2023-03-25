@@ -16,7 +16,7 @@ export default function ShowToast({ toastMsgObj, setShowToast }) {
           <strong className="me-auto">{toastMsgObj.variant + "!"}</strong>
         </Toast.Header>
         <Toast.Body style={{ color: "antiquewhite" }}>
-          <pre>{toastMsgObj.message}</pre>
+          <pre>{toastMsgObj.message.trim()}</pre>
         </Toast.Body>
       </Toast>
     </ToastContainer>

@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 import SocketClient from "../socket/SocketClient.js";
 import DataService from "../services/DataService.js";
 import Loading from "./Loading.jsx";
-import AddEditTestModal from "./modals/AddEditTestModal.jsx";
 import Utils from "../Utils.js";
 import AddCustomProblemModal from "./modals/AddCustomProblemModal.jsx";
 
@@ -88,6 +87,10 @@ function Parser({ appState }) {
     setShowAddCustomProblemModal(false);
   };
 
+  const insertCustomProblemIntoList = data => {
+    setParsedProblemList(data);
+  };
+
   const getProblemStatusIcon = status => {
     if (!status || status === "running") {
       return <Spinner animation="border" variant="primary" size="sm" />;
@@ -137,7 +140,9 @@ function Parser({ appState }) {
                   size="sm"
                   onClick={() => parseSingleProblem(id, problem?.url)}
                   disabled={
-                    parsingInProgress || !appState.config.workspaceDirectory
+                    parsingInProgress ||
+                    !appState.config.workspaceDirectory ||
+                    problem?.url.startsWith("custom/")
                   }
                 >
                   <FontAwesomeIcon icon={faSyncAlt} /> Refresh
@@ -227,6 +232,7 @@ function Parser({ appState }) {
       {showAddCustomProblemModal && (
         <AddCustomProblemModal
           closeAddCustomProblemModal={closeAddCustomProblemModal}
+          insertCustomProblemIntoList={insertCustomProblemIntoList}
         />
       )}
     </div>

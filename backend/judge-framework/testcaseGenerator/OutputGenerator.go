@@ -30,6 +30,10 @@ func GenerateOutput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionRes
 		return execResult
 	}
 
+	if !utils.IsDirExist(request.OutputDirectoryPath) {
+		_ = utils.CreateDir(request.OutputDirectoryPath)
+	}
+
 	// Step-3: Prepare testcase detail and run the executor
 	inputFiles := utils.GetFileNamesInDirectory(request.InputDirectoryPath)
 	for _, inputFilename := range inputFiles {

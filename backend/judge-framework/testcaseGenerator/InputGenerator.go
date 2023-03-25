@@ -110,6 +110,10 @@ func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResu
 		}
 	}
 
+	if !utils.IsDirExist(request.InputDirectoryPath) {
+		_ = utils.CreateDir(request.InputDirectoryPath)
+	}
+
 	execResult := dto.ProblemExecutionResult{
 		TestcaseExecutionDetailsList: []dto.TestcaseExecutionDetails{},
 	}

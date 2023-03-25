@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCode,
   faEdit,
+  faFileCirclePlus,
   faFileCode,
   faPlus,
   faTasks,
@@ -30,6 +31,7 @@ import RE from "../assets/icons/RE.svg";
 import TLE from "../assets/icons/TLE.svg";
 import WA from "../assets/icons/WA.svg";
 import Utils from "../Utils.js";
+import ShowToast from "./Toast/ShowToast.jsx";
 
 export default function Tester({ appState }) {
   const socketClient = new SocketClient();
@@ -71,6 +73,11 @@ export default function Tester({ appState }) {
   ] = useState(null);
   const [selectedTestcase, setSelectedTestcase] = useState(null);
   const [testStatusMessage, setTestStatusMessage] = useState({});
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsgObj, setToastMsgObj] = useState({
+    variant: "",
+    message: ""
+  });
 
   useEffect(() => {
     let socketConnTest = socketClient.initSocketConnection(
@@ -122,9 +129,27 @@ export default function Tester({ appState }) {
   };
 
   const openSource = () => {
-    DataService.openSourceByMetadata(selectedProblemMetadata).then(resp => {
-      console.log(resp);
-    });
+    DataService.openSourceByMetadata(selectedProblemMetadata)
+      .then(resp => {
+        console.log(resp);
+      })
+      .catch(error => {
+        console.log(error);
+        showToastMessage("Error", error.response.data);
+      });
+  };
+
+  const generateSourceCode = () => {
+    DataService.generateSourceCode(selectedProblemMetadata)
+      .then(resp => {
+        showToastMessage("Success", "Generated source code successfully!");
+      })
+      .catch(e => {
+        showToastMessage(
+          "Error",
+          "Oops! Something went wrong while generating the source!"
+        );
+      });
   };
 
   const runTest = () => {
@@ -198,6 +223,14 @@ export default function Tester({ appState }) {
   const closeAddEditTestModal = () => {
     setShowAddEditTestModal(false);
     getSelectedProblemExecResult(selectedProblemMetadata);
+  };
+
+  const showToastMessage = (variant, message) => {
+    setShowToast(true);
+    setToastMsgObj({
+      variant: variant,
+      message: message
+    });
   };
 
   const getTestStatusText = () => {
@@ -446,7 +479,7 @@ export default function Tester({ appState }) {
           </Col>
         </Row>
         <Row>
-          <Col xs={6}>
+          <Col xs={4}>
             <Form.Group className="mb-3">
               <Form.Select
                 size="sm"
@@ -506,6 +539,18 @@ export default function Tester({ appState }) {
                 disabled={!selectedProblemFilteredExecResult}
               >
                 <FontAwesomeIcon icon={faCode} /> View Code
+              </Button>
+            </div>
+          </Col>
+          <Col xs={2}>
+            <div className="d-grid gap-2">
+              <Button
+                size="sm"
+                variant="outline-success"
+                onClick={generateSourceCode}
+                disabled={!selectedProblemFilteredExecResult}
+              >
+                <FontAwesomeIcon icon={faFileCirclePlus} /> Generate Code
               </Button>
             </div>
           </Col>
@@ -600,20 +645,23 @@ export default function Tester({ appState }) {
         )}
         <Row>{getExecutionTable()}</Row>
         <Row>{getAlert()}</Row>
-        {showCodeModal && (
-          <ViewCodeModal
-            metadata={selectedProblemMetadata}
-            setShowCodeModal={setShowCodeModal}
-          />
-        )}
-        {showAddEditTestModal && (
-          <AddEditTestModal
-            metadata={selectedProblemMetadata}
-            closeAddEditTestModal={closeAddEditTestModal}
-            testcaseFilePath={selectedTestcase}
-          />
-        )}
       </Card>
+      {showCodeModal && (
+        <ViewCodeModal
+          metadata={selectedProblemMetadata}
+          setShowCodeModal={setShowCodeModal}
+        />
+      )}
+      {showAddEditTestModal && (
+        <AddEditTestModal
+          metadata={selectedProblemMetadata}
+          closeAddEditTestModal={closeAddEditTestModal}
+          testcaseFilePath={selectedTestcase}
+        />
+      )}
+      {showToast && (
+        <ShowToast toastMsgObj={toastMsgObj} setShowToast={setShowToast} />
+      )}
     </div>
   );
 }

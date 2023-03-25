@@ -67,6 +67,10 @@ class DataService {
     return this.getData("problem/" + encodedUrl);
   }
 
+  addCustomProblem(addCustomProblemRequest) {
+    return this.postData("problem/custom/add/", addCustomProblemRequest);
+  }
+
   getConfig() {
     return this.getData("config/");
   }
@@ -97,6 +101,10 @@ class DataService {
 
   openSourceByPath(openSourceRequest) {
     return this.putData("source/open/", openSourceRequest);
+  }
+
+  generateSourceCode(path) {
+    return this.getData("source/generate/" + path);
   }
 
   getTestcaseByFilePath(getTestcaseRequest) {

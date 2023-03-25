@@ -1,7 +1,9 @@
 package fileService
 
 import (
+	"errors"
 	"fmt"
+	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -14,14 +16,15 @@ import (
 )
 
 func CreateSourceFiles(problems []models.Problem) {
+	logger.Info("Creating source files...")
 	judgeConfig := config.GetJudgeConfigFromCache()
-
 	for _, prob := range problems {
 		saveSourceIntoFile(judgeConfig, prob)
 	}
 }
 
 func saveSourceIntoFile(judgeConfig *config.JudgeConfig, problem models.Problem) {
+	logger.Info(fmt.Sprintf("Saving source file for: %v", problem))
 	folderPath := fmt.Sprintf("%v/%v/%v/source", strings.TrimRight(judgeConfig.WorkspaceDirectory, "/"), problem.Platform, problem.ContestId)
 	fileName := problem.Label + judgeConfig.ActiveLanguage.FileExtension
 	filePath := filepath.Join(folderPath, fileName)
@@ -107,11 +110,14 @@ func OpenSourceByPath(filePath string) {
 	}
 }
 
-func OpenSourceByMetadata(platform string, cid string, label string) {
+func OpenSourceByMetadata(platform string, cid string, label string) error {
 	filePath := GetSourceFilePath(platform, cid, label)
 	if utils.IsFileExist(filePath) {
 		OpenSourceByPath(filePath)
+		return nil
 	}
+	logger.Error("Source file not found. Click Generate Code button.")
+	return errors.New("Source file not found. Click Generate Code button.")
 }
 
 func GetCodeByMetadata(platform string, cid string, label string) string {
@@ -143,4 +149,9 @@ func GetSourceBinaryPath(platform string, cid string, label string) string {
 	folderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
 	binaryPath := fmt.Sprintf("%v%v", filepath.Join(folderPath, label), utils.GetBinaryFileExt())
 	return binaryPath
+}
+
+func GenerateSourceByProblemPath(problem models.Problem) {
+	problems := []models.Problem{problem}
+	CreateSourceFiles(problems)
 }
