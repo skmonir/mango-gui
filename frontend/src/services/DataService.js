@@ -99,10 +99,6 @@ class DataService {
     return this.getData("source/open/" + path);
   }
 
-  openSourceByPath(openSourceRequest) {
-    return this.putData("source/open/", openSourceRequest);
-  }
-
   generateSourceCode(path) {
     return this.getData("source/generate/" + path);
   }
@@ -149,6 +145,10 @@ class DataService {
 
   checkFilePathValidity(encodedPath) {
     return this.getData("misc/filepath/check/" + encodedPath);
+  }
+
+  openResource(openResourceRequest) {
+    return this.putData("misc/resource/open/", openResourceRequest);
   }
 }
 

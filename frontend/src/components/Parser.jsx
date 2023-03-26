@@ -122,12 +122,22 @@ function Parser({ appState }) {
           {parsedProblemList.map((problem, id) => (
             <tr key={id}>
               <td className="text-center">
-                <a href={problem?.url} style={{ pointerEvents: "none" }}>
+                <a
+                  href="#"
+                  onClick={() =>
+                    DataService.openResource({ path: problem?.url })
+                  }
+                >
                   {problem?.label.toUpperCase()}
                 </a>
               </td>
               <td>
-                <a href={problem?.url} style={{ pointerEvents: "none" }}>
+                <a
+                  href="#"
+                  onClick={() =>
+                    DataService.openResource({ path: problem?.url })
+                  }
+                >
                   {problem?.name}
                 </a>
               </td>
@@ -222,7 +232,7 @@ function Parser({ appState }) {
             <Col>
               <br />
               <Alert variant="danger" className="text-center">
-                Configuration is not set property. Please go to Settings and set
+                Configuration is not set properly. Please go to Settings and set
                 necessary fields.
               </Alert>
             </Col>

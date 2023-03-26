@@ -92,11 +92,13 @@ func DeleteCustomTest(ctx *fiber.Ctx) error {
 		})
 	}
 	fmt.Println(updateCustomTestRequest)
-	services.DeleteCustomTestcaseFromFile(
+	if err := services.DeleteCustomTestcaseFromFile(
 		updateCustomTestRequest.Platform,
 		updateCustomTestRequest.ContestId,
 		updateCustomTestRequest.Label,
-		updateCustomTestRequest.InputFilePath)
+		updateCustomTestRequest.InputFilePath); err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON("Error occurred while deleting the testcase")
+	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",
 	})

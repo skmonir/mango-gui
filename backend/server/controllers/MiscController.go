@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
@@ -28,5 +29,24 @@ func CheckFilePathValidity(ctx *fiber.Ctx) error {
 	isExist := utils.IsFileExist(utils.DecodeBase64(encodedPath))
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"isExist": isExist,
+	})
+}
+
+func OpenResource(ctx *fiber.Ctx) error {
+	openResourceRequest := struct {
+		Path string `json:"path"`
+	}{}
+	err := ctx.BodyParser(&openResourceRequest)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	fmt.Println(openResourceRequest)
+	if err := utils.OpenResourceInDefaultApplication(openResourceRequest.Path); err != nil {
+		return ctx.Status(fiber.StatusNotFound).JSON("Error occurred while opening the resource!")
+	}
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "success",
 	})
 }

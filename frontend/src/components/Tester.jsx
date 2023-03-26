@@ -24,7 +24,7 @@ import { useEffect, useState } from "react";
 import SocketClient from "../socket/SocketClient.js";
 import DataService from "../services/DataService.js";
 import ViewCodeModal from "./modals/ViewCodeModal.jsx";
-import AddEditTestModal from "./modals/AddEditTestModal.jsx";
+import AddEditCustomTestModal from "./modals/AddEditCustomTestModal.jsx";
 import AC from "../assets/icons/AC.svg";
 import CE from "../assets/icons/CE.svg";
 import RE from "../assets/icons/RE.svg";
@@ -32,6 +32,8 @@ import TLE from "../assets/icons/TLE.svg";
 import WA from "../assets/icons/WA.svg";
 import Utils from "../Utils.js";
 import ShowToast from "./Toast/ShowToast.jsx";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 export default function Tester({ appState }) {
   const socketClient = new SocketClient();
@@ -207,7 +209,7 @@ export default function Tester({ appState }) {
     setShowAddEditTestModal(true);
   };
 
-  const deleteCustomTest = inputFilePath => {
+  const deleteCustomTestTriggered = inputFilePath => {
     const data = selectedProblemMetadata.split("/");
     const req = {
       platform: data[0],
@@ -215,9 +217,30 @@ export default function Tester({ appState }) {
       label: data[2],
       inputFilePath: inputFilePath
     };
-    DataService.deleteCustomTest(req).then(() => {
-      getSelectedProblemExecResult(selectedProblemMetadata);
+    confirmAlert({
+      title: "",
+      message: "Are you sure to delete this testcase?",
+      buttons: [
+        {
+          label: "Cancel"
+        },
+        {
+          label: "Yes, Delete!",
+          onClick: () => deleteCustomTest(req)
+        }
+      ]
     });
+  };
+
+  const deleteCustomTest = req => {
+    DataService.deleteCustomTest(req)
+      .then(() => {
+        getSelectedProblemExecResult(selectedProblemMetadata);
+        showToastMessage("Success", "Testcase deleted successfully!");
+      })
+      .catch(error => {
+        showToastMessage("Error", error.response.data);
+      });
   };
 
   const closeAddEditTestModal = () => {
@@ -348,13 +371,13 @@ export default function Tester({ appState }) {
               >
                 <tr className="text-center">
                   <th>#</th>
-                  <th>INPUT</th>
-                  <th>OUTPUT</th>
-                  <th>EXPECTED</th>
-                  <th>VERDICT</th>
-                  <th>TIME</th>
-                  <th>MEMORY</th>
-                  <th>ACTION</th>
+                  <th>Input</th>
+                  <th>Expected Output</th>
+                  <th>Program Output</th>
+                  <th>Result</th>
+                  <th>Time</th>
+                  <th>Mem.</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -366,10 +389,10 @@ export default function Tester({ appState }) {
                         <pre>{execDetails.testcase.input}</pre>
                       </td>
                       <td>
-                        <pre>{execDetails.testcaseExecutionResult?.output}</pre>
+                        <pre>{execDetails.testcase.output}</pre>
                       </td>
                       <td>
-                        <pre>{execDetails.testcase.output}</pre>
+                        <pre>{execDetails.testcaseExecutionResult?.output}</pre>
                       </td>
                       <td className="text-center">{getVerdict(execDetails)}</td>
                       <td className="text-center">
@@ -402,7 +425,7 @@ export default function Tester({ appState }) {
                               size="sm"
                               variant="danger"
                               onClick={() =>
-                                deleteCustomTest(
+                                deleteCustomTestTriggered(
                                   execDetails.testcase.inputFilePath
                                 )
                               }
@@ -434,7 +457,7 @@ export default function Tester({ appState }) {
           <Col>
             <br />
             <Alert variant="danger" className="text-center">
-              Configuration is not set property. Please go to Settings and set
+              Configuration is not set properly. Please go to Settings and set
               necessary fields.
             </Alert>
           </Col>
@@ -675,7 +698,7 @@ export default function Tester({ appState }) {
         />
       )}
       {showAddEditTestModal && (
-        <AddEditTestModal
+        <AddEditCustomTestModal
           metadata={selectedProblemMetadata}
           closeAddEditTestModal={closeAddEditTestModal}
           testcaseFilePath={selectedTestcase}

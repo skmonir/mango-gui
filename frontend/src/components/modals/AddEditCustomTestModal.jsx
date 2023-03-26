@@ -3,8 +3,10 @@ import { Alert, Button, Col, Modal, Row } from "react-bootstrap";
 import DataService from "../../services/DataService.js";
 import Form from "react-bootstrap/Form";
 import ShowToast from "../Toast/ShowToast.jsx";
+import { faCompress, faPlus, faSave } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function AddEditTestModal({
+export default function AddEditCustomTestModal({
   metadata,
   testcaseFilePath,
   closeAddEditTestModal
@@ -121,9 +123,11 @@ export default function AddEditTestModal({
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
-        fullscreen={true}
       >
-        <Modal.Body style={{ height: "80vh", overflowY: "auto" }}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add Custom Test</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ overflowY: "auto" }}>
           <Row>
             <Col xs={6}>
               <Form>
@@ -144,7 +148,7 @@ export default function AddEditTestModal({
                     autoCapitalize="none"
                     as="textarea"
                     aria-label="With textarea"
-                    rows={23}
+                    rows={15}
                   />
                 </pre>
               </Form>
@@ -168,7 +172,7 @@ export default function AddEditTestModal({
                     autoCapitalize="none"
                     as="textarea"
                     aria-label="With textarea"
-                    rows={23}
+                    rows={15}
                   />
                 </pre>
               </Form>
@@ -184,7 +188,7 @@ export default function AddEditTestModal({
             }
             onClick={() => saveTriggered(true)}
           >
-            {`${eventType} and Close`}
+            <FontAwesomeIcon icon={faSave} /> {`${eventType} and Close`}
           </Button>
           {eventType === "Save" && (
             <Button
@@ -197,7 +201,8 @@ export default function AddEditTestModal({
               }
               onClick={() => saveTriggered(false)}
             >
-              {`Save and Add Another One`}
+              <FontAwesomeIcon icon={faSave} />{" "}
+              <FontAwesomeIcon icon={faPlus} /> Save and Add Another One
             </Button>
           )}
           <Button

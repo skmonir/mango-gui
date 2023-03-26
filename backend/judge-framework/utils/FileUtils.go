@@ -2,14 +2,11 @@ package utils
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strings"
 )
@@ -74,22 +71,6 @@ func CreateFile(folderPath string, filename string) error {
 	return nil
 }
 
-func OpenFile(filePath string) error {
-	var err error
-
-	switch runtime.GOOS {
-	case "linux":
-		err = exec.Command("xdg-open", filePath).Run()
-	case "windows":
-		exec.Command("cmd", filePath).Run()
-	case "darwin":
-		err = exec.Command("open", filePath).Run()
-	default:
-		err = errors.New("unsupported os")
-	}
-	return err
-}
-
 func ReadFileContent(filePath string, maxRow int, maxCol int) string {
 	if !IsFileExist(filePath) {
 		return ""
@@ -149,9 +130,10 @@ func WriteFileContent(folderPath string, filename string, data []byte) {
 	}
 }
 
-func RemoveFile(filePath string) {
+func RemoveFile(filePath string) error {
 	err := os.Remove(filePath)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
+	return nil
 }

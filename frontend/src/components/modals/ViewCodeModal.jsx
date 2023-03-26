@@ -8,6 +8,13 @@ import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import Editor from "react-simple-code-editor";
 import ShowToast from "../Toast/ShowToast.jsx";
+import {
+  faCompress,
+  faMaximize,
+  faMinimize,
+  faSave
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function ViewCodeModal({
   codePath,
@@ -22,6 +29,7 @@ export default function ViewCodeModal({
     message: ""
   });
   const [showToast, setShowToast] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   useEffect(() => {
     if (codePath) {
@@ -118,9 +126,9 @@ export default function ViewCodeModal({
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
-        fullscreen={true}
+        fullscreen={isFullScreen}
       >
-        <Modal.Header />
+        <Modal.Header closeButton />
         <Modal.Body style={{ height: "80vh", overflowY: "auto" }}>
           <Editor
             value={code}
@@ -138,15 +146,25 @@ export default function ViewCodeModal({
           />
         </Modal.Body>
         <Modal.Footer>
-          {isCodeUpdated && (
-            <Button
-              size="sm"
-              variant="outline-success"
-              onClick={() => updateAndCloseModal()}
-            >
-              Save Changes and Close
-            </Button>
-          )}
+          <Button
+            size="sm"
+            variant="outline-success"
+            onClick={() => setIsFullScreen(!isFullScreen)}
+          >
+            {isFullScreen ? (
+              <FontAwesomeIcon icon={faCompress} />
+            ) : (
+              <FontAwesomeIcon icon={faMaximize} />
+            )}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline-success"
+            disabled={!isCodeUpdated}
+            onClick={() => updateAndCloseModal()}
+          >
+            <FontAwesomeIcon icon={faSave} /> Save Changes and Close
+          </Button>
           <Button
             size="sm"
             variant="outline-danger"

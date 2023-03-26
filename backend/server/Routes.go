@@ -40,8 +40,6 @@ func SetRoutes(app fiber.Router) {
 	// Source Routes
 	app.Get("/source/open/:platform/:cid/:label", controllers.OpenSourceByMetadata)
 
-	app.Put("/source/open", controllers.OpenSourceByPath)
-
 	app.Get("/source/generate/:platform/:cid/:label", controllers.GenerateSourceByProblemPath)
 
 	// Testcase Routes
@@ -68,4 +66,6 @@ func SetRoutes(app fiber.Router) {
 	app.Get("/misc/directory/check/:encoded_path", controllers.CheckDirectoryPathValidity)
 
 	app.Get("/misc/filepath/check/:encoded_path", controllers.CheckFilePathValidity)
+
+	app.Put("/misc/resource/open", controllers.OpenResource)
 }

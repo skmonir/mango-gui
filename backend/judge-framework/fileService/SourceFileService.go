@@ -7,9 +7,7 @@ import (
 	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
-	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 )
@@ -94,31 +92,13 @@ func getGenericTemplateBody() string {
 	return header + body
 }
 
-func OpenSourceByPath(filePath string) {
-	var err error
-	switch runtime.GOOS {
-	case "linux":
-		err = exec.Command("xdg-open", filePath).Run()
-	case "windows":
-		err = exec.Command("cmd", fmt.Sprintf("/C start %v", filePath)).Run()
-	case "darwin":
-		err = exec.Command("open", filePath).Run()
-	default:
-		fmt.Println("unsupported os")
-	}
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
 func OpenSourceByMetadata(platform string, cid string, label string) error {
 	filePath := GetSourceFilePath(platform, cid, label)
 	if utils.IsFileExist(filePath) {
-		OpenSourceByPath(filePath)
-		return nil
+		return utils.OpenResourceInDefaultApplication(filePath)
 	}
-	logger.Error("Source file not found. Click Generate Code button.")
-	return errors.New("Source file not found. Click Generate Code button.")
+	logger.Error("Source file not found. Click Generate Source button.")
+	return errors.New("Source file not found. Click Generate Source button.")
 }
 
 func GetCodeByMetadata(platform string, cid string, label string) string {

@@ -38,9 +38,12 @@ func UpdateCustomTestcaseIntoFile(platform, cid, label, inputFilePath, outputFil
 	GetProblemExecutionResult(platform, cid, label, true, true)
 }
 
-func DeleteCustomTestcaseFromFile(platform, cid, label, inputFilePath string) {
-	utils.RemoveFile(inputFilePath)
+func DeleteCustomTestcaseFromFile(platform, cid, label, inputFilePath string) error {
+	if err := utils.RemoveFile(inputFilePath); err != nil {
+		return err
+	}
 	GetProblemExecutionResult(platform, cid, label, true, true)
+	return nil
 }
 
 func GetInputOutputDirectoryByUrl(url string) (string, string) {

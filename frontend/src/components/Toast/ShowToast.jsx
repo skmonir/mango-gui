@@ -9,7 +9,7 @@ export default function ShowToast({ toastMsgObj, setShowToast }) {
         bg={
           toastMsgObj.variant.toLowerCase() === "error" ? "danger" : "success"
         }
-        delay={toastMsgObj.variant === "Error" ? 10000 : 3000}
+        delay={toastMsgObj.variant === "Error" ? 5000 : 3000}
         autohide={toastMsgObj.variant !== "Error"}
       >
         <Toast.Header>

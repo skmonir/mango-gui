@@ -19,6 +19,11 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	logger.Info(fmt.Sprintf("Run test request received for %v %v %v", platform, cid, label))
 	// Step 0: Fetch new/previous execution result object and reset necessary fields
 	execResult := GetProblemExecutionResult(platform, cid, label, true, false)
+	if len(execResult.TestcaseExecutionDetailsList) == 0 {
+		logger.Error("No input files to test!")
+		socket.PublishStatusMessage("test_status", "No input files to test!", "error")
+		return execResult
+	}
 	execResult.CompilationError = ""
 	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
 		execResult.TestcaseExecutionDetailsList[i].Status = "none"
