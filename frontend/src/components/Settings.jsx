@@ -1,14 +1,42 @@
 import { Button, Card, Col, InputGroup, Row, Spinner } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCode, faSave } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCode,
+  faFileCode,
+  faSave,
+  faSyncAlt
+} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import DataService from "../services/DataService.js";
 import ViewCodeModal from "./modals/ViewCodeModal.jsx";
 import ShowToast from "./Toast/ShowToast.jsx";
 import Utils from "../Utils.js";
+import { confirmAlert } from "react-confirm-alert";
 
 export default function Settings({ appState, setAppState }) {
+  const placeholders = {
+    cpp: {
+      compCommand: "g++",
+      compFlags: "-std=c++20",
+      ext: ".cpp"
+    },
+    java: {
+      compCommand: "javac",
+      compFlags: "-encoding UTF-8 -J-Xmx2048m",
+      execCommand: "java",
+      execFlags: "-XX:+UseSerialGC -Xss64m -Xms64m -Xmx2048m",
+      ext: ".java"
+    },
+    python: {
+      compCommand: "python3",
+      execCommand: "python3",
+      execFlags: "",
+      ext: ".py"
+    },
+    "": {}
+  };
+
   const [config, setConfig] = useState({});
   const [selectedLang, setSelectedLang] = useState("");
   const [selectedLangConfig, setSelectedLangConfig] = useState({});
@@ -29,10 +57,7 @@ export default function Settings({ appState, setAppState }) {
     DataService.getConfig()
       .then(config => {
         console.log(config);
-        setConfig(config);
-        setAppState({ ...appState, config: config });
-        setSelectedLang(config?.activeLang);
-        setSelectedLangConfig(config.langConfigs[config.activeLang]);
+        updateConfig(config);
       })
       .catch(e => {
         showToastMessage(
@@ -40,6 +65,13 @@ export default function Settings({ appState, setAppState }) {
           "Oops! Something went wrong while fetching the config!"
         );
       });
+  };
+
+  const updateConfig = config => {
+    setConfig(config);
+    setAppState({ ...appState, config: config });
+    setSelectedLang(config?.activeLang);
+    setSelectedLangConfig(config.langConfigs[config.activeLang]);
   };
 
   const validate = () => {
@@ -72,6 +104,35 @@ export default function Settings({ appState, setAppState }) {
         })
         .finally(() => setSavingInProgress(false));
     }
+  };
+
+  const resetSettingsTriggered = () => {
+    confirmAlert({
+      title: "",
+      message: "Are you sure to reset the settings?",
+      buttons: [
+        {
+          label: "Cancel"
+        },
+        {
+          label: "Yes, Reset!",
+          onClick: () => resetSettings()
+        }
+      ]
+    });
+  };
+
+  const resetSettings = () => {
+    setSavingInProgress(true);
+    DataService.resetConfig()
+      .then(config => {
+        updateConfig(config);
+        showToastMessage("Success", "Settings reset is successful!");
+      })
+      .catch(error => {
+        showToastMessage("Error", error.response.data);
+      })
+      .finally(() => setSavingInProgress(false));
   };
 
   const selectedLangChanged = lang => {
@@ -223,7 +284,9 @@ export default function Settings({ appState, setAppState }) {
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  placeholder="Example: g++"
+                  placeholder={
+                    "Example: " + placeholders[selectedLang].compCommand
+                  }
                   value={selectedLangConfig.compilationCommand}
                   onChange={e =>
                     setSelectedLangConfig({
@@ -245,7 +308,9 @@ export default function Settings({ appState, setAppState }) {
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  placeholder="Example: -std=c++20"
+                  placeholder={
+                    "Example: " + placeholders[selectedLang].compFlags
+                  }
                   value={selectedLangConfig.compilationFlags}
                   onChange={e =>
                     setSelectedLangConfig({
@@ -271,7 +336,9 @@ export default function Settings({ appState, setAppState }) {
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  placeholder="Example: g++"
+                  placeholder={
+                    "Example: " + placeholders[selectedLang].execCommand
+                  }
                   value={selectedLangConfig.executionCommand}
                   onChange={e =>
                     setSelectedLangConfig({
@@ -293,7 +360,9 @@ export default function Settings({ appState, setAppState }) {
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  placeholder="Example: -std=c++20"
+                  placeholder={
+                    "Example: " + placeholders[selectedLang].execFlags
+                  }
                   value={selectedLangConfig.executionFlags}
                   onChange={e =>
                     setSelectedLangConfig({
@@ -330,7 +399,7 @@ export default function Settings({ appState, setAppState }) {
                     checkFilePathValidity(selectedLangConfig.templatePath)
                   }
                   placeholder={
-                    "Template file ends with extension(.cpp/.java/.py). The sourceTemplateService will be used to create source files."
+                    "Template file ends with extension(.cpp/.java/.py). The template file will be used to create source files."
                   }
                 />
                 <Button
@@ -348,28 +417,42 @@ export default function Settings({ appState, setAppState }) {
       </Card>
       <br />
       <Row>
-        <Col md={{ span: 2, offset: 5 }}>
+        <Col md={{ span: 4, offset: 4 }}>
           <Row>
-            <Col xs={12} className="d-flex justify-content-center">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => triggerSave()}
-                disabled={savingInProgress}
-              >
-                {!savingInProgress ? (
-                  <FontAwesomeIcon icon={faSave} />
-                ) : (
-                  <Spinner
-                    as="span"
-                    animation="grow"
-                    size="sm"
-                    role="status"
-                    aria-hidden="true"
-                  />
-                )}
-                {savingInProgress ? " Saving Settings" : " Save Settings"}
-              </Button>
+            <Col xs={6}>
+              <div className="d-grid gap-2">
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  onClick={() => triggerSave()}
+                  disabled={savingInProgress}
+                >
+                  {!savingInProgress ? (
+                    <FontAwesomeIcon icon={faSave} />
+                  ) : (
+                    <Spinner
+                      as="span"
+                      animation="grow"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {savingInProgress ? " Saving Settings" : " Save Settings"}
+                </Button>
+              </div>
+            </Col>
+            <Col xs={6}>
+              <div className="d-grid gap-2">
+                <Button
+                  size="sm"
+                  variant="outline-primary"
+                  onClick={resetSettingsTriggered}
+                  disabled={savingInProgress}
+                >
+                  <FontAwesomeIcon icon={faSyncAlt} /> Reset Settings
+                </Button>
+              </div>
             </Col>
           </Row>
         </Col>

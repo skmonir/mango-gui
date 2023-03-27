@@ -186,7 +186,7 @@ export default function OutputGenerator({ appState }) {
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  placeholder="Example: /Users/user/Desktop/bruteforce_solution.cpp"
+                  placeholder="e.g. /Users/user/Desktop/solution.cpp, /Users/user/Desktop/solution.py"
                   value={outputGenerateRequest.generatorScriptPath}
                   onChange={e =>
                     setOutputGenerateRequest({

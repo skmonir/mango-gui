@@ -479,7 +479,7 @@ export default function InputGenerator({ appState }) {
                     autoCorrect="off"
                     autoComplete="off"
                     autoCapitalize="none"
-                    placeholder="Example: /Users/user/Desktop/generator.cpp"
+                    placeholder="Example: /Users/user/Desktop/generator.py"
                     value={inputGenerateRequest.generatorScriptPath}
                     onChange={e =>
                       setInputGenerateRequest({

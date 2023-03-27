@@ -26,7 +26,9 @@ func SetRoutes(app fiber.Router) {
 	// Config Routes
 	app.Get("/config", controllers.GetConfig)
 
-	app.Put("/config", controllers.UpdateConfig)
+	app.Put("/config/update", controllers.UpdateConfig)
+
+	app.Get("/config/reset", controllers.ResetConfig)
 
 	// Code Routes
 	app.Get("/code/:platform/:cid/:label", controllers.GetCodeByProblemPath)

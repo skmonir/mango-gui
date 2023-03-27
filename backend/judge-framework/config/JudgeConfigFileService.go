@@ -17,7 +17,7 @@ func GetJudgeConfigFromFile() *JudgeConfig {
 	config := JudgeConfig{}
 	if !isConfigExist() {
 		fmt.Println("Config doesn't exist...")
-		if config, err = createDefaultConfig(); err != nil {
+		if config, err = CreateDefaultConfig(); err != nil {
 			return &config
 		}
 	}
@@ -91,7 +91,7 @@ func isConfigExist() bool {
 	return !info.IsDir()
 }
 
-func createDefaultConfig() (JudgeConfig, error) {
+func CreateDefaultConfig() (JudgeConfig, error) {
 	fmt.Println("Creating default conf...")
 	if err := createConfigDir(); err != nil {
 		return JudgeConfig{}, err

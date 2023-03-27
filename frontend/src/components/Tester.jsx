@@ -355,7 +355,7 @@ export default function Tester({ appState }) {
         <div>
           <div
             style={{
-              maxHeight: "70.5vh",
+              maxHeight: "73vh",
               overflowY: "auto",
               overflowX: "auto"
             }}
@@ -647,9 +647,9 @@ export default function Tester({ appState }) {
                 <Form.Text> {getTestStatusText()} </Form.Text>
               </Col>
             </Row>
-            {selectedProblemFilteredExecResult &&
-              selectedProblemFilteredExecResult?.compilationError && (
-                <Row>
+            <Row>
+              {selectedProblemFilteredExecResult &&
+                selectedProblemFilteredExecResult?.compilationError && (
                   <Col xs={12}>
                     <div
                       style={{
@@ -680,8 +680,8 @@ export default function Tester({ appState }) {
                       </Table>
                     </div>
                   </Col>
-                </Row>
-              )}
+                )}
+            </Row>
           </>
         )}
         <Row>{getExecutionTable()}</Row>

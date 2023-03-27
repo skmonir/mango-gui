@@ -21,3 +21,11 @@ func UpdateConfig(ctx *fiber.Ctx) error {
 	judgeConfig := config.UpdateJudgeConfigIntoCache(configToUpdate)
 	return ctx.Status(fiber.StatusOK).JSON(judgeConfig)
 }
+
+func ResetConfig(ctx *fiber.Ctx) error {
+	conf, err := config.CreateDefaultConfig()
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON("Oops! Something went wrong!")
+	}
+	return ctx.Status(fiber.StatusOK).JSON(conf)
+}

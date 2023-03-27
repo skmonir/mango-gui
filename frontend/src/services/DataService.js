@@ -76,7 +76,11 @@ class DataService {
   }
 
   updateConfig(config) {
-    return this.putData("config/", config);
+    return this.putData("config/update", config);
+  }
+
+  resetConfig() {
+    return this.getData("config/reset");
   }
 
   getCodeByMetadata(path) {
