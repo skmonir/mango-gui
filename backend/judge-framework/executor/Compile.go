@@ -3,49 +3,18 @@ package executor
 import (
 	"bytes"
 	"fmt"
+	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/languageServices"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"unicode"
-
-	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 
 	"github.com/skmonir/mango-gui/backend/judge-framework/config"
-	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
 
-// parseCommand parses a command line and handle arguments in quotes.
-// https://github.com/vrischmann/shlex/blob/master/shlex.go
-func parseCommand(s string) (res []string) {
-	var buf bytes.Buffer
-	insideQuotes := false
-	for _, r := range s {
-		switch {
-		case unicode.IsSpace(r) && !insideQuotes:
-			if buf.Len() > 0 {
-				res = append(res, buf.String())
-				buf.Reset()
-			}
-		case r == '"' || r == '\'':
-			if insideQuotes {
-				res = append(res, buf.String())
-				buf.Reset()
-				insideQuotes = false
-				continue
-			}
-			insideQuotes = true
-		default:
-			buf.WriteRune(r)
-		}
-	}
-	if buf.Len() > 0 {
-		res = append(res, buf.String())
-	}
-	return
-}
-
 func CompileSource(command string, showStdError bool) string {
-	cmds := parseCommand(command)
+	cmds := utils.ParseCommand(command)
 
 	// ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	// defer cancel()
@@ -73,16 +42,14 @@ func Compile(platform string, cid string, label string) string {
 	logger.Info(fmt.Sprintf("Compiling source for %v %v %v", platform, cid, label))
 	judgeConfig := config.GetJudgeConfigFromCache()
 
-	folderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
-	filePathWithoutExt := filepath.Join(folderPath, label)
-	filePathWithExt := filePathWithoutExt + judgeConfig.ActiveLanguage.FileExtension
+	sourceFolderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
+	filePathWithoutExt := filepath.Join(sourceFolderPath, label)
 
-	if !utils.IsFileExist(filePathWithExt) {
-		logger.Error("Source file not found!")
-		return "Source file not found!"
+	err, command := languageServices.GetCompilationCommand(filePathWithoutExt, judgeConfig.LangConfigs[judgeConfig.ActiveLang])
+	if err != nil {
+		logger.Error(err.Error())
+		return err.Error()
 	}
-
-	command := fmt.Sprintf("%v %v %v -o %v%v", judgeConfig.ActiveLanguage.CompilationCommand, judgeConfig.ActiveLanguage.CompilationArgs, filePathWithExt, filePathWithoutExt, utils.GetBinaryFileExt())
 
 	return CompileSource(command, false)
 }

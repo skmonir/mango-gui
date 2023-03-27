@@ -1,4 +1,4 @@
-package testcaseGenerator
+package testcaseGeneratorServices
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"github.com/skmonir/mango-gui/backend/judge-framework/executor"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/languageServices"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"path/filepath"
 	"strings"
@@ -24,7 +25,8 @@ func GenerateOutput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionRes
 	}
 
 	// Step-2: Check if generator binary is created
-	scriptBinaryPath := strings.TrimSuffix(request.GeneratorScriptPath, filepath.Ext(request.GeneratorScriptPath)) + utils.GetBinaryFileExt()
+	scriptBinaryPath := languageServices.GetBinaryFilePathByFilePath(request.GeneratorScriptPath)
+	executionCommand := languageServices.GetExecutionCommandByFilePath(request.GeneratorScriptPath)
 	if !utils.IsFileExist(scriptBinaryPath) {
 		execResult.CompilationError = "Solution script binary not found!"
 		return execResult
@@ -47,7 +49,7 @@ func GenerateOutput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionRes
 				MemoryLimit:        512,
 				InputFilePath:      inputFilepath,
 				ExecOutputFilePath: outputFilepath,
-				ExecutionCommand:   []string{scriptBinaryPath},
+				ExecutionCommand:   executionCommand,
 			},
 		}
 		execResult.TestcaseExecutionDetailsList = append(execResult.TestcaseExecutionDetailsList, execDetail)

@@ -1,13 +1,13 @@
-package testcaseGenerator
+package testcaseGeneratorServices
 
 import (
 	"fmt"
-	"github.com/skmonir/mango-gui/backend/judge-framework/config"
 	"github.com/skmonir/mango-gui/backend/judge-framework/dto"
 	"github.com/skmonir/mango-gui/backend/judge-framework/executor"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
-	"github.com/skmonir/mango-gui/backend/judge-framework/testcaseGenerator/tgenScripts"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/languageServices"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/testcaseGeneratorServices/tgenScripts"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"path/filepath"
 	"strconv"
@@ -62,7 +62,7 @@ func runValidator(tgenScript string) string {
 
 func validateScript(tgenScript string) string {
 	folderPath := getScriptDirectory()
-	binaryFilePath := fmt.Sprintf("%v%v", filepath.Join(folderPath, "validator"), utils.GetBinaryFileExt())
+	binaryFilePath := languageServices.GetBinaryFilePathByFilePath(filepath.Join(folderPath, "validator.cpp"))
 
 	execResult := dto.ProblemExecutionResult{
 		TestcaseExecutionDetailsList: []dto.TestcaseExecutionDetails{
@@ -103,7 +103,8 @@ func runGenerator(request dto.TestcaseGenerateRequest, skipIfCompiled bool) dto.
 }
 
 func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
-	scriptBinaryPath := strings.TrimSuffix(request.GeneratorScriptPath, filepath.Ext(request.GeneratorScriptPath)) + utils.GetBinaryFileExt()
+	scriptBinaryPath := languageServices.GetBinaryFilePathByFilePath(request.GeneratorScriptPath)
+	executionCommand := languageServices.GetExecutionCommandByFilePath(request.GeneratorScriptPath)
 	if !utils.IsFileExist(scriptBinaryPath) {
 		return dto.ProblemExecutionResult{
 			CompilationError: "Generator script binary not found!",
@@ -124,6 +125,9 @@ func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResu
 	for i := 0; i < request.FileNum; i++ {
 		sn++
 		paramId++
+		execCmd := executionCommand
+		execCmd = append(execCmd, strconv.Itoa(request.TestPerFile))
+		execCmd = append(execCmd, strconv.FormatInt(paramId, 10))
 		execOutputFilePath := fmt.Sprintf("%v_%03d.txt", filepath.Join(request.InputDirectoryPath, request.FileName), sn)
 		execDetail := dto.TestcaseExecutionDetails{
 			Status: "running",
@@ -132,7 +136,7 @@ func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResu
 				TimeLimit:          5,
 				MemoryLimit:        512,
 				ExecOutputFilePath: execOutputFilePath,
-				ExecutionCommand:   []string{scriptBinaryPath, strconv.Itoa(request.TestPerFile), strconv.FormatInt(paramId, 10)},
+				ExecutionCommand:   execCmd,
 			},
 		}
 		execResult.TestcaseExecutionDetailsList = append(execResult.TestcaseExecutionDetailsList, execDetail)
@@ -145,18 +149,18 @@ func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResu
 
 func compileScript(filePathWithExt string, skipIfCompiled bool) string {
 	fmt.Println("Compiling " + filePathWithExt)
-	judgeConfig := config.GetJudgeConfigFromCache()
 
-	filePathWithoutExt := strings.TrimSuffix(filePathWithExt, filepath.Ext(filePathWithExt))
+	fileExt := filepath.Ext(filePathWithExt)
+	filePathWithoutExt := strings.TrimSuffix(filePathWithExt, fileExt)
 
 	if skipIfCompiled && utils.IsFileExist(filePathWithoutExt) {
 		return ""
 	}
-	if !utils.IsFileExist(filePathWithExt) {
-		return filePathWithExt + ": file not found!"
-	}
 
-	command := fmt.Sprintf("%v %v %v -o %v%v", judgeConfig.ActiveLanguage.CompilationCommand, judgeConfig.ActiveLanguage.CompilationArgs, filePathWithExt, filePathWithoutExt, utils.GetBinaryFileExt())
+	err, command := languageServices.GetCompilationCommand(filePathWithoutExt, languageServices.GetLangConfigFromFileExt(fileExt))
+	if err != nil {
+		return err.Error()
+	}
 
 	return executor.CompileSource(command, false)
 }

@@ -1,4 +1,4 @@
-package fileService
+package fileServices
 
 import (
 	"fmt"
@@ -48,19 +48,16 @@ func GetTestcasesFromFile(platform string, cid string, label string, maxRow int,
 	fmt.Println("Fetching testcases from file...")
 
 	inputPaths, outputPaths := GetInputOutputFilePaths(platform, cid, label)
-	sourceBinaryPath := GetSourceBinaryPath(platform, cid, label)
 
 	var testcases []models.Testcase
 	for i := 0; i < len(inputPaths); i++ {
 		input := utils.ReadFileContent(inputPaths[i], maxRow, maxCol)
 		output := utils.ReadFileContent(outputPaths[i], maxRow, maxCol)
 		testcases = append(testcases, models.Testcase{
-			Input:            input,
-			Output:           output,
-			InputFilePath:    inputPaths[i],
-			OutputFilePath:   outputPaths[i],
-			SourceBinaryPath: sourceBinaryPath,
-			ExecutionCommand: []string{sourceBinaryPath},
+			Input:          input,
+			Output:         output,
+			InputFilePath:  inputPaths[i],
+			OutputFilePath: outputPaths[i],
 		})
 	}
 	fmt.Println("Fetched testcases from file.")

@@ -1,4 +1,4 @@
-package fileService
+package fileServices
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"github.com/skmonir/mango-gui/backend/judge-framework/config"
 	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/languageServices/sourceTemplateService"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"path/filepath"
 	"strings"
@@ -23,7 +24,7 @@ func CreateSourceFiles(problems []models.Problem) {
 func saveSourceIntoFile(judgeConfig *config.JudgeConfig, problem models.Problem) {
 	logger.Info(fmt.Sprintf("Saving source file for: %v", problem))
 	folderPath := fmt.Sprintf("%v/%v/%v/source", strings.TrimRight(judgeConfig.WorkspaceDirectory, "/"), problem.Platform, problem.ContestId)
-	fileName := problem.Label + judgeConfig.ActiveLanguage.FileExtension
+	fileName := problem.Label + judgeConfig.LangConfigs[judgeConfig.ActiveLang].FileExtension
 	filePath := filepath.Join(folderPath, fileName)
 
 	if !utils.IsFileExist(filePath) {
@@ -33,63 +34,13 @@ func saveSourceIntoFile(judgeConfig *config.JudgeConfig, problem models.Problem)
 }
 
 func getTemplate(judgeConfig *config.JudgeConfig, problem models.Problem) string {
-	body := ""
-	if len(judgeConfig.ActiveLanguage.TemplatePath) > 0 {
-		body = utils.ReadFileContent(judgeConfig.ActiveLanguage.TemplatePath, 123456, 123456)
-		if len(body) == 0 {
-			body = getGenericTemplateBody()
-		}
-	} else {
-		body = getGenericTemplateBody()
-	}
+	body := sourceTemplateService.GetTemplateCode()
 
 	body = strings.Replace(body, "{%AUTHOR%}", judgeConfig.Author, 1)
 	body = strings.Replace(body, "{%CREATED_DATETIME%}", time.Now().Local().Format("2-Jan-2006 15:04:05"), 1)
 	body = strings.Replace(body, "{%PROBLEM_NAME%}", strings.ToUpper(problem.Label)+" - "+problem.Name, 1)
 
 	return body
-}
-
-func getTemplateHeader() string {
-	header := "/**\n"
-	header += " *     author:  {%AUTHOR%}\n"
-	header += " *    created:  {%CREATED_DATETIME%}\n"
-	header += " *    problem:  {%PROBLEM_NAME%}\n"
-	header += "**/\n\n"
-
-	return header
-}
-
-func getGenericTemplateBody() string {
-	header := getTemplateHeader()
-
-	body := ""
-	body += "#include <bits/stdc++.h>\n"
-	body += "\n"
-	body += "using namespace std;\n"
-	body += "\n"
-	body += "const int N = 1e5 + 7;\n"
-	body += "const int INF = 1e9 + 7;\n"
-	body += "const int MOD = 1e9 + 7;\n"
-	body += "\n"
-	body += "\n"
-	body += "int solver() {\n"
-	body += "\t// your code goes here\n"
-	body += "\treturn 0;\n"
-	body += "}\n"
-	body += "\n"
-	body += "\n"
-	body += "int main() {\n"
-	body += "\tios::sync_with_stdio(0), cin.tie(0);\n"
-	body += "\tint tt = 1;\n"
-	body += "\tcin >> tt;\n"
-	body += "\tfor (int t = 1; t <= tt; ++t) {\n"
-	body += "\t\tsolver();\n"
-	body += "\t}\n"
-	body += "\treturn 0;\n"
-	body += "}"
-
-	return header + body
 }
 
 func OpenSourceByMetadata(platform string, cid string, label string) error {
@@ -119,17 +70,10 @@ func GetSourceFilePath(platform string, cid string, label string) string {
 	judgeConfig := config.GetJudgeConfigFromCache()
 
 	folderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
-	fileName := label + judgeConfig.ActiveLanguage.FileExtension
+	fileName := label + judgeConfig.LangConfigs[judgeConfig.ActiveLang].FileExtension
 	filePath := filepath.Join(folderPath, fileName)
 
 	return filePath
-}
-
-func GetSourceBinaryPath(platform string, cid string, label string) string {
-	judgeConfig := config.GetJudgeConfigFromCache()
-	folderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
-	binaryPath := fmt.Sprintf("%v%v", filepath.Join(folderPath, label), utils.GetBinaryFileExt())
-	return binaryPath
 }
 
 func GenerateSourceByProblemPath(problem models.Problem) {

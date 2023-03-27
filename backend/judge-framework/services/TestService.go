@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
 	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/cacheServices"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/fileServices"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/languageServices"
 	"time"
 
-	"github.com/skmonir/mango-gui/backend/judge-framework/cacheServices"
-	"github.com/skmonir/mango-gui/backend/judge-framework/fileService"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 
 	"github.com/skmonir/mango-gui/backend/judge-framework/dto"
@@ -30,7 +31,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 		execResult.TestcaseExecutionDetailsList[i].TestcaseExecutionResult = dto.TestcaseExecutionResult{}
 	}
 
-	// Step 1: Compile the source
+	// Step 1: Compile the source (except Python)
 	socket.PublishStatusMessage("test_status", "Compiling source code", "info")
 	err := executor.Compile(platform, cid, label)
 	if err != "" {
@@ -47,7 +48,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	time.Sleep(500 * time.Millisecond)
 
 	// Step 2: Check if binary is available for the source
-	binaryPath := fileService.GetSourceBinaryPath(platform, cid, label)
+	binaryPath := GetProblemSourceBinaryPath(platform, cid, label)
 	if !utils.IsFileExist(binaryPath) {
 		logger.Error(fmt.Sprintf("Binary file not found for %v", binaryPath))
 		socket.PublishStatusMessage("test_status", "Binary file not found!", "error")
@@ -64,7 +65,6 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	socket.PublishExecutionResult(execResult, "test_exec_result_event")
 
 	// Step 4: Run the binary and check testcases
-	//socket.PublishStatusMessage("test_status", "Running testcases", "info")
 	execResult = executor.Execute(execResult, "test_exec_result_event", false)
 	cacheServices.SaveExecutionResult(platform, cid, label, execResult)
 
@@ -86,9 +86,12 @@ func GetProblemExecutionResult(platform string, cid string, label string, isForU
 		}
 	}
 
-	testcases := fileService.GetTestcasesFromFile(platform, cid, label, maxRow, maxCol)
+	testcases := fileServices.GetTestcasesFromFile(platform, cid, label, maxRow, maxCol)
+	sourceBinaryPath := GetProblemSourceBinaryPath(platform, cid, label)
 	var testcaseExecutionDetailsList []dto.TestcaseExecutionDetails
 	for i := 0; i < len(testcases); i++ {
+		testcases[i].SourceBinaryPath = sourceBinaryPath
+		testcases[i].ExecutionCommand = GetProblemBinaryExecCommand(platform, cid, label)
 		testcaseExecutionDetailsList = append(testcaseExecutionDetailsList, dto.TestcaseExecutionDetails{
 			Status:   "none",
 			Testcase: testcases[i],
@@ -114,4 +117,14 @@ func UpdateProblemExecutionResultInCacheByUrl(url string) {
 			fmt.Println("No parsed problem found for", url)
 		}
 	}
+}
+
+func GetProblemSourceBinaryPath(platform string, cid string, label string) string {
+	filePath := fileServices.GetSourceFilePath(platform, cid, label)
+	return languageServices.GetBinaryFilePathByFilePath(filePath)
+}
+
+func GetProblemBinaryExecCommand(platform string, cid string, label string) []string {
+	filePath := fileServices.GetSourceFilePath(platform, cid, label)
+	return languageServices.GetExecutionCommandByFilePath(filePath)
 }

@@ -3,9 +3,9 @@ package parser
 import (
 	"fmt"
 	"github.com/anaskhan96/soup"
-	"github.com/skmonir/mango-gui/backend/judge-framework/fileService"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/fileServices"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"github.com/skmonir/mango-gui/backend/socket"
 	"log"
@@ -22,10 +22,10 @@ func publishToParsingChannel(parsedProblem models.Problem) {
 func getProblemsToParse(parser IParser) []models.Problem {
 	defer utils.PanicRecovery()
 
-	problemList := services.GetProblemList(parser.GetPlatformAndContestId()) // Read from cache or json fileService
+	problemList := services.GetProblemList(parser.GetPlatformAndContestId()) // Read from cache or json fileServices
 	if len(problemList) == 0 {
 		problemList = parser.ParseProblemListOnContestPage()
-		services.SaveProblemList(problemList) // Write into cache and json fileService
+		services.SaveProblemList(problemList) // Write into cache and json fileServices
 	}
 
 	var problemsToParse = parser.FilterProblemsToParse(problemList)
@@ -56,7 +56,7 @@ func parseProblem(parser IParser, problem models.Problem) {
 		testcases[i].TimeLimit = timeLimit
 		testcases[i].MemoryLimit = memoryLimit
 	}
-	fileService.SaveTestcasesIntoFiles(problem.Platform, problem.ContestId, problem.Label, testcases)
+	fileServices.SaveTestcasesIntoFiles(problem.Platform, problem.ContestId, problem.Label, testcases)
 
 	problem.Status = "success"
 
@@ -146,7 +146,7 @@ func Parse(url string) []models.Problem {
 	parsedProblemList = parseProblems(parser)
 
 	services.UpdateProblemList(parsedProblemList)
-	fileService.CreateSourceFiles(parsedProblemList)
+	fileServices.CreateSourceFiles(parsedProblemList)
 	services.UpdateProblemExecutionResultInCacheByUrl(url)
 	return parsedProblemList
 }

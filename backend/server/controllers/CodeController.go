@@ -3,7 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/skmonir/mango-gui/backend/judge-framework/fileService"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/fileServices"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"path/filepath"
 )
@@ -27,7 +27,7 @@ func GetCodeByProblemPath(ctx *fiber.Ctx) error {
 	platform := ctx.Params("platform")
 	cid := ctx.Params("cid")
 	label := ctx.Params("label")
-	code := fileService.GetCodeByMetadata(platform, cid, label)
+	code := fileServices.GetCodeByMetadata(platform, cid, label)
 	return ctx.Status(fiber.StatusOK).JSON(code)
 }
 
@@ -63,7 +63,7 @@ func UpdateCodeByProblemPath(ctx *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
-	fileService.UpdateCodeByProblemPath(platform, cid, label, updateRequest.Code)
+	fileServices.UpdateCodeByProblemPath(platform, cid, label, updateRequest.Code)
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",
 	})

@@ -1,4 +1,4 @@
-package fileService
+package fileServices
 
 import (
 	"encoding/json"

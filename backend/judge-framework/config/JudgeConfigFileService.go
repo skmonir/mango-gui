@@ -12,7 +12,7 @@ import (
 )
 
 func GetJudgeConfigFromFile() *JudgeConfig {
-	fmt.Println("Getting config from fileService...")
+	fmt.Println("Getting config from file...")
 	var err error
 	config := JudgeConfig{}
 	if !isConfigExist() {
@@ -97,15 +97,29 @@ func createDefaultConfig() (JudgeConfig, error) {
 		return JudgeConfig{}, err
 	}
 
-	activeLang := LanguageConfig{
-		Lang:               "c++",
-		CompilationCommand: "g++",
-		CompilationArgs:    "-std=c++20",
-		FileExtension:      ".cpp",
-	}
 	conf := JudgeConfig{
-		ActiveLanguage:  activeLang,
-		LanguageConfigs: []LanguageConfig{activeLang},
+		ActiveLang: "cpp",
+		LangConfigs: map[string]LanguageConfig{
+			"cpp": {
+				Lang:               "CPP",
+				CompilationCommand: "g++",
+				CompilationFlags:   "-std=c++20",
+				FileExtension:      ".cpp",
+			},
+			"java": {
+				Lang:               "Java",
+				CompilationCommand: "javac",
+				CompilationFlags:   "-encoding UTF-8 -J-Xmx2048m",
+				ExecutionCommand:   "java",
+				ExecutionFlags:     "-XX:+UseSerialGC -Xss64m -Xms64m -Xmx2048m",
+				FileExtension:      ".java",
+			},
+			"python": {
+				Lang:             "Python",
+				ExecutionCommand: "python3",
+				FileExtension:    ".py",
+			},
+		},
 	}
 
 	if err := SaveConfigIntoJsonFile(conf); err != nil {

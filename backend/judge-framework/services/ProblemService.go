@@ -2,10 +2,10 @@ package services
 
 import (
 	"fmt"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/cacheServices"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/fileServices"
 	"strings"
 
-	"github.com/skmonir/mango-gui/backend/judge-framework/cacheServices"
-	"github.com/skmonir/mango-gui/backend/judge-framework/fileService"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
@@ -42,7 +42,7 @@ func GetProblemList(platform string, cid string) []models.Problem {
 	if problems := cacheServices.GetProblemListFromCache(platform, cid); len(problems) > 0 {
 		return problems
 	}
-	problems := fileService.GetProblemListFromFile(platform, cid)
+	problems := fileServices.GetProblemListFromFile(platform, cid)
 	if len(problems) > 0 {
 		cacheServices.SetProblemListIntoCache(platform, cid, problems)
 	}
@@ -54,7 +54,7 @@ func SaveProblemList(problemList []models.Problem) {
 	if len(problemList) > 0 {
 		platform, cid := problemList[0].Platform, problemList[0].ContestId
 		cacheServices.SetProblemListIntoCache(platform, cid, problemList)
-		fileService.SaveProblemListIntoFile(platform, cid, problemList)
+		fileServices.SaveProblemListIntoFile(platform, cid, problemList)
 	}
 }
 
@@ -86,6 +86,6 @@ func AddCustomProblem(problem models.Problem) []models.Problem {
 	problem.Status = "success"
 	problems := []models.Problem{problem}
 	UpdateProblemList(problems)
-	fileService.CreateSourceFiles(problems)
+	fileServices.CreateSourceFiles(problems)
 	return problems
 }

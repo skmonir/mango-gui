@@ -1,19 +1,19 @@
 package services
 
 import (
-	"github.com/skmonir/mango-gui/backend/judge-framework/fileService"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/fileServices"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"strconv"
 	"strings"
 )
 
 func GetTestcaseByPath(inputFilePath string, outputFilePath string) models.Testcase {
-	return fileService.GetTestcaseByPath(inputFilePath, outputFilePath)
+	return fileServices.GetTestcaseByPath(inputFilePath, outputFilePath)
 }
 
 func SaveCustomTestcaseIntoFile(platform string, cid string, label string, input string, output string) {
-	inputDirectory, outputDirectory := fileService.GetInputOutputDirectories(platform, cid, label)
+	inputDirectory, outputDirectory := fileServices.GetInputOutputDirectories(platform, cid, label)
 	inputFiles := utils.GetFileNamesInDirectory(inputDirectory)
 	maxCustomTestId := -1
 	for _, filename := range inputFiles {
@@ -29,12 +29,12 @@ func SaveCustomTestcaseIntoFile(platform string, cid string, label string, input
 	}
 	maxCustomTestId++
 
-	fileService.SaveCustomTestcaseIntoFile(inputDirectory, outputDirectory, input, output, maxCustomTestId)
+	fileServices.SaveCustomTestcaseIntoFile(inputDirectory, outputDirectory, input, output, maxCustomTestId)
 	GetProblemExecutionResult(platform, cid, label, true, true)
 }
 
 func UpdateCustomTestcaseIntoFile(platform, cid, label, inputFilePath, outputFilePath, input, output string) {
-	fileService.UpdateCustomTestcaseIntoFile(inputFilePath, outputFilePath, input, output)
+	fileServices.UpdateCustomTestcaseIntoFile(inputFilePath, outputFilePath, input, output)
 	GetProblemExecutionResult(platform, cid, label, true, true)
 }
 
@@ -51,5 +51,5 @@ func GetInputOutputDirectoryByUrl(url string) (string, string) {
 	if len(probs) == 0 {
 		return "", ""
 	}
-	return fileService.GetInputOutputDirectories(probs[0].Platform, probs[0].ContestId, probs[0].Label)
+	return fileServices.GetInputOutputDirectories(probs[0].Platform, probs[0].ContestId, probs[0].Label)
 }
