@@ -447,11 +447,7 @@ export default function Tester({ appState }) {
   };
 
   const getAlert = () => {
-    if (
-      !appState.config.workspaceDirectory ||
-      !appState.config.activeLanguage.lang ||
-      !appState.config.activeLanguage.compilationCommand
-    ) {
+    if (!appState.config.workspaceDirectory) {
       return (
         <Row>
           <Col>

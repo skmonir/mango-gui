@@ -9,15 +9,9 @@ import ShowToast from "./Toast/ShowToast.jsx";
 import Utils from "../Utils.js";
 
 export default function Settings({ appState, setAppState }) {
-  const [config, setConfig] = useState({
-    workspaceDirectory: "",
-    sourceDirectory: "",
-    author: "",
-    lang: "",
-    compilationCommand: "",
-    compilationArgs: "",
-    templatePath: ""
-  });
+  const [config, setConfig] = useState({});
+  const [selectedLang, setSelectedLang] = useState("");
+  const [selectedLangConfig, setSelectedLangConfig] = useState({});
 
   const [toastMsgObj, setToastMsgObj] = useState({
     variant: "",
@@ -34,7 +28,11 @@ export default function Settings({ appState, setAppState }) {
   const fetchConfig = () => {
     DataService.getConfig()
       .then(config => {
-        saveConfigToUI(config);
+        console.log(config);
+        setConfig(config);
+        setAppState({ ...appState, config: config });
+        setSelectedLang(config?.activeLang);
+        setSelectedLangConfig(config.langConfigs[config.activeLang]);
       })
       .catch(e => {
         showToastMessage(
@@ -49,9 +47,6 @@ export default function Settings({ appState, setAppState }) {
     if (Utils.isStrNullOrEmpty(config.workspaceDirectory)) {
       errMessage += "Workspace directory path can't be empty\n";
     }
-    if (Utils.isStrNullOrEmpty(config.compilationCommand)) {
-      errMessage += "Compilation command can't be empty\n";
-    }
     if (Utils.isStrNullOrEmpty(errMessage)) {
       return true;
     } else {
@@ -60,34 +55,13 @@ export default function Settings({ appState, setAppState }) {
     }
   };
 
-  const triggerSave = () => {
+  const triggerSave = async () => {
+    console.log(config);
     if (validate()) {
-      console.log("save triggerred");
-      let configToSave = { ...appState.config };
-      configToSave.author = config.author;
-      configToSave.sourceDirectory = config.sourceDirectory;
-      configToSave.workspaceDirectory = config.workspaceDirectory;
-      configToSave.activeLanguage.lang = config.lang;
-      configToSave.activeLanguage.compilationCommand =
-        config.compilationCommand;
-      configToSave.activeLanguage.compilationArgs = config.compilationArgs;
-      configToSave.activeLanguage.templatePath = config.templatePath;
-      let isFound = false;
-      for (let i = 0; i < configToSave.languageConfigs.length; i++) {
-        if (configToSave.languageConfigs[i].lang === config.lang) {
-          isFound = true;
-          configToSave.languageConfigs[i] = { ...configToSave.activeLanguage };
-          break;
-        }
-      }
-      if (!isFound) {
-        configToSave.languageConfigs.push({ ...configToSave.activeLanguage });
-      }
-      console.log(configToSave);
       setSavingInProgress(true);
-      DataService.updateConfig(configToSave)
+      DataService.updateConfig(updateLangConfigs())
         .then(config => {
-          saveConfigToUI(config);
+          setAppState({ ...appState, config: config });
           showToastMessage("Success", "Settings saved successfully!");
         })
         .catch(e => {
@@ -100,23 +74,25 @@ export default function Settings({ appState, setAppState }) {
     }
   };
 
-  const saveConfigToUI = config => {
-    console.log(config);
-    setConfig({
-      workspaceDirectory: config.workspaceDirectory,
-      sourceDirectory: config.sourceDirectory,
-      author: config.author,
-      lang: config.activeLanguage.lang,
-      compilationCommand: config.activeLanguage.compilationCommand,
-      compilationArgs: config.activeLanguage.compilationArgs,
-      templatePath: config.activeLanguage.templatePath
-    });
-    setAppState({ ...appState, config: config });
-    console.log(appState.config);
+  const selectedLangChanged = lang => {
+    if (!Utils.isStrNullOrEmpty(selectedLang)) {
+      updateLangConfigs();
+    }
+    setSelectedLang(lang);
+    setSelectedLangConfig(config.langConfigs[lang]);
   };
 
-  const changeLanguage = lang => {
-    setConfig({ ...config, lang: lang });
+  const updateLangConfigs = () => {
+    let updatedLangConfigs = {
+      ...config.langConfigs
+    };
+    updatedLangConfigs[selectedLang] = { ...selectedLangConfig };
+    const updatedConfig = {
+      ...config,
+      langConfigs: updatedLangConfigs
+    };
+    setConfig(updatedConfig);
+    return updatedConfig;
   };
 
   const showToastMessage = (variant, message) => {
@@ -153,49 +129,10 @@ export default function Settings({ appState, setAppState }) {
     <div>
       <Card body bg="light">
         <Row>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              <strong>Workspace Directory</strong>
-            </Form.Label>
-            <Form.Control
-              type="text"
-              size="sm"
-              autoCorrect="off"
-              autoComplete="off"
-              autoCapitalize="none"
-              placeholder="Enter your workspace directory absolute path. All the testcases and sources will be saved here."
-              value={config.workspaceDirectory}
-              onChange={e =>
-                setConfig({ ...config, workspaceDirectory: e.target.value })
-              }
-              onBlur={() =>
-                checkDirectoryPathValidity(config.workspaceDirectory)
-              }
-            />
-          </Form.Group>
-        </Row>
-        <Row>
-          <Col sm={3}>
+          <Col xs={9}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Language</strong>
-              </Form.Label>
-              <Form.Select
-                size="sm"
-                aria-label="Default select example"
-                value={config.lang}
-                onChange={e => changeLanguage(e.target.value)}
-              >
-                {/*<option value="">Select language</option>*/}
-                <option value="c++">C++</option>
-                {/*<option value="java">Java</option>*/}
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col sm={4}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>Compilation Command</strong>
+                <strong>Workspace Directory</strong>
               </Form.Label>
               <Form.Control
                 type="text"
@@ -203,35 +140,17 @@ export default function Settings({ appState, setAppState }) {
                 autoCorrect="off"
                 autoComplete="off"
                 autoCapitalize="none"
-                placeholder="Example: g++"
-                value={config.compilationCommand}
+                placeholder="Enter your workspace directory absolute path. All the testcases and sources will be saved here."
+                value={config.workspaceDirectory}
                 onChange={e =>
-                  setConfig({ ...config, compilationCommand: e.target.value })
+                  setConfig({ ...config, workspaceDirectory: e.target.value })
+                }
+                onBlur={() =>
+                  checkDirectoryPathValidity(config.workspaceDirectory)
                 }
               />
             </Form.Group>
           </Col>
-          <Col sm={5}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>Compilation Flags</strong>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                size="sm"
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="none"
-                placeholder="Example: -std=c++20"
-                value={config.compilationArgs}
-                onChange={e =>
-                  setConfig({ ...config, compilationArgs: e.target.value })
-                }
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row>
           <Col sm={3}>
             <Form.Group className="mb-3">
               <Form.Label>
@@ -249,7 +168,146 @@ export default function Settings({ appState, setAppState }) {
               />
             </Form.Group>
           </Col>
-          <Col sm={9}>
+        </Row>
+      </Card>
+      <br />
+      <Card body bg="light">
+        <Row>
+          <Col sm={2}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Active Language</strong>
+              </Form.Label>
+              <Form.Select
+                size="sm"
+                aria-label="Default select example"
+                value={config.activeLang}
+                onChange={e =>
+                  setConfig({ ...config, activeLang: e.currentTarget.value })
+                }
+              >
+                <option value="cpp">CPP</option>
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col sm={2}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Configure Language</strong>
+              </Form.Label>
+              <Form.Select
+                size="sm"
+                aria-label="Default select example"
+                value={selectedLang}
+                onChange={e => selectedLangChanged(e.currentTarget.value)}
+              >
+                <option value="cpp">CPP</option>
+                <option value="java">Java</option>
+                <option value="python">Python</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+        </Row>
+        {["java", "cpp"].includes(selectedLang) && (
+          <Row>
+            <Col sm={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Compilation Command</strong>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  placeholder="Example: g++"
+                  value={selectedLangConfig.compilationCommand}
+                  onChange={e =>
+                    setSelectedLangConfig({
+                      ...selectedLangConfig,
+                      compilationCommand: e.target.value
+                    })
+                  }
+                />
+              </Form.Group>
+            </Col>
+            <Col sm={8}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Compilation Flags</strong>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  placeholder="Example: -std=c++20"
+                  value={selectedLangConfig.compilationFlags}
+                  onChange={e =>
+                    setSelectedLangConfig({
+                      ...selectedLangConfig,
+                      compilationFlags: e.target.value
+                    })
+                  }
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+        )}
+        {["java", "python"].includes(selectedLang) && (
+          <Row>
+            <Col sm={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Execution Command</strong>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  placeholder="Example: g++"
+                  value={selectedLangConfig.executionCommand}
+                  onChange={e =>
+                    setSelectedLangConfig({
+                      ...selectedLangConfig,
+                      executionCommand: e.target.value
+                    })
+                  }
+                />
+              </Form.Group>
+            </Col>
+            <Col sm={8}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Execution Flags</strong>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  placeholder="Example: -std=c++20"
+                  value={selectedLangConfig.executionFlags}
+                  onChange={e =>
+                    setSelectedLangConfig({
+                      ...selectedLangConfig,
+                      executionFlags: e.target.value
+                    })
+                  }
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+        )}
+        <Row>
+          <Col sm={12}>
             <Form.Group className="mb-3">
               <Form.Label>
                 <strong>Template File Path</strong>
@@ -261,19 +319,24 @@ export default function Settings({ appState, setAppState }) {
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  value={config.templatePath}
+                  value={selectedLangConfig.templatePath}
                   onChange={e =>
-                    setConfig({ ...config, templatePath: e.target.value })
+                    setSelectedLangConfig({
+                      ...selectedLangConfig,
+                      templatePath: e.target.value
+                    })
                   }
-                  onBlur={() => checkFilePathValidity(config.templatePath)}
+                  onBlur={() =>
+                    checkFilePathValidity(selectedLangConfig.templatePath)
+                  }
                   placeholder={
-                    "Template file ends with extension(.cpp). The template will be used to create source files."
+                    "Template file ends with extension(.cpp/.java/.py). The sourceTemplateService will be used to create source files."
                   }
                 />
                 <Button
                   size="sm"
                   variant="outline-success"
-                  disabled={!config.templatePath}
+                  disabled={!selectedLangConfig.templatePath}
                   onClick={() => setShowCodeModal(true)}
                 >
                   <FontAwesomeIcon icon={faCode} /> View Code{" "}
@@ -282,40 +345,41 @@ export default function Settings({ appState, setAppState }) {
             </Form.Group>
           </Col>
         </Row>
-        <Row>
-          <Col md={{ span: 2, offset: 5 }}>
-            <Row>
-              <Col xs={12} className="d-flex justify-content-center">
-                <Button
-                  size="sm"
-                  variant="outline-success"
-                  onClick={() => triggerSave()}
-                  disabled={savingInProgress}
-                >
-                  {!savingInProgress ? (
-                    <FontAwesomeIcon icon={faSave} />
-                  ) : (
-                    <Spinner
-                      as="span"
-                      animation="grow"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                    />
-                  )}
-                  {savingInProgress ? " Saving Settings" : " Save Settings"}
-                </Button>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
       </Card>
+      <br />
+      <Row>
+        <Col md={{ span: 2, offset: 5 }}>
+          <Row>
+            <Col xs={12} className="d-flex justify-content-center">
+              <Button
+                size="sm"
+                variant="outline-success"
+                onClick={() => triggerSave()}
+                disabled={savingInProgress}
+              >
+                {!savingInProgress ? (
+                  <FontAwesomeIcon icon={faSave} />
+                ) : (
+                  <Spinner
+                    as="span"
+                    animation="grow"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                )}
+                {savingInProgress ? " Saving Settings" : " Save Settings"}
+              </Button>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
       {showToast && (
         <ShowToast toastMsgObj={toastMsgObj} setShowToast={setShowToast} />
       )}
       {showCodeModal && (
         <ViewCodeModal
-          codePath={config.templatePath}
+          codePath={selectedLangConfig.templatePath}
           setShowCodeModal={setShowCodeModal}
         />
       )}
