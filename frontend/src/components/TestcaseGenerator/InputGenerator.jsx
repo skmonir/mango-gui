@@ -294,7 +294,10 @@ export default function InputGenerator({ appState }) {
           <Col xs={6}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Directory to save the input files</strong>
+                <strong>
+                  Directory to save the input files
+                  <span style={{ color: "red" }}>*</span>
+                </strong>
               </Form.Label>
               <Form.Control
                 type="text"
@@ -324,7 +327,10 @@ export default function InputGenerator({ appState }) {
           <Col xs={3}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Number of input files to generate</strong>
+                <strong>
+                  No. of input files to generate
+                  <span style={{ color: "red" }}>*</span>
+                </strong>
               </Form.Label>
               <Form.Select
                 size="sm"
@@ -426,7 +432,9 @@ export default function InputGenerator({ appState }) {
           <Col xs={3}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>File serial starts from</strong>
+                <strong>
+                  File serial starts from<span style={{ color: "red" }}>*</span>
+                </strong>
               </Form.Label>
               <Form.Select
                 size="sm"
@@ -470,7 +478,10 @@ export default function InputGenerator({ appState }) {
             {inputGenerateRequest.generationProcess !== "tgen_script" ? (
               <Form.Group controlId="formFileSm" className="mb-3">
                 <Form.Label>
-                  <strong>Generator script source path</strong>
+                  <strong>
+                    Generator script source path
+                    <span style={{ color: "red" }}>*</span>
+                  </strong>
                 </Form.Label>
                 <InputGroup className="mb-3">
                   <Form.Control

@@ -36,7 +36,7 @@ func (parser *CodeforcesParser) ParseProblemListOnContestPage() []models.Problem
 		fullName := link.Text()
 		dividerIndex := strings.Index(fullName, "-")
 		if dividerIndex != -1 {
-			label := strings.ToLower(strings.TrimSpace(fullName[0:dividerIndex]))
+			label := strings.ToUpper(strings.TrimSpace(fullName[0:dividerIndex]))
 			name := strings.TrimSpace(fullName[dividerIndex+1:])
 			url := parser.getProblemUrl(label)
 			fmt.Println(label, name, url)
@@ -122,9 +122,9 @@ func (parser *CodeforcesParser) getContestUrl() string {
 	if cid > 100000 {
 		return cfHost + "/gym" + "/" + parser.contestId
 	}
-	return cfHost + "/contest" + "/" + parser.contestId
+	return strings.ToLower(cfHost + "/contest" + "/" + parser.contestId)
 }
 
 func (parser *CodeforcesParser) getProblemUrl(label string) string {
-	return parser.getContestUrl() + "/" + "problem" + "/" + label
+	return strings.ToLower(parser.getContestUrl() + "/" + "problem" + "/" + label)
 }

@@ -58,6 +58,7 @@ func RunTest(platform string, cid string, label string) dto.ProblemExecutionResu
 	// Step 3: Prepare testcases for execution
 	prob := GetProblem(platform, cid, label)
 	for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
+		execResult.TestcaseExecutionDetailsList[i].Testcase.ExecutionCommand = GetProblemBinaryExecCommand(platform, cid, label)
 		execResult.TestcaseExecutionDetailsList[i].Status = "running"
 		execResult.TestcaseExecutionDetailsList[i].Testcase.TimeLimit = prob.TimeLimit
 		execResult.TestcaseExecutionDetailsList[i].Testcase.MemoryLimit = prob.MemoryLimit
@@ -80,14 +81,18 @@ func GetProblemExecutionResult(platform string, cid string, label string, isForU
 		maxRow, maxCol = constants.IO_MAX_ROW_FOR_UI, constants.IO_MAX_COL_FOR_UI
 	}
 
+	sourceBinaryPath := GetProblemSourceBinaryPath(platform, cid, label)
+
 	if !isSkipCache {
 		if ok, execResult := cacheServices.GetExecutionResult(platform, cid, label); ok {
+			for i := 0; i < len(execResult.TestcaseExecutionDetailsList); i++ {
+				execResult.TestcaseExecutionDetailsList[i].Testcase.SourceBinaryPath = sourceBinaryPath
+			}
 			return execResult
 		}
 	}
 
 	testcases := fileServices.GetTestcasesFromFile(platform, cid, label, maxRow, maxCol)
-	sourceBinaryPath := GetProblemSourceBinaryPath(platform, cid, label)
 	var testcaseExecutionDetailsList []dto.TestcaseExecutionDetails
 	for i := 0; i < len(testcases); i++ {
 		testcases[i].SourceBinaryPath = sourceBinaryPath

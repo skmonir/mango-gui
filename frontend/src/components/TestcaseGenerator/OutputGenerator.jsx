@@ -177,7 +177,9 @@ export default function OutputGenerator({ appState }) {
           <Col xs={6}>
             <Form.Group controlId="formFileSm" className="mb-3">
               <Form.Label>
-                <strong>Solution source path</strong>
+                <strong>
+                  Solution source path<span style={{ color: "red" }}>*</span>
+                </strong>
               </Form.Label>
               <InputGroup className="mb-3">
                 <Form.Control
@@ -216,7 +218,10 @@ export default function OutputGenerator({ appState }) {
           <Col xs={6}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Directory of the input files</strong>
+                <strong>
+                  Directory of the input files
+                  <span style={{ color: "red" }}>*</span>
+                </strong>
               </Form.Label>
               <Form.Control
                 type="text"
@@ -244,7 +249,10 @@ export default function OutputGenerator({ appState }) {
           <Col xs={6}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Directory to save the output files</strong>
+                <strong>
+                  Directory to save the output files
+                  <span style={{ color: "red" }}>*</span>
+                </strong>
               </Form.Label>
               <Form.Control
                 type="text"

@@ -522,7 +522,7 @@ export default function Tester({ appState }) {
                           problem.label
                         }
                       >
-                        {problem.label.toUpperCase() + " - " + problem.name}
+                        {problem.label + " - " + problem.name}
                       </option>
                     ))}
                   </Form.Select>
@@ -632,7 +632,7 @@ export default function Tester({ appState }) {
               <Col xs={8}>
                 <Form.Text style={{ color: "darkcyan" }}>
                   <strong>
-                    {selectedProblem.label.toUpperCase() +
+                    {selectedProblem.label +
                       " - " +
                       selectedProblem.name +
                       ", Time Limit: " +

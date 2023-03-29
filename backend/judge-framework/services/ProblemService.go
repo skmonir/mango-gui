@@ -68,7 +68,7 @@ func UpdateProblemList(newProblemList []models.Problem) {
 		for _, newProblem := range newProblemList {
 			isFound := false
 			for i := 0; i < len(oldProblemList); i++ {
-				if oldProblemList[i].Label == newProblem.Label {
+				if strings.ToLower(oldProblemList[i].Label) == strings.ToLower(newProblem.Label) {
 					oldProblemList[i] = newProblem
 					isFound = true
 				}

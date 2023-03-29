@@ -128,7 +128,7 @@ function Parser({ appState }) {
                     DataService.openResource({ path: problem?.url })
                   }
                 >
-                  {problem?.label.toUpperCase()}
+                  {problem?.label}
                 </a>
               </td>
               <td>

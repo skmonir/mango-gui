@@ -37,7 +37,7 @@ func (parser *AtcoderParser) ParseProblemListOnContestPage() []models.Problem {
 
 	for index, row := range problemElements {
 		if index%2 == 1 {
-			label := strings.ToLower(strings.ToLower(strings.TrimSpace(problemElements[index-1].Text())))
+			label := strings.ToUpper(strings.TrimSpace(problemElements[index-1].Text()))
 			name := strings.TrimSpace(row.Text())
 			url := strings.ToLower(acHost + row.Attrs()["href"])
 			log.Println(label, name, url)

@@ -31,6 +31,7 @@ export default function Settings({ appState, setAppState }) {
     python: {
       compCommand: "python3",
       execCommand: "python3",
+      compFlags: "",
       execFlags: "",
       ext: ".py"
     },
@@ -74,10 +75,40 @@ export default function Settings({ appState, setAppState }) {
     setSelectedLangConfig(config.langConfigs[config.activeLang]);
   };
 
-  const validate = () => {
+  const validate = confToSave => {
     let errMessage = "";
-    if (Utils.isStrNullOrEmpty(config.workspaceDirectory)) {
+    if (Utils.isStrNullOrEmpty(confToSave.workspaceDirectory)) {
       errMessage += "Workspace directory path can't be empty\n";
+    }
+    if (
+      Utils.isStrNullOrEmpty(
+        confToSave.langConfigs[confToSave.activeLang].compilationCommand
+      )
+    ) {
+      errMessage += "Compilation command of active language can't be empty\n";
+    }
+    if (
+      ["java", "python"].includes(selectedLang) &&
+      Utils.isStrNullOrEmpty(
+        confToSave.langConfigs[confToSave.activeLang].executionCommand
+      )
+    ) {
+      errMessage += "Execution command of active language can't be empty\n";
+    }
+    if (
+      Utils.isStrNullOrEmpty(
+        confToSave.langConfigs[selectedLang].compilationCommand
+      )
+    ) {
+      errMessage += "Compilation command of selected language can't be empty\n";
+    }
+    if (
+      ["java", "python"].includes(selectedLang) &&
+      Utils.isStrNullOrEmpty(
+        confToSave.langConfigs[selectedLang].executionCommand
+      )
+    ) {
+      errMessage += "Execution command of selected language can't be empty\n";
     }
     if (Utils.isStrNullOrEmpty(errMessage)) {
       return true;
@@ -88,10 +119,11 @@ export default function Settings({ appState, setAppState }) {
   };
 
   const triggerSave = async () => {
-    console.log(config);
-    if (validate()) {
+    const confToSave = updateLangConfigs();
+    console.log(confToSave);
+    if (validate(confToSave)) {
       setSavingInProgress(true);
-      DataService.updateConfig(updateLangConfigs())
+      DataService.updateConfig(confToSave)
         .then(config => {
           setAppState({ ...appState, config: config });
           showToastMessage("Success", "Settings saved successfully!");
@@ -193,7 +225,9 @@ export default function Settings({ appState, setAppState }) {
           <Col xs={9}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Workspace Directory</strong>
+                <strong>
+                  Workspace Directory<span style={{ color: "red" }}>*</span>
+                </strong>
               </Form.Label>
               <Form.Control
                 type="text"
@@ -237,7 +271,9 @@ export default function Settings({ appState, setAppState }) {
           <Col sm={2}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Active Language</strong>
+                <strong>
+                  Active Language<span style={{ color: "red" }}>*</span>
+                </strong>
               </Form.Label>
               <Form.Select
                 size="sm"
@@ -271,64 +307,64 @@ export default function Settings({ appState, setAppState }) {
             </Form.Group>
           </Col>
         </Row>
-        {["java", "cpp"].includes(selectedLang) && (
-          <Row>
-            <Col sm={4}>
-              <Form.Group className="mb-3">
-                <Form.Label>
-                  <strong>Compilation Command</strong>
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  size="sm"
-                  autoCorrect="off"
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  placeholder={
-                    "Example: " + placeholders[selectedLang].compCommand
-                  }
-                  value={selectedLangConfig.compilationCommand}
-                  onChange={e =>
-                    setSelectedLangConfig({
-                      ...selectedLangConfig,
-                      compilationCommand: e.target.value
-                    })
-                  }
-                />
-              </Form.Group>
-            </Col>
-            <Col sm={8}>
-              <Form.Group className="mb-3">
-                <Form.Label>
-                  <strong>Compilation Flags</strong>
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  size="sm"
-                  autoCorrect="off"
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  placeholder={
-                    "Example: " + placeholders[selectedLang].compFlags
-                  }
-                  value={selectedLangConfig.compilationFlags}
-                  onChange={e =>
-                    setSelectedLangConfig({
-                      ...selectedLangConfig,
-                      compilationFlags: e.target.value
-                    })
-                  }
-                />
-              </Form.Group>
-            </Col>
-          </Row>
-        )}
+        <Row>
+          <Col sm={4}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>
+                  Compilation Command<span style={{ color: "red" }}>*</span>
+                </strong>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                size="sm"
+                autoCorrect="off"
+                autoComplete="off"
+                autoCapitalize="none"
+                placeholder={
+                  "Example: " + placeholders[selectedLang].compCommand
+                }
+                value={selectedLangConfig.compilationCommand}
+                onChange={e =>
+                  setSelectedLangConfig({
+                    ...selectedLangConfig,
+                    compilationCommand: e.target.value
+                  })
+                }
+              />
+            </Form.Group>
+          </Col>
+          <Col sm={8}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>Compilation Flags</strong>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                size="sm"
+                autoCorrect="off"
+                autoComplete="off"
+                autoCapitalize="none"
+                placeholder={"Example: " + placeholders[selectedLang].compFlags}
+                value={selectedLangConfig.compilationFlags}
+                onChange={e =>
+                  setSelectedLangConfig({
+                    ...selectedLangConfig,
+                    compilationFlags: e.target.value
+                  })
+                }
+              />
+            </Form.Group>
+          </Col>
+        </Row>
         {["java", "python"].includes(selectedLang) && (
           <Row>
             <Col sm={4}>
               <Form.Group className="mb-3">
                 <Form.Label>
-                  <strong>Execution Command</strong>
+                  <strong>
+                    Execution Command<span style={{ color: "red" }}>*</span>
+                  </strong>
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -417,9 +453,21 @@ export default function Settings({ appState, setAppState }) {
       </Card>
       <br />
       <Row>
-        <Col md={{ span: 4, offset: 4 }}>
+        <Col md={{ span: 6, offset: 3 }}>
           <Row>
-            <Col xs={6}>
+            <Col xs={4}>
+              <div className="d-grid gap-2">
+                <Button
+                  size="sm"
+                  variant="outline-secondary"
+                  onClick={fetchConfig}
+                  disabled={savingInProgress}
+                >
+                  <FontAwesomeIcon icon={faSyncAlt} /> Refresh Settings
+                </Button>
+              </div>
+            </Col>
+            <Col xs={4}>
               <div className="d-grid gap-2">
                 <Button
                   size="sm"
@@ -442,7 +490,7 @@ export default function Settings({ appState, setAppState }) {
                 </Button>
               </div>
             </Col>
-            <Col xs={6}>
+            <Col xs={4}>
               <div className="d-grid gap-2">
                 <Button
                   size="sm"

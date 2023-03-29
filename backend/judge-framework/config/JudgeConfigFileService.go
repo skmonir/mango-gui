@@ -115,9 +115,10 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 				FileExtension:      ".java",
 			},
 			"python": {
-				Lang:             "Python",
-				ExecutionCommand: "python3",
-				FileExtension:    ".py",
+				Lang:               "Python",
+				CompilationCommand: "python3",
+				ExecutionCommand:   "python3",
+				FileExtension:      ".py",
 			},
 		},
 	}

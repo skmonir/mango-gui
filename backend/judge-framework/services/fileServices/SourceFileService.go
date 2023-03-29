@@ -38,7 +38,8 @@ func getTemplate(judgeConfig *config.JudgeConfig, problem models.Problem) string
 
 	body = strings.Replace(body, "{%AUTHOR%}", judgeConfig.Author, 1)
 	body = strings.Replace(body, "{%CREATED_DATETIME%}", time.Now().Local().Format("2-Jan-2006 15:04:05"), 1)
-	body = strings.Replace(body, "{%PROBLEM_NAME%}", strings.ToUpper(problem.Label)+" - "+problem.Name, 1)
+	body = strings.Replace(body, "{%PROBLEM_NAME%}", problem.Label+" - "+problem.Name, 1)
+	body = strings.Replace(body, "{%CLASS_NAME%}", problem.Label, 1)
 
 	return body
 }

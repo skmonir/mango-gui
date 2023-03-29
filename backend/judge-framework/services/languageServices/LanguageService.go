@@ -23,7 +23,7 @@ func GetCompilationCommand(programFilePathWithoutExt string, lang config.Languag
 	} else if lang.Lang == "Java" {
 		command = fmt.Sprintf("%v %v %v", lang.CompilationCommand, lang.CompilationFlags, programFilePathWithExt)
 	} else if lang.Lang == "Python" {
-		command = fmt.Sprintf("%v -m py_compile %v", lang.CompilationCommand, programFilePathWithExt)
+		command = fmt.Sprintf("%v -m py_compile %v %v", lang.CompilationCommand, lang.CompilationFlags, programFilePathWithExt)
 	}
 
 	logger.Info("Prepared compilation command: " + command)
@@ -40,11 +40,14 @@ func GetExecutionCommandByFilePath(filePathWithExt string) []string {
 	if fileExt == ".cpp" || fileExt == ".cc" {
 		command = fmt.Sprintf("%v%v", filePathWithoutExt, utils.GetBinaryFileExt())
 	} else if fileExt == ".java" {
-		command = fmt.Sprintf("%v %v %v", conf.LangConfigs[conf.ActiveLang].ExecutionCommand, conf.LangConfigs[conf.ActiveLang].ExecutionFlags, filePathWithoutExt)
+		dirPath := filepath.Dir(filePathWithExt)
+		fileName := filepath.Base(filePathWithoutExt)
+		command = fmt.Sprintf("%v -cp %v %v %v", conf.LangConfigs[conf.ActiveLang].ExecutionCommand, dirPath, conf.LangConfigs[conf.ActiveLang].ExecutionFlags, fileName)
 	} else if fileExt == ".py" {
 		command = fmt.Sprintf("%v %v", conf.LangConfigs[conf.ActiveLang].ExecutionCommand, filePathWithExt)
 	}
 
+	logger.Info("Prepared execution command: " + command)
 	return utils.ParseCommand(command)
 }
 
@@ -69,7 +72,7 @@ func GetBinaryFilePathByFilePath(filePathWithExt string) string {
 	if fileExt == ".cpp" || fileExt == ".cc" {
 		scriptBinaryPath = filePathWithoutExt + utils.GetBinaryFileExt()
 	} else if fileExt == ".java" {
-		scriptBinaryPath = filePathWithoutExt + utils.GetBinaryFileExt()
+		scriptBinaryPath = filePathWithoutExt + ".class"
 	} else if fileExt == ".py" {
 		scriptBinaryPath = filePathWithExt
 	}
