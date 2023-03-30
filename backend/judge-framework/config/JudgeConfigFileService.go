@@ -2,8 +2,9 @@ package config
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
+	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"io/ioutil"
 	"os"
@@ -12,11 +13,9 @@ import (
 )
 
 func GetJudgeConfigFromFile() *JudgeConfig {
-	fmt.Println("Getting config from file...")
 	var err error
 	config := JudgeConfig{}
 	if !isConfigExist() {
-		fmt.Println("Config doesn't exist...")
 		if config, err = CreateDefaultConfig(); err != nil {
 			return &config
 		}
@@ -24,7 +23,6 @@ func GetJudgeConfigFromFile() *JudgeConfig {
 
 	configFilePath := getConfigFilePath()
 
-	fmt.Println("Reading config from " + configFilePath)
 	data, e := ioutil.ReadFile(configFilePath)
 	if e != nil {
 		fmt.Println("Error: ", err)
@@ -36,7 +34,7 @@ func GetJudgeConfigFromFile() *JudgeConfig {
 		return &config
 	}
 
-	fmt.Println(config)
+	fmt.Println("Returning app config from file")
 
 	return &config
 }
@@ -92,41 +90,44 @@ func isConfigExist() bool {
 }
 
 func CreateDefaultConfig() (JudgeConfig, error) {
-	fmt.Println("Creating default conf...")
 	if err := createConfigDir(); err != nil {
 		return JudgeConfig{}, err
 	}
 
 	conf := JudgeConfig{
+		AppVersion: constants.APP_VERSION,
 		ActiveLang: "cpp",
 		LangConfigs: map[string]LanguageConfig{
 			"cpp": {
-				Lang:               "CPP",
-				CompilationCommand: "g++",
-				CompilationFlags:   "-std=c++20",
-				FileExtension:      ".cpp",
+				Lang:                "CPP",
+				CompilationCommand:  "g++",
+				CompilationFlags:    "-std=c++20",
+				FileExtension:       ".cpp",
+				DefaultTemplatePath: utils.GetTemplateFilePathByLang("cpp"),
 			},
 			"java": {
-				Lang:               "Java",
-				CompilationCommand: "javac",
-				CompilationFlags:   "-encoding UTF-8 -J-Xmx2048m",
-				ExecutionCommand:   "java",
-				ExecutionFlags:     "-XX:+UseSerialGC -Xss64m -Xms64m -Xmx2048m",
-				FileExtension:      ".java",
+				Lang:                "Java",
+				CompilationCommand:  "javac",
+				CompilationFlags:    "-encoding UTF-8 -J-Xmx2048m",
+				ExecutionCommand:    "java",
+				ExecutionFlags:      "-XX:+UseSerialGC -Xss64m -Xms64m -Xmx2048m",
+				FileExtension:       ".java",
+				DefaultTemplatePath: utils.GetTemplateFilePathByLang("java"),
 			},
 			"python": {
-				Lang:               "Python",
-				CompilationCommand: "python3",
-				ExecutionCommand:   "python3",
-				FileExtension:      ".py",
+				Lang:                "Python",
+				CompilationCommand:  "python3",
+				ExecutionCommand:    "python3",
+				FileExtension:       ".py",
+				DefaultTemplatePath: utils.GetTemplateFilePathByLang("python"),
 			},
 		},
 	}
 
 	if err := SaveConfigIntoJsonFile(conf); err != nil {
-		fmt.Println(err.Error())
-		return JudgeConfig{}, errors.New("error while creating default AppConfig")
+		return JudgeConfig{}, err
 	}
+	logger.Info("Default app config is created")
 
 	return conf, nil
 }

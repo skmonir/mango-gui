@@ -8,13 +8,12 @@
 
 using namespace std;
 
-const int N = 1e5 + 7;
-const int INF = 1e9 + 7;
-const int MOD = 1e9 + 7;
+const int N = (int) 1e5 + 7;
+const int INF = (int) 1e9 + 7;
+const int MOD = (int) 1e9 + 7;
 
 
-int solver() {
-	return 0;
+void solver() {
 }
 
 

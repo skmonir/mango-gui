@@ -152,6 +152,20 @@ func OpenResourceInDefaultApplication(path string) error {
 	return nil
 }
 
+func GetTemplateFilePathByLang(lang string) string {
+	appdataDirectory := GetAppDataDirectoryPath()
+	templateDirectory := filepath.Join(appdataDirectory, "source_templates")
+	templateFilePath := ""
+	if lang == "cpp" {
+		templateFilePath = filepath.Join(templateDirectory, "template_CPP.txt")
+	} else if lang == "java" {
+		templateFilePath = filepath.Join(templateDirectory, "template_Java.txt")
+	} else if lang == "python" {
+		templateFilePath = filepath.Join(templateDirectory, "template_Python.txt")
+	}
+	return templateFilePath
+}
+
 func GetBinaryFileExt() string {
 	if runtime.GOOS == "windows" {
 		return ".exe"

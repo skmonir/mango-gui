@@ -178,7 +178,8 @@ export default function OutputGenerator({ appState }) {
             <Form.Group controlId="formFileSm" className="mb-3">
               <Form.Label>
                 <strong>
-                  Solution source path<span style={{ color: "red" }}>*</span>
+                  Solution source file path
+                  <span style={{ color: "red" }}>*</span>
                 </strong>
               </Form.Label>
               <InputGroup className="mb-3">
@@ -188,7 +189,7 @@ export default function OutputGenerator({ appState }) {
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  placeholder="e.g. /Users/user/Desktop/solution.cpp, /Users/user/Desktop/solution.py"
+                  placeholder="e.g. /user/Desktop/solution.cpp, /user/Desktop/solution.py"
                   value={outputGenerateRequest.generatorScriptPath}
                   onChange={e =>
                     setOutputGenerateRequest({

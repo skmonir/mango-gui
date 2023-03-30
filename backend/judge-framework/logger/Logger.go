@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
@@ -44,4 +45,21 @@ func getLogFile() (*os.File, error) {
 		return nil, err
 	}
 	return logFile, nil
+}
+
+func InvalidateLogFiles() {
+	logDir := filepath.Join(utils.GetAppDataDirectoryPath(), "logs")
+	logFiles := utils.GetFileNamesInDirectory(logDir)
+	currentTime, _ := time.Parse("2006-01-02", time.Now().Format("2006-01-02"))
+
+	for _, filename := range logFiles {
+		basename := strings.TrimRight(filename, filepath.Ext(filename))
+		date, _ := time.Parse("2006-01-02", basename)
+		nxtDate := date.AddDate(0, 0, 9)
+		if nxtDate.Before(currentTime) {
+			if err := utils.RemoveFile(filepath.Join(logDir, filename)); err != nil {
+				Error("Error while removing " + filename)
+			}
+		}
+	}
 }

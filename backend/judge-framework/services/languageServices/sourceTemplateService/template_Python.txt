@@ -1,0 +1,16 @@
+#     author:  {%AUTHOR%}
+#    created:  {%CREATED_DATETIME%}
+#    problem:  {%PROBLEM_NAME%}
+
+N = 10**5 + 7
+INF = 10**9 + 7
+MOD = 10**9 + 7
+
+
+def solver():
+    pass
+
+
+TC = int(input())
+for testcases in range(TC):
+    solver()

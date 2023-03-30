@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/skmonir/mango-gui/backend/judge-framework/config"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services/languageServices/sourceTemplateService"
 )
 
 func GetConfig(ctx *fiber.Ctx) error {
@@ -27,5 +28,6 @@ func ResetConfig(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON("Oops! Something went wrong!")
 	}
+	sourceTemplateService.CreateTemplateFiles()
 	return ctx.Status(fiber.StatusOK).JSON(conf)
 }

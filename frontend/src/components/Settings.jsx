@@ -47,6 +47,7 @@ export default function Settings({ appState, setAppState }) {
     message: ""
   });
   const [showToast, setShowToast] = useState(false);
+  const [codePathForModal, setCodePathForModal] = useState("");
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [savingInProgress, setSavingInProgress] = useState(false);
 
@@ -186,6 +187,11 @@ export default function Settings({ appState, setAppState }) {
     };
     setConfig(updatedConfig);
     return updatedConfig;
+  };
+
+  const showCodeTriggered = codePath => {
+    setCodePathForModal(codePath);
+    setTimeout(() => setShowCodeModal(true), 0);
   };
 
   const showToastMessage = (variant, message) => {
@@ -412,10 +418,29 @@ export default function Settings({ appState, setAppState }) {
           </Row>
         )}
         <Row>
-          <Col sm={12}>
+          <Col sm={4}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Template File Path</strong>
+                <strong>Default Template Code</strong>
+              </Form.Label>
+              <InputGroup className="mb-3">
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  disabled={!selectedLangConfig.defaultTemplatePath}
+                  onClick={() =>
+                    showCodeTriggered(selectedLangConfig.defaultTemplatePath)
+                  }
+                >
+                  <FontAwesomeIcon icon={faCode} /> View Edit Default Template{" "}
+                </Button>
+              </InputGroup>
+            </Form.Group>
+          </Col>
+          <Col sm={8}>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                <strong>User Template Code File Path</strong>
               </Form.Label>
               <InputGroup className="mb-3">
                 <Form.Control
@@ -424,25 +449,25 @@ export default function Settings({ appState, setAppState }) {
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  value={selectedLangConfig.templatePath}
+                  value={selectedLangConfig.userTemplatePath}
                   onChange={e =>
                     setSelectedLangConfig({
                       ...selectedLangConfig,
-                      templatePath: e.target.value
+                      userTemplatePath: e.target.value
                     })
                   }
                   onBlur={() =>
-                    checkFilePathValidity(selectedLangConfig.templatePath)
+                    checkFilePathValidity(selectedLangConfig.userTemplatePath)
                   }
-                  placeholder={
-                    "Template file ends with extension(.cpp/.java/.py). The template file will be used to create source files."
-                  }
+                  placeholder={`Template file ends with extension(${placeholders[selectedLang].ext}). The template file will be used to create source files.`}
                 />
                 <Button
                   size="sm"
                   variant="outline-success"
-                  disabled={!selectedLangConfig.templatePath}
-                  onClick={() => setShowCodeModal(true)}
+                  disabled={!selectedLangConfig.userTemplatePath}
+                  onClick={() =>
+                    showCodeTriggered(selectedLangConfig.userTemplatePath)
+                  }
                 >
                   <FontAwesomeIcon icon={faCode} /> View Code{" "}
                 </Button>
@@ -510,7 +535,7 @@ export default function Settings({ appState, setAppState }) {
       )}
       {showCodeModal && (
         <ViewCodeModal
-          codePath={selectedLangConfig.templatePath}
+          codePath={codePathForModal}
           setShowCodeModal={setShowCodeModal}
         />
       )}
