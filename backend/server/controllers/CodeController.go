@@ -24,7 +24,6 @@ func GetCodeByFilePath(ctx *fiber.Ctx) error {
 		"lang": utils.GetLangNameByFileExt(filepath.Ext(codeRequest.FilePath)),
 		"code": code,
 	}
-	fmt.Println(response)
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
@@ -33,7 +32,6 @@ func GetCodeByProblemPath(ctx *fiber.Ctx) error {
 	cid := ctx.Params("cid")
 	label := ctx.Params("label")
 	response := fileServices.GetCodeByMetadata(platform, cid, label)
-	fmt.Println(response)
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 

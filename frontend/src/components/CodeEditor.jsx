@@ -9,12 +9,12 @@ import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/mode-csharp";
-import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/mode-sass";
 
 import "ace-builds/src-noconflict/snippets/java";
 import "ace-builds/src-noconflict/snippets/python";
 import "ace-builds/src-noconflict/snippets/csharp";
-import "ace-builds/src-noconflict/snippets/javascript";
+import "ace-builds/src-noconflict/snippets/sass";
 
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/theme-xcode";
@@ -29,10 +29,11 @@ import Utils from "../Utils.js";
 
 export default function CodeEditor({ codeContent, onChange, readOnly }) {
   const themes = ["monokai", "xcode", "textmate", "twilight", "terminal"];
+  const fontSizes = ["13", "14", "16", "18", "20", "24", "28", "32", "40"];
   const [editorPref, setEditorPref] = useState({
     theme: "monokai",
-    fontSize: 14,
-    tabSize: 4
+    fontSize: "14",
+    tabSize: "4"
   });
   const [modalSetup, setModalSetup] = useState({});
   const [editorLang, setEditorLang] = useState("");
@@ -60,15 +61,16 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
 
   const handleEditorPrefResponse = pref => {
     setEditorPref({
+      ...editorPref,
       theme: Utils.isStrNullOrEmpty(pref.theme) ? "monokai" : pref.theme,
-      fontSize: Utils.isValidNum(pref.fontSize, 13, 50) ? pref.fontSize : 14,
-      tabSize: Utils.isValidNum(pref.tabSize, 2, 8) ? pref.tabSize : 4
+      fontSize: Utils.isStrNullOrEmpty(pref.fontSize) ? "14" : pref.fontSize,
+      tabSize: Utils.isStrNullOrEmpty(pref.tabSize) ? "4" : pref.tabSize
     });
   };
 
   const convertModeToLang = () => {
     if (codeContent.lang === "" || codeContent.lang === "tgen") {
-      setEditorLang("javascript");
+      setEditorLang("sass");
     } else if (codeContent.lang === "cpp") {
       setEditorLang("java");
     } else {
@@ -77,10 +79,11 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
   };
 
   const openEditorPrefModal = () => {
+    console.log(editorPref);
     setModalSetup({
       ...editorPref
     });
-    setShowEditorPref(true);
+    setTimeout(() => setShowEditorPref(true), 300);
   };
 
   const saveEditorPref = () => {
@@ -120,7 +123,6 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
             theme={editorPref.theme}
             name="code_editor"
             onChange={code => onChange(code)}
-            fontSize={editorPref.fontSize}
             showPrintMargin={false}
             showGutter={true}
             highlightActiveLine={true}
@@ -132,7 +134,8 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
               enableSnippets: true,
               showLineNumbers: true,
               dragEnabled: true,
-              tabSize: editorPref.tabSize
+              tabSize: Number(editorPref.tabSize),
+              fontSize: Number(editorPref.fontSize)
             }}
           />
         </Col>
@@ -190,7 +193,7 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
                     })
                   }
                 >
-                  {[13, 14, 16, 18, 20, 24, 28, 32, 40].map((size, id) => (
+                  {fontSizes.map((size, id) => (
                     <option key={id} value={size}>
                       {size}
                     </option>

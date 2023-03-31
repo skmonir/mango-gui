@@ -23,6 +23,6 @@ type LanguageConfig struct {
 
 type EditorPreferences struct {
 	Theme    string `json:"theme"`
-	FontSize int    `json:"fontSize"`
-	TabSize  int    `json:"tabSize"`
+	FontSize string `json:"fontSize"`
+	TabSize  string `json:"tabSize"`
 }
