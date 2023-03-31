@@ -133,7 +133,7 @@ func generateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResu
 			Status: "running",
 			Testcase: models.Testcase{
 				Input:              utils.TrimIO(request.TgenScriptContent + "\nEND"),
-				TimeLimit:          5,
+				TimeLimit:          10,
 				MemoryLimit:        512,
 				ExecOutputFilePath: execOutputFilePath,
 				ExecutionCommand:   execCmd,

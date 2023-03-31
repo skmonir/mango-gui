@@ -127,7 +127,9 @@ export default function ViewCodeModal({
         centered
         fullscreen={isFullScreen}
       >
-        <Modal.Header closeButton />
+        <Modal.Header closeButton>
+          <strong>Code Editor</strong>
+        </Modal.Header>
         <Modal.Body style={{ height: "80vh", overflowY: "auto" }}>
           <Editor
             value={code}

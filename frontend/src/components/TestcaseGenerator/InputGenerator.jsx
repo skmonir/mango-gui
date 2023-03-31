@@ -390,6 +390,9 @@ export default function InputGenerator({ appState }) {
                 autoCapitalize="none"
                 placeholder="In between [0, 100000]. Default 0."
                 value={inputGenerateRequest.testPerFile}
+                disabled={
+                  inputGenerateRequest.generationProcess !== "tgen_script"
+                }
                 onChange={e => {
                   console.log(e.target.value);
                   setInputGenerateRequest({
@@ -463,12 +466,13 @@ export default function InputGenerator({ appState }) {
               size="sm"
               aria-label="Default select example"
               value={inputGenerateRequest.generationProcess}
-              onChange={e =>
+              onChange={e => {
                 setInputGenerateRequest({
                   ...inputGenerateRequest,
-                  generationProcess: e.target.value
-                })
-              }
+                  generationProcess: e.target.value,
+                  testPerFile: 0
+                });
+              }}
             >
               <option value="tgen_script">Tgen script</option>
               <option value="custom_script">Generator script source</option>
