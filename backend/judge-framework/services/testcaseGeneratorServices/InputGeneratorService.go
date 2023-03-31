@@ -18,7 +18,7 @@ import (
 func GenerateInput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionResult {
 	var execResult dto.ProblemExecutionResult
 
-	tgenScripts.CreateIfScriptsAreNotAvailable()
+	tgenScripts.CreateGeneratorScriptsIfNotAvailable()
 
 	if request.GenerationProcess == "tgen_script" {
 		execResult = generateWithTgenScript(request)

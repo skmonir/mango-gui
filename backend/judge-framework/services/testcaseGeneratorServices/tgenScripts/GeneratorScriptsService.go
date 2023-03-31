@@ -16,7 +16,7 @@ var generatorContent []byte
 //go:embed testlib.txt
 var testlibContent []byte
 
-func CreateIfScriptsAreNotAvailable() {
+func CreateGeneratorScriptsIfNotAvailable() {
 	appdataDirectory := utils.GetAppDataDirectoryPath()
 	scriptDirectory := filepath.Join(appdataDirectory, "tgen_scripts")
 	scriptFiles := []string{"validator.cpp", "generator.cpp", "testlib.h"}

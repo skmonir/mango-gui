@@ -19,9 +19,8 @@ var templateJava []byte
 //go:embed template_Python.txt
 var templatePython []byte
 
-func CreateIfTemplatesAreNotAvailable() {
-	appdataDirectory := utils.GetAppDataDirectoryPath()
-	templateDirectory := filepath.Join(appdataDirectory, "source_templates")
+func CreateDefaultTemplatesIfNotAvailable() {
+	templateDirectory := filepath.Join(utils.GetAppDataDirectoryPath(), "source_templates")
 	templateFiles := []string{"template_CPP.txt", "template_Java.txt", "template_Python.txt"}
 
 	allFileAvailable := true
@@ -31,13 +30,12 @@ func CreateIfTemplatesAreNotAvailable() {
 	}
 
 	if !allFileAvailable {
-		CreateTemplateFiles()
+		CreateDefaultTemplateFiles()
 	}
 }
 
-func CreateTemplateFiles() {
-	appdataDirectory := utils.GetAppDataDirectoryPath()
-	templateDirectory := filepath.Join(appdataDirectory, "source_templates")
+func CreateDefaultTemplateFiles() {
+	templateDirectory := filepath.Join(utils.GetAppDataDirectoryPath(), "source_templates")
 	utils.WriteFileContent(templateDirectory, "template_CPP.txt", templateCpp)
 	utils.WriteFileContent(templateDirectory, "template_Java.txt", templateJava)
 	utils.WriteFileContent(templateDirectory, "template_Python.txt", templatePython)
@@ -59,8 +57,8 @@ func GetTemplateCode() string {
 }
 
 func GetDefaultTemplate(lang string) string {
-	CreateIfTemplatesAreNotAvailable()
+	CreateDefaultTemplatesIfNotAvailable()
 
-	templateFilePath := utils.GetTemplateFilePathByLang(lang)
+	templateFilePath := utils.GetDefaultTemplateFilePathByLang(lang)
 	return utils.ReadFileContent(templateFilePath, constants.SOURCE_MAX_ROW_FOR_TEST, constants.SOURCE_MAX_COL_FOR_TEST)
 }

@@ -103,7 +103,7 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 				CompilationCommand:  "g++",
 				CompilationFlags:    "-std=c++20",
 				FileExtension:       ".cpp",
-				DefaultTemplatePath: utils.GetTemplateFilePathByLang("cpp"),
+				DefaultTemplatePath: utils.GetDefaultTemplateFilePathByLang("cpp"),
 			},
 			"java": {
 				Lang:                "Java",
@@ -112,14 +112,14 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 				ExecutionCommand:    "java",
 				ExecutionFlags:      "-XX:+UseSerialGC -Xss64m -Xms64m -Xmx2048m",
 				FileExtension:       ".java",
-				DefaultTemplatePath: utils.GetTemplateFilePathByLang("java"),
+				DefaultTemplatePath: utils.GetDefaultTemplateFilePathByLang("java"),
 			},
 			"python": {
 				Lang:                "Python",
 				CompilationCommand:  "python3",
 				ExecutionCommand:    "python3",
 				FileExtension:       ".py",
-				DefaultTemplatePath: utils.GetTemplateFilePathByLang("python"),
+				DefaultTemplatePath: utils.GetDefaultTemplateFilePathByLang("python"),
 			},
 		},
 	}

@@ -152,9 +152,8 @@ func OpenResourceInDefaultApplication(path string) error {
 	return nil
 }
 
-func GetTemplateFilePathByLang(lang string) string {
-	appdataDirectory := GetAppDataDirectoryPath()
-	templateDirectory := filepath.Join(appdataDirectory, "source_templates")
+func GetDefaultTemplateFilePathByLang(lang string) string {
+	templateDirectory := filepath.Join(GetAppDataDirectoryPath(), "source_templates")
 	templateFilePath := ""
 	if lang == "cpp" {
 		templateFilePath = filepath.Join(templateDirectory, "template_CPP.txt")

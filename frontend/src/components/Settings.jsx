@@ -49,13 +49,22 @@ export default function Settings({ appState, setAppState }) {
   const [showToast, setShowToast] = useState(false);
   const [codePathForModal, setCodePathForModal] = useState("");
   const [showCodeModal, setShowCodeModal] = useState(false);
-  const [savingInProgress, setSavingInProgress] = useState(false);
+
+  const [flags, setFlags] = useState({
+    savingInProgress: false,
+    fetchingInProgress: false,
+    resetInProgress: false
+  });
 
   useEffect(() => {
     fetchConfig();
   }, []);
 
   const fetchConfig = () => {
+    setFlags({
+      ...flags,
+      fetchingInProgress: true
+    });
     DataService.getConfig()
       .then(config => {
         console.log(config);
@@ -66,7 +75,13 @@ export default function Settings({ appState, setAppState }) {
           "Error",
           "Oops! Something went wrong while fetching the config!"
         );
-      });
+      })
+      .finally(() =>
+        setFlags({
+          ...flags,
+          fetchingInProgress: false
+        })
+      );
   };
 
   const updateConfig = config => {
@@ -123,7 +138,10 @@ export default function Settings({ appState, setAppState }) {
     const confToSave = updateLangConfigs();
     console.log(confToSave);
     if (validate(confToSave)) {
-      setSavingInProgress(true);
+      setFlags({
+        ...flags,
+        savingInProgress: true
+      });
       DataService.updateConfig(confToSave)
         .then(config => {
           setAppState({ ...appState, config: config });
@@ -135,7 +153,12 @@ export default function Settings({ appState, setAppState }) {
             "Oops! Something went wrong while saving the config!"
           );
         })
-        .finally(() => setSavingInProgress(false));
+        .finally(() =>
+          setFlags({
+            ...flags,
+            savingInProgress: false
+          })
+        );
     }
   };
 
@@ -156,7 +179,10 @@ export default function Settings({ appState, setAppState }) {
   };
 
   const resetSettings = () => {
-    setSavingInProgress(true);
+    setFlags({
+      ...flags,
+      resetInProgress: true
+    });
     DataService.resetConfig()
       .then(config => {
         updateConfig(config);
@@ -165,7 +191,12 @@ export default function Settings({ appState, setAppState }) {
       .catch(error => {
         showToastMessage("Error", error.response.data);
       })
-      .finally(() => setSavingInProgress(false));
+      .finally(() =>
+        setFlags({
+          ...flags,
+          resetInProgress: false
+        })
+      );
   };
 
   const selectedLangChanged = lang => {
@@ -485,10 +516,29 @@ export default function Settings({ appState, setAppState }) {
                 <Button
                   size="sm"
                   variant="outline-secondary"
-                  onClick={fetchConfig}
-                  disabled={savingInProgress}
+                  onClick={() => {
+                    setFlags({
+                      ...flags,
+                      fetchingInProgress: true
+                    });
+                    setTimeout(fetchConfig, 500);
+                  }}
+                  disabled={flags.fetchingInProgress}
                 >
-                  <FontAwesomeIcon icon={faSyncAlt} /> Refresh Settings
+                  {!flags.fetchingInProgress ? (
+                    <FontAwesomeIcon icon={faSyncAlt} />
+                  ) : (
+                    <Spinner
+                      as="span"
+                      animation="grow"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {flags.fetchingInProgress
+                    ? " Refreshing Settings"
+                    : " Refresh Settings"}
                 </Button>
               </div>
             </Col>
@@ -498,9 +548,9 @@ export default function Settings({ appState, setAppState }) {
                   size="sm"
                   variant="outline-success"
                   onClick={() => triggerSave()}
-                  disabled={savingInProgress}
+                  disabled={flags.savingInProgress}
                 >
-                  {!savingInProgress ? (
+                  {!flags.savingInProgress ? (
                     <FontAwesomeIcon icon={faSave} />
                   ) : (
                     <Spinner
@@ -511,7 +561,9 @@ export default function Settings({ appState, setAppState }) {
                       aria-hidden="true"
                     />
                   )}
-                  {savingInProgress ? " Saving Settings" : " Save Settings"}
+                  {flags.savingInProgress
+                    ? " Saving Settings"
+                    : " Save Settings"}
                 </Button>
               </div>
             </Col>
@@ -521,7 +573,7 @@ export default function Settings({ appState, setAppState }) {
                   size="sm"
                   variant="outline-primary"
                   onClick={resetSettingsTriggered}
-                  disabled={savingInProgress}
+                  disabled={flags.resetInProgress}
                 >
                   <FontAwesomeIcon icon={faSyncAlt} /> Reset Settings
                 </Button>

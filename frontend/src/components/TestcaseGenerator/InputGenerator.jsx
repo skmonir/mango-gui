@@ -559,7 +559,10 @@ export default function InputGenerator({ appState }) {
                   borderRadius: "5px"
                 }}
               >
-                <pre> Write your script below </pre>
+                <pre style={{ backgroundColor: "#d1e0e0", marginBottom: "0" }}>
+                  {" "}
+                  Write your script below
+                </pre>
                 <Editor
                   value={inputGenerateRequest.tgenScriptContent}
                   onValueChange={code =>

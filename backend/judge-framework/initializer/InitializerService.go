@@ -13,10 +13,10 @@ func InitializeJudgeFramework() {
 	invalidateAndPrepareAppConfig()
 
 	// Prepare scripts for Input/Output Generator
-	tgenScripts.CreateIfScriptsAreNotAvailable()
+	tgenScripts.CreateGeneratorScriptsIfNotAvailable()
 
 	// Prepare template codes
-	sourceTemplateService.CreateIfTemplatesAreNotAvailable()
+	sourceTemplateService.CreateDefaultTemplatesIfNotAvailable()
 
 	// Invalidate the log files
 	logger.InvalidateLogFiles()
