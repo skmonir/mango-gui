@@ -30,6 +30,10 @@ func SetRoutes(app fiber.Router) {
 
 	app.Get("/config/reset", controllers.ResetConfig)
 
+	app.Get("/config/editor", controllers.GetEditorPreference)
+
+	app.Put("/config/editor", controllers.UpdateEditorPreference)
+
 	// Code Routes
 	app.Get("/code/:platform/:cid/:label", controllers.GetCodeByProblemPath)
 

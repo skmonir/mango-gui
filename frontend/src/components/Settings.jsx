@@ -104,7 +104,7 @@ export default function Settings({ appState, setAppState }) {
       errMessage += "Compilation command of active language can't be empty\n";
     }
     if (
-      ["java", "python"].includes(selectedLang) &&
+      ["java", "python"].includes(confToSave.activeLang) &&
       Utils.isStrNullOrEmpty(
         confToSave.langConfigs[confToSave.activeLang].executionCommand
       )

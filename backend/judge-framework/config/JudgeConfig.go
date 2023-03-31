@@ -7,6 +7,7 @@ type JudgeConfig struct {
 	Author             string                    `json:"author"`
 	ActiveLang         string                    `json:"activeLang"`
 	LangConfigs        map[string]LanguageConfig `json:"langConfigs"`
+	EditorPreference   EditorPreferences         `json:"editorPreference"`
 }
 
 type LanguageConfig struct {
@@ -18,4 +19,10 @@ type LanguageConfig struct {
 	DefaultTemplatePath string `json:"defaultTemplatePath"`
 	UserTemplatePath    string `json:"userTemplatePath"`
 	FileExtension       string `json:"fileExtension"`
+}
+
+type EditorPreferences struct {
+	Theme    string `json:"theme"`
+	FontSize int    `json:"fontSize"`
+	TabSize  int    `json:"tabSize"`
 }

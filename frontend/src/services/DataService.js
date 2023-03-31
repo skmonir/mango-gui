@@ -75,6 +75,14 @@ class DataService {
     return this.getData("config/");
   }
 
+  getEditorPreference() {
+    return this.getData("config/editor");
+  }
+
+  updateEditorPreference(preference) {
+    return this.putData("config/editor", preference);
+  }
+
   updateConfig(config) {
     return this.putData("config/update", config);
   }

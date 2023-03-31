@@ -21,7 +21,7 @@ var templatePython []byte
 
 func CreateDefaultTemplatesIfNotAvailable() {
 	templateDirectory := filepath.Join(utils.GetAppDataDirectoryPath(), "source_templates")
-	templateFiles := []string{"template_CPP.txt", "template_Java.txt", "template_Python.txt"}
+	templateFiles := []string{"template_CPP.cpp", "template_Java.java", "template_Python.py"}
 
 	allFileAvailable := true
 	for _, filename := range templateFiles {
@@ -36,9 +36,9 @@ func CreateDefaultTemplatesIfNotAvailable() {
 
 func CreateDefaultTemplateFiles() {
 	templateDirectory := filepath.Join(utils.GetAppDataDirectoryPath(), "source_templates")
-	utils.WriteFileContent(templateDirectory, "template_CPP.txt", templateCpp)
-	utils.WriteFileContent(templateDirectory, "template_Java.txt", templateJava)
-	utils.WriteFileContent(templateDirectory, "template_Python.txt", templatePython)
+	utils.WriteFileContent(templateDirectory, "template_CPP.cpp", templateCpp)
+	utils.WriteFileContent(templateDirectory, "template_Java.java", templateJava)
+	utils.WriteFileContent(templateDirectory, "template_Python.py", templatePython)
 }
 
 func GetTemplateCode() string {

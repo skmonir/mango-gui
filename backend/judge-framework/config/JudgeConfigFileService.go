@@ -122,6 +122,11 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 				DefaultTemplatePath: utils.GetDefaultTemplateFilePathByLang("python"),
 			},
 		},
+		EditorPreference: EditorPreferences{
+			Theme:    "monokai",
+			FontSize: 14,
+			TabSize:  4,
+		},
 	}
 
 	if err := SaveConfigIntoJsonFile(conf); err != nil {

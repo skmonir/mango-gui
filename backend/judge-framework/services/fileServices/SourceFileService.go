@@ -53,12 +53,16 @@ func OpenSourceByMetadata(platform string, cid string, label string) error {
 	return errors.New("Source file not found. Click Generate Source button.")
 }
 
-func GetCodeByMetadata(platform string, cid string, label string) string {
+func GetCodeByMetadata(platform string, cid string, label string) map[string]string {
 	filePath := GetSourceFilePath(platform, cid, label)
+	code := ""
 	if utils.IsFileExist(filePath) {
-		return utils.ReadFileContent(filePath, 123456, 123456)
+		code = utils.ReadFileContent(filePath, 123456, 123456)
 	}
-	return ""
+	return map[string]string{
+		"lang": utils.GetLangNameByFileExt(filepath.Ext(filePath)),
+		"code": code,
+	}
 }
 
 func UpdateCodeByProblemPath(platform, cid, label, code string) {

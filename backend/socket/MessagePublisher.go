@@ -3,6 +3,7 @@ package socket
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/skmonir/mango-gui/backend/judge-framework/config"
 	"github.com/skmonir/mango-gui/backend/judge-framework/dto"
 
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
@@ -97,4 +98,19 @@ func PublishPreviousRunStatus(execResult dto.ProblemExecutionResult) {
 	} else if execResult.CompilationError != "" {
 		PublishStatusMessage("test_status", "Compilation error!", "error")
 	}
+}
+
+func PublishAppConfig(conf config.JudgeConfig) {
+	fmt.Println("publishing app config.....")
+
+	confJson, err := json.Marshal(conf)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	broadcastMessage(Message{
+		Key:     "app_conf_get_event",
+		Content: string(confJson),
+	})
 }

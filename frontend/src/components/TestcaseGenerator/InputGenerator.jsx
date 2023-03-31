@@ -4,34 +4,19 @@ import {
   Card,
   Col,
   InputGroup,
-  ProgressBar,
   Row,
   Spinner,
-  Tab,
-  Table,
-  Tabs,
-  Toast,
-  ToastContainer
+  Table
 } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
-import Editor from "react-simple-code-editor";
 import { useEffect, useState } from "react";
-import { highlight, languages } from "prismjs/components/prism-core";
-import "prismjs/components/prism-clike";
-import "prismjs/components/prism-javascript";
-import "prismjs/themes/prism.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCode,
-  faCog,
-  faPlus,
-  faSave,
-  faTerminal
-} from "@fortawesome/free-solid-svg-icons";
+import { faCode, faCog, faPlus } from "@fortawesome/free-solid-svg-icons";
 import DataService from "../../services/DataService.js";
 import ShowToast from "../Toast/ShowToast.jsx";
 import ViewCodeModal from "../modals/ViewCodeModal.jsx";
 import Utils from "../../Utils.js";
+import CodeEditor from "../CodeEditor.jsx";
 
 export default function InputGenerator({ appState }) {
   const socketClient = new SocketClient();
@@ -555,34 +540,26 @@ export default function InputGenerator({ appState }) {
             <Col xs={7}>
               <div
                 style={{
-                  height: "35vh",
+                  height: "40vh",
                   overflowY: "auto",
                   overflowX: "auto",
-                  border: "2px solid transparent",
                   borderColor: "black",
                   borderRadius: "5px"
                 }}
               >
-                <pre style={{ backgroundColor: "#d1e0e0", marginBottom: "0" }}>
-                  {" "}
-                  Write your script below
-                </pre>
-                <Editor
-                  value={inputGenerateRequest.tgenScriptContent}
-                  onValueChange={code =>
+                <CodeEditor
+                  codeContent={{
+                    lang: "tgen",
+                    code: inputGenerateRequest.tgenScriptContent
+                  }}
+                  onChange={code =>
                     setInputGenerateRequest({
                       ...inputGenerateRequest,
                       tgenScriptContent: code
                     })
                   }
-                  highlight={code => highlight(code, languages.js)}
-                  padding={10}
-                  tabSize={4}
-                  style={{
-                    fontFamily: '"Fira code", "Fira Mono", monospace',
-                    fontSize: 13
-                  }}
-                />
+                  readOnly={{ editor: false, preference: true }}
+                ></CodeEditor>
               </div>
             </Col>
           )}

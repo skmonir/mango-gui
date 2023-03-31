@@ -20,15 +20,21 @@ func GetCodeByFilePath(ctx *fiber.Ctx) error {
 	}
 	fmt.Println(codeRequest)
 	code := utils.ReadFileContent(codeRequest.FilePath, 123456, 123456)
-	return ctx.Status(fiber.StatusOK).JSON(code)
+	response := map[string]string{
+		"lang": utils.GetLangNameByFileExt(filepath.Ext(codeRequest.FilePath)),
+		"code": code,
+	}
+	fmt.Println(response)
+	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
 func GetCodeByProblemPath(ctx *fiber.Ctx) error {
 	platform := ctx.Params("platform")
 	cid := ctx.Params("cid")
 	label := ctx.Params("label")
-	code := fileServices.GetCodeByMetadata(platform, cid, label)
-	return ctx.Status(fiber.StatusOK).JSON(code)
+	response := fileServices.GetCodeByMetadata(platform, cid, label)
+	fmt.Println(response)
+	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
 func UpdateCodeByFilePath(ctx *fiber.Ctx) error {

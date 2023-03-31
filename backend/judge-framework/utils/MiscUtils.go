@@ -156,13 +156,24 @@ func GetDefaultTemplateFilePathByLang(lang string) string {
 	templateDirectory := filepath.Join(GetAppDataDirectoryPath(), "source_templates")
 	templateFilePath := ""
 	if lang == "cpp" {
-		templateFilePath = filepath.Join(templateDirectory, "template_CPP.txt")
+		templateFilePath = filepath.Join(templateDirectory, "template_CPP.cpp")
 	} else if lang == "java" {
-		templateFilePath = filepath.Join(templateDirectory, "template_Java.txt")
+		templateFilePath = filepath.Join(templateDirectory, "template_Java.java")
 	} else if lang == "python" {
-		templateFilePath = filepath.Join(templateDirectory, "template_Python.txt")
+		templateFilePath = filepath.Join(templateDirectory, "template_Python.py")
 	}
 	return templateFilePath
+}
+
+func GetLangNameByFileExt(fileExt string) string {
+	if fileExt == ".cpp" || fileExt == ".cc" {
+		return "cpp"
+	} else if fileExt == ".java" {
+		return "java"
+	} else if fileExt == ".py" {
+		return "python"
+	}
+	return ""
 }
 
 func GetBinaryFileExt() string {
