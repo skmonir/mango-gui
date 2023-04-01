@@ -74,4 +74,6 @@ func SetRoutes(app fiber.Router) {
 	app.Get("/misc/filepath/check/:encoded_path", controllers.CheckFilePathValidity)
 
 	app.Put("/misc/resource/open", controllers.OpenResource)
+
+	app.Get("/misc/history", controllers.GetHistory)
 }

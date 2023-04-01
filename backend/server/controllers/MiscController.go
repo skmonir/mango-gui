@@ -50,3 +50,8 @@ func OpenResource(ctx *fiber.Ctx) error {
 		"message": "success",
 	})
 }
+
+func GetHistory(ctx *fiber.Ctx) error {
+	response := services.GetHistory()
+	return ctx.Status(fiber.StatusOK).JSON(response)
+}

@@ -17,7 +17,7 @@ func GenerateRandomTests(ctx *fiber.Ctx) error {
 		})
 	}
 	fmt.Println(req)
-	req.ProblemUrl = strings.ToLower(req.ProblemUrl)
+	req.ParsedProblemUrl = strings.ToLower(req.ParsedProblemUrl)
 	execRes := testcaseGeneratorServices.GenerateInput(req)
 	return ctx.Status(fiber.StatusOK).JSON(execRes)
 }
@@ -31,7 +31,7 @@ func GenerateOutputs(ctx *fiber.Ctx) error {
 		})
 	}
 	fmt.Println(req)
-	req.ProblemUrl = strings.ToLower(req.ProblemUrl)
+	req.ParsedProblemUrl = strings.ToLower(req.ParsedProblemUrl)
 	execRes := testcaseGeneratorServices.GenerateOutput(req)
 	return ctx.Status(fiber.StatusOK).JSON(execRes)
 }

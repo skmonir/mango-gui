@@ -162,6 +162,10 @@ class DataService {
   openResource(openResourceRequest) {
     return this.putData("misc/resource/open/", openResourceRequest);
   }
+
+  getHistory() {
+    return this.getData("misc/history");
+  }
 }
 
 export default new DataService();

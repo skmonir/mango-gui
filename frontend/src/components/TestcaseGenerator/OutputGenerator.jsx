@@ -17,7 +17,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faCog } from "@fortawesome/free-solid-svg-icons";
 import Utils from "../../Utils.js";
 
-export default function OutputGenerator({ appState }) {
+export default function OutputGenerator() {
   const socketClient = new SocketClient();
 
   const [toastMsgObj, setToastMsgObj] = useState({
@@ -27,11 +27,11 @@ export default function OutputGenerator({ appState }) {
 
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [isForProblem, setIsForProblem] = useState(false);
   const [isGeneratingInProgress, setIsGeneratingInProgress] = useState(false);
 
   const [outputGenerateRequest, setOutputGenerateRequest] = useState({
-    problemUrl: "",
+    isForParsedProblem: false,
+    parsedProblemUrl: "",
     fileMode: "write",
     inputDirectoryPath: "",
     outputDirectoryPath: "",
@@ -51,9 +51,9 @@ export default function OutputGenerator({ appState }) {
   }, []);
 
   const fetchIODirectories = () => {
-    if (!Utils.isStrNullOrEmpty(outputGenerateRequest.problemUrl)) {
+    if (!Utils.isStrNullOrEmpty(outputGenerateRequest.parsedProblemUrl)) {
       DataService.getInputOutputDirectoriesByUrl(
-        window.btoa(outputGenerateRequest.problemUrl)
+        window.btoa(outputGenerateRequest.parsedProblemUrl)
       ).then(dir => {
         setOutputGenerateRequest({
           ...outputGenerateRequest,
@@ -145,10 +145,10 @@ export default function OutputGenerator({ appState }) {
               <InputGroup className="mb-3" size="sm">
                 <InputGroup.Checkbox
                   onChange={e => {
-                    setIsForProblem(e.currentTarget.checked);
                     setOutputGenerateRequest({
                       ...outputGenerateRequest,
-                      problemUrl: "",
+                      isForParsedProblem: e.currentTarget.checked,
+                      parsedProblemUrl: "",
                       inputDirectoryPath: "",
                       outputDirectoryPath: ""
                     });
@@ -161,12 +161,12 @@ export default function OutputGenerator({ appState }) {
                   autoComplete="off"
                   autoCapitalize="none"
                   placeholder="Enter Problem URL [Codeforces, AtCoder, Custom]"
-                  disabled={!isForProblem}
-                  value={outputGenerateRequest.problemUrl}
+                  disabled={!outputGenerateRequest.isForParsedProblem}
+                  value={outputGenerateRequest.parsedProblemUrl}
                   onChange={e =>
                     setOutputGenerateRequest({
                       ...outputGenerateRequest,
-                      problemUrl: e.target.value
+                      parsedProblemUrl: e.target.value
                     })
                   }
                   onBlur={fetchIODirectories}
@@ -231,7 +231,7 @@ export default function OutputGenerator({ appState }) {
                 autoComplete="off"
                 autoCapitalize="none"
                 placeholder="Enter directory where all the input files have"
-                disabled={isForProblem}
+                disabled={outputGenerateRequest.isForParsedProblem}
                 value={outputGenerateRequest.inputDirectoryPath}
                 onChange={e =>
                   setOutputGenerateRequest({
@@ -262,7 +262,7 @@ export default function OutputGenerator({ appState }) {
                 autoComplete="off"
                 autoCapitalize="none"
                 placeholder="Enter directory where you want to save the output files"
-                disabled={isForProblem}
+                disabled={outputGenerateRequest.isForParsedProblem}
                 value={outputGenerateRequest.outputDirectoryPath}
                 onChange={e =>
                   setOutputGenerateRequest({

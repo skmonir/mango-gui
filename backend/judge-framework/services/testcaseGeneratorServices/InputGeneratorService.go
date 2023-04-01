@@ -96,7 +96,7 @@ func runGenerator(request dto.TestcaseGenerateRequest, skipIfCompiled bool) dto.
 	execResult := generateInput(request)
 
 	if execResult.CompilationError == "" {
-		services.UpdateProblemExecutionResultInCacheByUrl(request.ProblemUrl)
+		services.UpdateProblemExecutionResultInCacheByUrl(request.ParsedProblemUrl)
 	}
 
 	return execResult

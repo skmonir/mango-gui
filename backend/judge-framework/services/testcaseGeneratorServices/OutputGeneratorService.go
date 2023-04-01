@@ -57,7 +57,7 @@ func GenerateOutput(request dto.TestcaseGenerateRequest) dto.ProblemExecutionRes
 
 	execResult = executor.Execute(execResult, "output_generate_result_event", true)
 
-	services.UpdateProblemExecutionResultInCacheByUrl(request.ProblemUrl)
+	services.UpdateProblemExecutionResultInCacheByUrl(request.ParsedProblemUrl)
 
 	return execResult
 }

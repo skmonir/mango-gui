@@ -1,7 +1,8 @@
 package dto
 
 type TestcaseGenerateRequest struct {
-	ProblemUrl          string `json:"problemUrl"`
+	IsForParsedProblem  bool   `json:"isForParsedProblem"`
+	ParsedProblemUrl    string `json:"parsedProblemUrl"`
 	FileNum             int    `json:"fileNum"`
 	FileMode            string `json:"fileMode"`
 	FileName            string `json:"fileName"`

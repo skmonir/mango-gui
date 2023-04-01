@@ -18,7 +18,7 @@ import ViewCodeModal from "../modals/ViewCodeModal.jsx";
 import Utils from "../../Utils.js";
 import CodeEditor from "../CodeEditor.jsx";
 
-export default function InputGenerator({ appState }) {
+export default function InputGenerator() {
   const socketClient = new SocketClient();
 
   const tgenKeywords = [
@@ -68,11 +68,11 @@ export default function InputGenerator({ appState }) {
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [isGeneratingInProgress, setIsGeneratingInProgress] = useState(false);
-  const [isForProblem, setIsForProblem] = useState(false);
   const [selectedScriptKeyword, setSelectedScriptKeyword] = useState("<line>");
 
   const [inputGenerateRequest, setInputGenerateRequest] = useState({
-    problemUrl: "",
+    isForParsedProblem: false,
+    parsedProblemUrl: "",
     fileNum: 1,
     fileMode: "write",
     fileName: "02_random_input",
@@ -111,9 +111,9 @@ export default function InputGenerator({ appState }) {
   };
 
   const fetchIODirectories = () => {
-    if (!Utils.isStrNullOrEmpty(inputGenerateRequest.problemUrl)) {
+    if (!Utils.isStrNullOrEmpty(inputGenerateRequest.parsedProblemUrl)) {
       DataService.getInputOutputDirectoriesByUrl(
-        window.btoa(inputGenerateRequest.problemUrl)
+        window.btoa(inputGenerateRequest.parsedProblemUrl)
       ).then(dir => {
         setInputGenerateRequest({
           ...inputGenerateRequest,
@@ -245,10 +245,10 @@ export default function InputGenerator({ appState }) {
               <InputGroup className="mb-3" size="sm">
                 <InputGroup.Checkbox
                   onChange={e => {
-                    setIsForProblem(e.currentTarget.checked);
                     setInputGenerateRequest({
                       ...inputGenerateRequest,
-                      problemUrl: "",
+                      isForParsedProblem: e.currentTarget.checked,
+                      parsedProblemUrl: "",
                       inputDirectoryPath: "",
                       fileName: e.currentTarget.checked
                         ? "02_random_input"
@@ -263,12 +263,12 @@ export default function InputGenerator({ appState }) {
                   autoComplete="off"
                   autoCapitalize="none"
                   placeholder="Enter Problem URL [Codeforces, AtCoder, Custom]"
-                  disabled={!isForProblem}
-                  value={inputGenerateRequest.problemUrl}
+                  disabled={!inputGenerateRequest.isForParsedProblem}
+                  value={inputGenerateRequest.parsedProblemUrl}
                   onChange={e =>
                     setInputGenerateRequest({
                       ...inputGenerateRequest,
-                      problemUrl: e.target.value
+                      parsedProblemUrl: e.target.value
                     })
                   }
                   onBlur={fetchIODirectories}
@@ -291,7 +291,7 @@ export default function InputGenerator({ appState }) {
                 autoComplete="off"
                 autoCapitalize="none"
                 placeholder="Enter directory where you want to save the input files"
-                disabled={isForProblem}
+                disabled={inputGenerateRequest.isForParsedProblem}
                 value={inputGenerateRequest.inputDirectoryPath}
                 onChange={e =>
                   setInputGenerateRequest({
@@ -404,7 +404,7 @@ export default function InputGenerator({ appState }) {
                 autoComplete="off"
                 autoCapitalize="none"
                 placeholder="Default '02_random_input'"
-                disabled={isForProblem}
+                disabled={inputGenerateRequest.isForParsedProblem}
                 value={inputGenerateRequest.fileName}
                 onChange={e =>
                   setInputGenerateRequest({
