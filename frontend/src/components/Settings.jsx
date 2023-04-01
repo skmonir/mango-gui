@@ -126,6 +126,19 @@ export default function Settings({ appState, setAppState }) {
     ) {
       errMessage += "Execution command of selected language can't be empty\n";
     }
+    if (
+      !Utils.isStrNullOrEmpty(
+        confToSave.langConfigs[selectedLang].userTemplatePath
+      ) &&
+      !confToSave.langConfigs[selectedLang].userTemplatePath.endsWith(
+        placeholders[selectedLang].ext
+      )
+    ) {
+      errMessage +=
+        "User template file path should end with " +
+        placeholders[selectedLang].ext +
+        "\n";
+    }
     if (Utils.isStrNullOrEmpty(errMessage)) {
       return true;
     } else {
