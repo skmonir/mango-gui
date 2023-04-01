@@ -41,6 +41,7 @@ export default function OutputGenerator() {
   const [generatorExecResult, setGeneratorExecResult] = useState({});
 
   useEffect(() => {
+    fetchHistory();
     let socketConnGenerator = socketClient.initSocketConnection(
       "output_generate_result_event",
       updateExecResultFromSocket
@@ -49,6 +50,12 @@ export default function OutputGenerator() {
       socketConnGenerator.close();
     };
   }, []);
+
+  const fetchHistory = () => {
+    DataService.getHistory().then(appHistory => {
+      setOutputGenerateRequest(appHistory.outputGenerateRequest);
+    });
+  };
 
   const fetchIODirectories = () => {
     if (!Utils.isStrNullOrEmpty(outputGenerateRequest.parsedProblemUrl)) {
@@ -144,6 +151,7 @@ export default function OutputGenerator() {
               </Form.Label>
               <InputGroup className="mb-3" size="sm">
                 <InputGroup.Checkbox
+                  checked={outputGenerateRequest.isForParsedProblem}
                   onChange={e => {
                     setOutputGenerateRequest({
                       ...outputGenerateRequest,

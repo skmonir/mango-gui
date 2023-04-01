@@ -164,7 +164,7 @@ class DataService {
   }
 
   getHistory() {
-    return this.getData("misc/history");
+    return this.getData("misc/history").then(response => JSON.parse(response));
   }
 }
 

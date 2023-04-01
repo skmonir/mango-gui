@@ -4,6 +4,7 @@ import (
 	"github.com/skmonir/mango-gui/backend/judge-framework/config"
 	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
 	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services/languageServices/sourceTemplateService"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services/testcaseGeneratorServices/tgenScripts"
 )
@@ -20,6 +21,9 @@ func InitializeJudgeFramework() {
 
 	// Invalidate the log files
 	logger.InvalidateLogFiles()
+
+	// Init history file
+	services.InitHistory()
 }
 
 func invalidateAndPrepareAppConfig() {

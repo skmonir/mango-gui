@@ -11,7 +11,9 @@ import (
 
 func GetProblemList(ctx *fiber.Ctx) error {
 	encodedUrl := ctx.Params("encoded_url")
-	problems := services.GetProblemListByUrl(utils.DecodeBase64(encodedUrl))
+	decodedUrl := utils.DecodeBase64(encodedUrl)
+	services.UpdateTestContestUrlHistory(decodedUrl)
+	problems := services.GetProblemListByUrl(decodedUrl)
 	return ctx.Status(fiber.StatusOK).JSON(problems)
 }
 

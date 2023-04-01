@@ -87,6 +87,7 @@ export default function InputGenerator() {
   const [generatorExecResult, setGeneratorExecResult] = useState(null);
 
   useEffect(() => {
+    fetchHistory();
     let socketConnGenerator = socketClient.initSocketConnection(
       "input_generate_result_event",
       updateExecResultFromSocket
@@ -95,6 +96,12 @@ export default function InputGenerator() {
       socketConnGenerator.close();
     };
   }, []);
+
+  const fetchHistory = () => {
+    DataService.getHistory().then(appHistory => {
+      setInputGenerateRequest(appHistory.inputGenerateRequest);
+    });
+  };
 
   const insertScript = () => {
     let keyword = selectedScriptKeyword;
@@ -244,6 +251,7 @@ export default function InputGenerator() {
               </Form.Label>
               <InputGroup className="mb-3" size="sm">
                 <InputGroup.Checkbox
+                  checked={inputGenerateRequest.isForParsedProblem}
                   onChange={e => {
                     setInputGenerateRequest({
                       ...inputGenerateRequest,
@@ -376,7 +384,7 @@ export default function InputGenerator() {
                 placeholder="In between [0, 100000]. Default 0."
                 value={inputGenerateRequest.testPerFile}
                 disabled={
-                  inputGenerateRequest.generationProcess !== "tgen_script"
+                  inputGenerateRequest.generationProcess === "custom_script"
                 }
                 onChange={e => {
                   console.log(e.target.value);

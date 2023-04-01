@@ -1,33 +1,29 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Col, NavDropdown, Row, Tab } from "react-bootstrap";
+import { Col, Row, Tab } from "react-bootstrap";
 import Tester from "./components/Tester.jsx";
 import Parser from "./components/Parser.jsx";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faAngleDoubleLeft,
-  faAngleDoubleRight,
-  faCog,
   faDiagramProject,
   faDownload,
   faLaptopCode,
   faMicrochip,
   faTools
 } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Settings from "./components/Settings.jsx";
 import Navbar from "react-bootstrap/Navbar";
 import InputGenerator from "./components/TestcaseGenerator/InputGenerator.jsx";
 import OutputGenerator from "./components/TestcaseGenerator/OutputGenerator.jsx";
 
 function App() {
-  const [state, setState] = useState({
+  const [currentTab, setCurrentTab] = useState("parser");
+  const [appState, setAppState] = useState({
     config: {}
   });
-
-  const [currentTab, setCurrentTab] = useState("parser");
 
   return (
     <div className="App" style={{ height: "100vh" }}>
@@ -98,19 +94,19 @@ function App() {
             <Col xs={12}>
               <Tab.Content>
                 <Tab.Pane eventKey="parser">
-                  <Parser appState={{ ...state }} />
+                  <Parser appState={appState} />
                 </Tab.Pane>
                 <Tab.Pane eventKey="tester">
-                  <Tester appState={{ ...state }} />
+                  <Tester appState={appState} />
                 </Tab.Pane>
                 <Tab.Pane eventKey="input_generator">
-                  <InputGenerator appState={{ ...state }} />
+                  <InputGenerator appState={appState} />
                 </Tab.Pane>
                 <Tab.Pane eventKey="output_generator">
-                  <OutputGenerator appState={{ ...state }} />
+                  <OutputGenerator appState={appState} />
                 </Tab.Pane>
                 <Tab.Pane eventKey="settings">
-                  <Settings appState={{ ...state }} setAppState={setState} />
+                  <Settings appState={appState} setAppState={setAppState} />
                 </Tab.Pane>
               </Tab.Content>
             </Col>

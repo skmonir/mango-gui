@@ -28,6 +28,7 @@ function Parser({ appState }) {
   );
 
   useEffect(() => {
+    fetchHistory();
     let socketConn = socketClient.initSocketConnection(
       "parse_problems_event",
       updateParseStatusFromSocket
@@ -36,6 +37,12 @@ function Parser({ appState }) {
       socketConn.close();
     };
   }, []);
+
+  const fetchHistory = () => {
+    DataService.getHistory().then(appHistory => {
+      setParseUrl(appHistory?.parseUrl);
+    });
+  };
 
   const parseTriggerred = () => {
     setParsingInProgress(true);

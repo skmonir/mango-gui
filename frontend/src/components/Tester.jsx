@@ -82,6 +82,7 @@ export default function Tester({ appState }) {
   });
 
   useEffect(() => {
+    fetchHistory();
     let socketConnTest = socketClient.initSocketConnection(
       "test_exec_result_event",
       updateExecResultFromSocket
@@ -95,6 +96,12 @@ export default function Tester({ appState }) {
       socketConnStatus.close();
     };
   }, []);
+
+  const fetchHistory = () => {
+    DataService.getHistory().then(appHistory => {
+      setTestContestUrl(appHistory?.testContestUrl);
+    });
+  };
 
   const getProblemList = () => {
     setLoadingInProgress(true);

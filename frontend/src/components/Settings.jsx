@@ -1,12 +1,7 @@
 import { Button, Card, Col, InputGroup, Row, Spinner } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCode,
-  faFileCode,
-  faSave,
-  faSyncAlt
-} from "@fortawesome/free-solid-svg-icons";
+import { faCode, faSave, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import DataService from "../services/DataService.js";
 import ViewCodeModal from "./modals/ViewCodeModal.jsx";
