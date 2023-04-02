@@ -11,7 +11,7 @@ func OpenSourceByMetadata(ctx *fiber.Ctx) error {
 	cid := ctx.Params("cid")
 	label := ctx.Params("label")
 	if err := fileServices.OpenSourceByMetadata(platform, cid, label); err != nil {
-		return ctx.Status(fiber.StatusNotFound).JSON("Error occurred while opening the source file!")
+		return ctx.Status(fiber.StatusNotFound).JSON(err.Error())
 	}
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "success",
