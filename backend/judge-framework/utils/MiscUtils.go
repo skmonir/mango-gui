@@ -152,6 +152,18 @@ func OpenResourceInDefaultApplication(path string) error {
 	return nil
 }
 
+func IsOsWindows() bool {
+	return runtime.GOOS == "windows"
+}
+
+func IsOsLinux() bool {
+	return runtime.GOOS == "linux"
+}
+
+func IsOsMac() bool {
+	return runtime.GOOS == "darwin"
+}
+
 func GetDefaultTemplateFilePathByLang(lang string) string {
 	templateDirectory := filepath.Join(GetAppDataDirectoryPath(), "source_templates")
 	templateFilePath := ""
@@ -177,7 +189,7 @@ func GetLangNameByFileExt(fileExt string) string {
 }
 
 func GetBinaryFileExt() string {
-	if runtime.GOOS == "windows" {
+	if IsOsWindows() {
 		return ".exe"
 	}
 	return ""

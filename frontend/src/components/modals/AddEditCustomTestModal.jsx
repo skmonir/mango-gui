@@ -143,7 +143,7 @@ export default function AddEditCustomTestModal({
                 </Form.Label>
                 <pre>
                   <Form.Control
-                    style={{ fontSize: 14 }}
+                    style={{ fontSize: 13 }}
                     value={inputOutputObj.input}
                     onChange={e =>
                       setInputOutputObj({
@@ -168,7 +168,7 @@ export default function AddEditCustomTestModal({
                 </Form.Label>
                 <pre>
                   <Form.Control
-                    style={{ fontSize: 14 }}
+                    style={{ fontSize: 13 }}
                     value={inputOutputObj.output}
                     onChange={e =>
                       setInputOutputObj({

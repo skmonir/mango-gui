@@ -102,7 +102,7 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 			"cpp": {
 				Lang:                "CPP",
 				CompilationCommand:  "g++",
-				CompilationFlags:    "-std=gnu++17",
+				CompilationFlags:    map[bool]string{true: "-std=gnu++17", false: "-std=c++20"}[utils.IsOsWindows()],
 				FileExtension:       ".cpp",
 				DefaultTemplatePath: utils.GetDefaultTemplateFilePathByLang("cpp"),
 			},
@@ -117,8 +117,8 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 			},
 			"python": {
 				Lang:                "Python",
-				CompilationCommand:  "py",
-				ExecutionCommand:    "py",
+				CompilationCommand:  map[bool]string{true: "py", false: "python3"}[utils.IsOsWindows()],
+				ExecutionCommand:    map[bool]string{true: "py", false: "python3"}[utils.IsOsWindows()],
 				FileExtension:       ".py",
 				DefaultTemplatePath: utils.GetDefaultTemplateFilePathByLang("python"),
 			},

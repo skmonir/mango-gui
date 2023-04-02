@@ -141,7 +141,7 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
       <Modal
         show={showEditorPref}
         onHide={() => setShowEditorPref(false)}
-        size="lg"
+        size="sm"
         aria-labelledby="contained-modal-title-vcenter"
         centered
       >
@@ -153,7 +153,7 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
         </Modal.Header>
         <Modal.Body style={{ paddingBottom: "2px", paddingTop: "5px" }}>
           <Row>
-            <Col xs={6}>
+            <Col xs={12}>
               <Form.Group className="mb-3">
                 <Form.Label>Theme</Form.Label>
                 <Form.Select
@@ -177,7 +177,7 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
             </Col>
           </Row>
           <Row>
-            <Col xs={6}>
+            <Col xs={12}>
               <Form.Group className="mb-3">
                 <Form.Label>Font Size</Form.Label>
                 <Form.Select
@@ -201,7 +201,7 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
             </Col>
           </Row>
           <Row>
-            <Col xs={6}>
+            <Col xs={12}>
               <Form.Group className="mb-3">
                 <Form.Label>Tab Size</Form.Label>
                 <Form.Select
