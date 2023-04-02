@@ -86,7 +86,7 @@ function App() {
           </Row>
           <Row
             style={{
-              maxHeight: "93vh",
+              maxHeight: "92vh",
               overflowY: "auto",
               overflowX: "auto"
             }}

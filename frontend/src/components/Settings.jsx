@@ -13,19 +13,19 @@ export default function Settings({ appState, setAppState }) {
   const placeholders = {
     cpp: {
       compCommand: "g++",
-      compFlags: "-std=c++20",
+      compFlags: "-std=gnu++17, -std=c++20",
       ext: ".cpp"
     },
     java: {
-      compCommand: "javac",
+      compCommand: "javac, C:\\Java\\jdk-20\\bin\\javac.exe",
       compFlags: "-encoding UTF-8 -J-Xmx2048m",
-      execCommand: "java",
+      execCommand: "java, C:\\Java\\jdk-20\\bin\\java.exe",
       execFlags: "-XX:+UseSerialGC -Xss64m -Xms64m -Xmx2048m",
       ext: ".java"
     },
     python: {
-      compCommand: "python3",
-      execCommand: "python3",
+      compCommand: "py, python3",
+      execCommand: "py, python3",
       compFlags: "",
       execFlags: "",
       ext: ".py"
@@ -107,6 +107,7 @@ export default function Settings({ appState, setAppState }) {
       errMessage += "Execution command of active language can't be empty\n";
     }
     if (
+      confToSave.activeLang != selectedLang &&
       Utils.isStrNullOrEmpty(
         confToSave.langConfigs[selectedLang].compilationCommand
       )
@@ -114,6 +115,7 @@ export default function Settings({ appState, setAppState }) {
       errMessage += "Compilation command of selected language can't be empty\n";
     }
     if (
+      confToSave.activeLang != selectedLang &&
       ["java", "python"].includes(selectedLang) &&
       Utils.isStrNullOrEmpty(
         confToSave.langConfigs[selectedLang].executionCommand
@@ -382,7 +384,7 @@ export default function Settings({ appState, setAppState }) {
           <Col sm={8}>
             <Form.Group className="mb-3">
               <Form.Label>
-                <strong>Compilation Flags</strong>
+                <strong>Compilation Flags [Space Separated]</strong>
               </Form.Label>
               <Form.Control
                 type="text"
@@ -433,7 +435,7 @@ export default function Settings({ appState, setAppState }) {
             <Col sm={8}>
               <Form.Group className="mb-3">
                 <Form.Label>
-                  <strong>Execution Flags</strong>
+                  <strong>Execution Flags [Space Separated]</strong>
                 </Form.Label>
                 <Form.Control
                   type="text"

@@ -3,13 +3,14 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
-	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
-	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
+	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
 
 func GetJudgeConfigFromFile() *JudgeConfig {
@@ -101,7 +102,7 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 			"cpp": {
 				Lang:                "CPP",
 				CompilationCommand:  "g++",
-				CompilationFlags:    "-std=c++20",
+				CompilationFlags:    "-std=gnu++17",
 				FileExtension:       ".cpp",
 				DefaultTemplatePath: utils.GetDefaultTemplateFilePathByLang("cpp"),
 			},
@@ -116,8 +117,8 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 			},
 			"python": {
 				Lang:                "Python",
-				CompilationCommand:  "python3",
-				ExecutionCommand:    "python3",
+				CompilationCommand:  "py",
+				ExecutionCommand:    "py",
 				FileExtension:       ".py",
 				DefaultTemplatePath: utils.GetDefaultTemplateFilePathByLang("python"),
 			},
