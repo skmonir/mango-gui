@@ -3,15 +3,15 @@ import { Alert, Button, Col, Modal, Row } from "react-bootstrap";
 import DataService from "../../services/DataService.js";
 import Form from "react-bootstrap/Form";
 import ShowToast from "../Toast/ShowToast.jsx";
-import { faCompress, faPlus, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function AddEditCustomTestModal({
+  event,
   metadata,
   testcaseFilePath,
   closeAddEditTestModal
 }) {
-  const [eventType, setEventType] = useState("");
   const [inputOutputObj, setInputOutputObj] = useState({
     input: "",
     output: ""
@@ -25,11 +25,9 @@ export default function AddEditCustomTestModal({
 
   useEffect(() => {
     console.log(testcaseFilePath);
-    if (testcaseFilePath) {
-      setEventType("Update");
+    if (event === "Update" || event === "Clone") {
       fetchTestcaseByFilePath();
-    } else {
-      setEventType("Save");
+    } else if (event === "Add") {
       setShowModal(true);
     }
   }, []);
@@ -63,7 +61,7 @@ export default function AddEditCustomTestModal({
       input: inputOutputObj.input,
       output: inputOutputObj.output
     };
-    if (eventType === "Save") {
+    if (event !== "Update") {
       DataService.addCustomTest(req)
         .then(resp => {
           if (resp.message === "success") {
@@ -81,7 +79,7 @@ export default function AddEditCustomTestModal({
           }
         })
         .catch(() => showToastMessage("Error", "Error from server!"));
-    } else if (eventType === "Update") {
+    } else if (event === "Update") {
       DataService.updateCustomTest({
         ...req,
         inputFilePath: testcaseFilePath.inputFilePath,
@@ -91,7 +89,7 @@ export default function AddEditCustomTestModal({
           if (resp.message === "success") {
             showToastMessage(
               "Success",
-              `${eventType}d custom testcase successfully!`
+              "Updated custom testcase successfully!"
             );
             setTimeout(() => closeModal(), 1000);
           } else {
@@ -124,10 +122,19 @@ export default function AddEditCustomTestModal({
         aria-labelledby="contained-modal-title-vcenter"
         centered
       >
-        <Modal.Header closeButton>
-          <Modal.Title>Add Custom Test</Modal.Title>
+        <Modal.Header
+          style={{ paddingBottom: "5px", paddingTop: "5px" }}
+          closeButton
+        >
+          <strong>{`${event} Custom Test`}</strong>
         </Modal.Header>
-        <Modal.Body style={{ overflowY: "auto" }}>
+        <Modal.Body
+          style={{
+            overflowY: "auto",
+            paddingBottom: "1px",
+            paddingTop: "1px"
+          }}
+        >
           <Row>
             <Col xs={6}>
               <Form>
@@ -136,6 +143,7 @@ export default function AddEditCustomTestModal({
                 </Form.Label>
                 <pre>
                   <Form.Control
+                    style={{ fontSize: 14 }}
                     value={inputOutputObj.input}
                     onChange={e =>
                       setInputOutputObj({
@@ -160,6 +168,7 @@ export default function AddEditCustomTestModal({
                 </Form.Label>
                 <pre>
                   <Form.Control
+                    style={{ fontSize: 14 }}
                     value={inputOutputObj.output}
                     onChange={e =>
                       setInputOutputObj({
@@ -179,7 +188,7 @@ export default function AddEditCustomTestModal({
             </Col>
           </Row>
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer style={{ paddingBottom: "2px", paddingTop: "2px" }}>
           <Button
             size="sm"
             variant="outline-primary"
@@ -188,9 +197,10 @@ export default function AddEditCustomTestModal({
             }
             onClick={() => saveTriggered(true)}
           >
-            <FontAwesomeIcon icon={faSave} /> {`${eventType} and Close`}
+            <FontAwesomeIcon icon={faSave} />{" "}
+            {(event !== "Update" ? "Save" : "Update") + ` and Close`}
           </Button>
-          {eventType === "Save" && (
+          {event === "Add" && (
             <Button
               size="sm"
               variant="outline-success"

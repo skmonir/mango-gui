@@ -11,6 +11,7 @@ import {
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faClone,
   faCode,
   faEdit,
   faFileCirclePlus,
@@ -80,6 +81,7 @@ export default function Tester({ appState }) {
     variant: "",
     message: ""
   });
+  const [customTestEvent, setCustomTestEvent] = useState("");
 
   useEffect(() => {
     fetchHistory();
@@ -208,11 +210,13 @@ export default function Tester({ appState }) {
 
   const addCustomTest = () => {
     setSelectedTestcase(null);
+    setCustomTestEvent("Add");
     setTimeout(() => setShowAddEditTestModal(true), 200);
   };
 
-  const updateCustomTest = testcase => {
+  const cloneUpdateCustomTest = (testcase, eventType) => {
     setSelectedTestcase(testcase);
+    setCustomTestEvent(eventType);
     setShowAddEditTestModal(true);
   };
 
@@ -415,32 +419,52 @@ export default function Tester({ appState }) {
                         </pre>
                       </td>
                       <td className="text-center">
-                        {execDetails.testcase.inputFilePath.includes(
-                          "01_custom_input_"
-                        ) && (
-                          <ButtonGroup>
-                            <Button
-                              size="sm"
-                              variant="secondary"
-                              onClick={() =>
-                                updateCustomTest(execDetails.testcase)
-                              }
-                            >
-                              <FontAwesomeIcon icon={faEdit} />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="danger"
-                              onClick={() =>
-                                deleteCustomTestTriggered(
-                                  execDetails.testcase.inputFilePath
-                                )
-                              }
-                            >
-                              <FontAwesomeIcon icon={faTrashAlt} />
-                            </Button>
-                          </ButtonGroup>
-                        )}
+                        <ButtonGroup>
+                          <Button
+                            size="sm"
+                            variant="success"
+                            title="Clone"
+                            onClick={() =>
+                              cloneUpdateCustomTest(
+                                execDetails.testcase,
+                                "Clone"
+                              )
+                            }
+                          >
+                            <FontAwesomeIcon icon={faClone} />
+                          </Button>
+                          {execDetails.testcase.inputFilePath.includes(
+                            "01_custom_input_"
+                          ) && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="primary"
+                                title="Edit"
+                                onClick={() =>
+                                  cloneUpdateCustomTest(
+                                    execDetails.testcase,
+                                    "Update"
+                                  )
+                                }
+                              >
+                                <FontAwesomeIcon icon={faEdit} />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="danger"
+                                title="Delete"
+                                onClick={() =>
+                                  deleteCustomTestTriggered(
+                                    execDetails.testcase.inputFilePath
+                                  )
+                                }
+                              >
+                                <FontAwesomeIcon icon={faTrashAlt} />
+                              </Button>
+                            </>
+                          )}
+                        </ButtonGroup>
                       </td>
                     </tr>
                   )
@@ -702,6 +726,7 @@ export default function Tester({ appState }) {
       )}
       {showAddEditTestModal && (
         <AddEditCustomTestModal
+          event={customTestEvent}
           metadata={selectedProblemMetadata}
           closeAddEditTestModal={closeAddEditTestModal}
           testcaseFilePath={selectedTestcase}

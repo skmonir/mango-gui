@@ -91,10 +91,20 @@ export default function AddCustomProblemModal({
         aria-labelledby="contained-modal-title-vcenter"
         centered
       >
-        <Modal.Header closeButton>
-          <Modal.Title>Add Custom Problem</Modal.Title>
+        <Modal.Header
+          style={{ paddingBottom: "5px", paddingTop: "5px" }}
+          closeButton
+        >
+          <strong>Add Custom Problem</strong>
         </Modal.Header>
-        <Modal.Body style={{ height: "55vh", overflowY: "auto" }}>
+        <Modal.Body
+          style={{
+            height: "55vh",
+            overflowY: "auto",
+            paddingBottom: "1px",
+            paddingTop: "1px"
+          }}
+        >
           <Row>
             <Col xs={3}>
               <Form.Group className="mb-3">
@@ -237,7 +247,7 @@ export default function AddCustomProblemModal({
             </Alert>
           </Row>
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer style={{ paddingBottom: "2px", paddingTop: "2px" }}>
           <Button
             size="sm"
             variant="outline-success"

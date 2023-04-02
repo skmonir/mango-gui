@@ -7,15 +7,15 @@ import {
   Spinner,
   Table
 } from "react-bootstrap";
-import SocketClient from "../../socket/SocketClient.js";
+import SocketClient from "../socket/SocketClient.js";
 import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
-import DataService from "../../services/DataService.js";
-import ShowToast from "../Toast/ShowToast.jsx";
-import ViewCodeModal from "../modals/ViewCodeModal.jsx";
+import DataService from "../services/DataService.js";
+import ShowToast from "./Toast/ShowToast.jsx";
+import ViewCodeModal from "./modals/ViewCodeModal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faCog } from "@fortawesome/free-solid-svg-icons";
-import Utils from "../../Utils.js";
+import Utils from "../Utils.js";
 
 export default function OutputGenerator() {
   const socketClient = new SocketClient();

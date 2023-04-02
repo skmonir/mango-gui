@@ -16,8 +16,8 @@ import {
 import { useState } from "react";
 import Settings from "./components/Settings.jsx";
 import Navbar from "react-bootstrap/Navbar";
-import InputGenerator from "./components/TestcaseGenerator/InputGenerator.jsx";
-import OutputGenerator from "./components/TestcaseGenerator/OutputGenerator.jsx";
+import InputGenerator from "./components/InputGenerator.jsx";
+import OutputGenerator from "./components/OutputGenerator.jsx";
 
 function App() {
   const [currentTab, setCurrentTab] = useState("parser");
@@ -88,7 +88,8 @@ function App() {
             style={{
               maxHeight: "92vh",
               overflowY: "auto",
-              overflowX: "auto"
+              overflowX: "auto",
+              marginBottom: "5px"
             }}
           >
             <Col xs={12}>
