@@ -11,6 +11,7 @@ def solver():
     pass
 
 
-TC = int(input())
-for testcases in range(TC):
-    solver()
+if __name__ == "__main__":
+    TC = int(input())
+    for _ in range(TC):
+        solver()

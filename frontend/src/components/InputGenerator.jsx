@@ -238,6 +238,32 @@ export default function InputGenerator() {
     scrollToId("input_logs");
   };
 
+  const getTgenKeywordsSelectElement = () => {
+    return (
+      <InputGroup className="mb-3">
+        <Form.Select
+          size="sm"
+          aria-label="Default select example"
+          value={selectedScriptKeyword}
+          onChange={e => setSelectedScriptKeyword(e.currentTarget.value)}
+        >
+          {tgenKeywords.map((keyword, idx) => (
+            <option key={idx} value={keyword.script}>
+              {keyword.label}
+            </option>
+          ))}
+        </Form.Select>
+        <Button
+          size="sm"
+          variant="outline-success"
+          onClick={() => insertScript()}
+        >
+          <FontAwesomeIcon icon={faPlus} /> Insert Script
+        </Button>
+      </InputGroup>
+    );
+  };
+
   return (
     <div>
       <Card body bg="light">
@@ -472,7 +498,7 @@ export default function InputGenerator() {
             </Form.Select>
           </Col>
           <Col xs={6}>
-            {inputGenerateRequest.generationProcess !== "tgen_script" ? (
+            {inputGenerateRequest.generationProcess !== "tgen_script" && (
               <Form.Group controlId="formFileSm" className="mb-3">
                 <Form.Label>
                   <strong>
@@ -511,35 +537,6 @@ export default function InputGenerator() {
                   </Button>
                 </InputGroup>
               </Form.Group>
-            ) : (
-              <Form.Group controlId="formFileSm" className="mb-3">
-                <Form.Label>
-                  <strong>TGen script keywords</strong>
-                </Form.Label>
-                <InputGroup className="mb-3">
-                  <Form.Select
-                    size="sm"
-                    aria-label="Default select example"
-                    value={selectedScriptKeyword}
-                    onChange={e =>
-                      setSelectedScriptKeyword(e.currentTarget.value)
-                    }
-                  >
-                    {tgenKeywords.map((keyword, idx) => (
-                      <option key={idx} value={keyword.script}>
-                        {keyword.label}
-                      </option>
-                    ))}
-                  </Form.Select>
-                  <Button
-                    size="sm"
-                    variant="outline-success"
-                    onClick={() => insertScript()}
-                  >
-                    <FontAwesomeIcon icon={faPlus} /> Insert Script
-                  </Button>
-                </InputGroup>
-              </Form.Group>
             )}
           </Col>
         </Row>
@@ -567,7 +564,13 @@ export default function InputGenerator() {
                     })
                   }
                   readOnly={{ editor: false, preference: true }}
-                ></CodeEditor>
+                  customElemsOnTop={[
+                    {
+                      colSpan: 7,
+                      elem: getTgenKeywordsSelectElement()
+                    }
+                  ]}
+                />
               </div>
             </Col>
           )}

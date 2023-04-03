@@ -23,7 +23,12 @@ import "ace-builds/src-min-noconflict/ext-searchbox";
 import DataService from "../services/DataService.js";
 import Utils from "../Utils.js";
 
-export default function CodeEditor({ codeContent, onChange, readOnly }) {
+export default function CodeEditor({
+  codeContent,
+  onChange,
+  readOnly,
+  customElemsOnTop
+}) {
   const themes = ["monokai", "xcode", "textmate", "twilight", "terminal"];
   const fontSizes = ["13", "14", "16", "18", "20", "24", "28", "32", "40"];
   const [editorPref, setEditorPref] = useState({
@@ -92,7 +97,7 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
 
   return (
     <div>
-      <Row style={{ marginBottom: "5px" }}>
+      <Row style={{ marginTop: "3px", marginBottom: "5px" }}>
         <Col xs={2}>
           <Form.Select size="sm" value={codeContent.lang} disabled={true}>
             <option value=""></option>
@@ -111,6 +116,12 @@ export default function CodeEditor({ codeContent, onChange, readOnly }) {
             />
           </Col>
         )}
+        {customElemsOnTop &&
+          customElemsOnTop.map((elem, idx) => (
+            <Col key={idx} xs={elem.colSpan}>
+              {elem.elem}
+            </Col>
+          ))}
       </Row>
       <Row>
         <Col xs={12} style={{ minHeight: "81vh", overflowY: "auto" }}>
