@@ -166,6 +166,10 @@ class DataService {
   getHistory() {
     return this.getData("misc/history").then(response => JSON.parse(response));
   }
+
+  initApp() {
+    return this.getData("misc/init");
+  }
 }
 
 export default new DataService();

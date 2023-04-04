@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDiagramProject,
   faDownload,
+  faHome,
   faLaptopCode,
   faMicrochip,
   faTools
@@ -18,9 +19,10 @@ import Settings from "./components/Settings.jsx";
 import Navbar from "react-bootstrap/Navbar";
 import InputGenerator from "./components/InputGenerator.jsx";
 import OutputGenerator from "./components/OutputGenerator.jsx";
+import Home from "./components/Home.jsx";
 
 function App() {
-  const [currentTab, setCurrentTab] = useState("parser");
+  const [currentTab, setCurrentTab] = useState("home");
   const [appState, setAppState] = useState({
     config: {}
   });
@@ -38,6 +40,14 @@ function App() {
               <Navbar collapseOnSelect expand="lg" sticky="top">
                 <Navbar.Collapse id="basic-navbar-nav">
                   <Nav className="mr-auto">
+                    <Nav.Item className="text-center">
+                      <Nav.Link
+                        onClick={() => setCurrentTab("home")}
+                        eventKey="home"
+                      >
+                        <FontAwesomeIcon icon={faHome} /> Home
+                      </Nav.Link>
+                    </Nav.Item>
                     <Nav.Item className="text-center">
                       <Nav.Link
                         onClick={() => setCurrentTab("parser")}
@@ -94,6 +104,9 @@ function App() {
           >
             <Col xs={12}>
               <Tab.Content>
+                <Tab.Pane eventKey="home">
+                  <Home appState={appState} />
+                </Tab.Pane>
                 <Tab.Pane eventKey="parser">
                   <Parser appState={appState} />
                 </Tab.Pane>

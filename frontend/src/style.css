@@ -24,3 +24,34 @@ body {
     height: 100vh;
     text-align: center;
 }
+
+.panel {
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 1px;
+    /*box-shadow: rgba(0, 0, 0, 0.24) 0px 2px 2px, rgba(0, 0, 0, 0.24) 0px 0px 2px;*/
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.03);
+    border-image: initial;
+    margin: 3px 3px 15px;
+    background: #f8f9fa;
+}
+
+.panel-heading {
+    align-content: center;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: 3px 10px;
+    /* color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.03); */
+}
+
+.panel-title {
+    flex: 1 1 auto;
+    display: block;
+}
+
+.panel-body {
+    padding: 10px;
+    display: block;
+}

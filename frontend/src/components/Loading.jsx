@@ -5,7 +5,7 @@ export default function Loading() {
     <Row className="no-gutters">
       <Col xs="12" className="d-flex justify-content-center">
         <Spinner
-          color="primary"
+          variant="success"
           style={{ width: "7rem", height: "7rem", margin: "5px" }}
         />
       </Col>

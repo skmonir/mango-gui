@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/skmonir/mango-gui/backend/judge-framework/initializer"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
@@ -54,4 +55,11 @@ func OpenResource(ctx *fiber.Ctx) error {
 func GetHistory(ctx *fiber.Ctx) error {
 	response := services.GetHistory()
 	return ctx.Status(fiber.StatusOK).JSON(response)
+}
+
+func InitApp(ctx *fiber.Ctx) error {
+	initializer.InitializeJudgeFramework()
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "success",
+	})
 }

@@ -140,250 +140,253 @@ export default function OutputGenerator() {
 
   return (
     <div>
-      <Card body bg="light">
-        <Row>
-          <Col xs={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>
-                  Problem URL [Tick below to generate output for parsed problem]
-                </strong>
-              </Form.Label>
-              <InputGroup className="mb-3" size="sm">
-                <InputGroup.Checkbox
-                  checked={outputGenerateRequest.isForParsedProblem}
-                  onChange={e => {
-                    setOutputGenerateRequest({
-                      ...outputGenerateRequest,
-                      isForParsedProblem: e.currentTarget.checked,
-                      parsedProblemUrl: "",
-                      inputDirectoryPath: "",
-                      outputDirectoryPath: ""
-                    });
-                  }}
-                />
+      <div className="panel">
+        <div className="panel-body">
+          <Row>
+            <Col xs={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>
+                    Problem URL [Tick below to generate output for parsed
+                    problem]
+                  </strong>
+                </Form.Label>
+                <InputGroup className="mb-3" size="sm">
+                  <InputGroup.Checkbox
+                    checked={outputGenerateRequest.isForParsedProblem}
+                    onChange={e => {
+                      setOutputGenerateRequest({
+                        ...outputGenerateRequest,
+                        isForParsedProblem: e.currentTarget.checked,
+                        parsedProblemUrl: "",
+                        inputDirectoryPath: "",
+                        outputDirectoryPath: ""
+                      });
+                    }}
+                  />
+                  <Form.Control
+                    type="text"
+                    size="sm"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    placeholder="Enter Problem URL [Codeforces, AtCoder, Custom]"
+                    disabled={!outputGenerateRequest.isForParsedProblem}
+                    value={outputGenerateRequest.parsedProblemUrl}
+                    onChange={e =>
+                      setOutputGenerateRequest({
+                        ...outputGenerateRequest,
+                        parsedProblemUrl: e.target.value
+                      })
+                    }
+                    onBlur={fetchIODirectories}
+                  />
+                </InputGroup>
+              </Form.Group>
+            </Col>
+            <Col xs={6}>
+              <Form.Group controlId="formFileSm" className="mb-3">
+                <Form.Label>
+                  <strong>
+                    Solution source file path
+                    <span style={{ color: "red" }}>*</span>
+                  </strong>
+                </Form.Label>
+                <InputGroup className="mb-3">
+                  <Form.Control
+                    type="text"
+                    size="sm"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    placeholder="e.g. /user/Desktop/solution.cpp, /user/Desktop/solution.py"
+                    value={outputGenerateRequest.generatorScriptPath}
+                    onChange={e =>
+                      setOutputGenerateRequest({
+                        ...outputGenerateRequest,
+                        generatorScriptPath: e.target.value
+                      })
+                    }
+                    onBlur={() =>
+                      checkFilePathValidity(
+                        outputGenerateRequest.generatorScriptPath
+                      )
+                    }
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    disabled={!outputGenerateRequest.generatorScriptPath}
+                    onClick={() => setShowCodeModal(true)}
+                  >
+                    <FontAwesomeIcon icon={faCode} /> View Code
+                  </Button>
+                </InputGroup>
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>
+                    Directory of the input files
+                    <span style={{ color: "red" }}>*</span>
+                  </strong>
+                </Form.Label>
                 <Form.Control
                   type="text"
                   size="sm"
                   autoCorrect="off"
                   autoComplete="off"
                   autoCapitalize="none"
-                  placeholder="Enter Problem URL [Codeforces, AtCoder, Custom]"
-                  disabled={!outputGenerateRequest.isForParsedProblem}
-                  value={outputGenerateRequest.parsedProblemUrl}
+                  placeholder="Enter directory where all the input files have"
+                  disabled={outputGenerateRequest.isForParsedProblem}
+                  value={outputGenerateRequest.inputDirectoryPath}
                   onChange={e =>
                     setOutputGenerateRequest({
                       ...outputGenerateRequest,
-                      parsedProblemUrl: e.target.value
-                    })
-                  }
-                  onBlur={fetchIODirectories}
-                />
-              </InputGroup>
-            </Form.Group>
-          </Col>
-          <Col xs={6}>
-            <Form.Group controlId="formFileSm" className="mb-3">
-              <Form.Label>
-                <strong>
-                  Solution source file path
-                  <span style={{ color: "red" }}>*</span>
-                </strong>
-              </Form.Label>
-              <InputGroup className="mb-3">
-                <Form.Control
-                  type="text"
-                  size="sm"
-                  autoCorrect="off"
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  placeholder="e.g. /user/Desktop/solution.cpp, /user/Desktop/solution.py"
-                  value={outputGenerateRequest.generatorScriptPath}
-                  onChange={e =>
-                    setOutputGenerateRequest({
-                      ...outputGenerateRequest,
-                      generatorScriptPath: e.target.value
+                      inputDirectoryPath: e.target.value
                     })
                   }
                   onBlur={() =>
-                    checkFilePathValidity(
-                      outputGenerateRequest.generatorScriptPath
+                    checkDirectoryPathValidity(
+                      outputGenerateRequest.inputDirectoryPath
                     )
                   }
                 />
-                <Button
+              </Form.Group>
+            </Col>
+            <Col xs={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>
+                    Directory to save the output files
+                    <span style={{ color: "red" }}>*</span>
+                  </strong>
+                </Form.Label>
+                <Form.Control
+                  type="text"
                   size="sm"
-                  variant="outline-success"
-                  disabled={!outputGenerateRequest.generatorScriptPath}
-                  onClick={() => setShowCodeModal(true)}
-                >
-                  <FontAwesomeIcon icon={faCode} /> View Code
-                </Button>
-              </InputGroup>
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>
-                  Directory of the input files
-                  <span style={{ color: "red" }}>*</span>
-                </strong>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                size="sm"
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="none"
-                placeholder="Enter directory where all the input files have"
-                disabled={outputGenerateRequest.isForParsedProblem}
-                value={outputGenerateRequest.inputDirectoryPath}
-                onChange={e =>
-                  setOutputGenerateRequest({
-                    ...outputGenerateRequest,
-                    inputDirectoryPath: e.target.value
-                  })
-                }
-                onBlur={() =>
-                  checkDirectoryPathValidity(
-                    outputGenerateRequest.inputDirectoryPath
-                  )
-                }
-              />
-            </Form.Group>
-          </Col>
-          <Col xs={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>
-                  Directory to save the output files
-                  <span style={{ color: "red" }}>*</span>
-                </strong>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                size="sm"
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="none"
-                placeholder="Enter directory where you want to save the output files"
-                disabled={outputGenerateRequest.isForParsedProblem}
-                value={outputGenerateRequest.outputDirectoryPath}
-                onChange={e =>
-                  setOutputGenerateRequest({
-                    ...outputGenerateRequest,
-                    outputDirectoryPath: e.target.value
-                  })
-                }
-                onBlur={() =>
-                  checkDirectoryPathValidity(
-                    outputGenerateRequest.outputDirectoryPath
-                  )
-                }
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={{ span: 2, offset: 5 }}>
-            <Row>
-              <Col xs={12} className="d-flex justify-content-center">
-                <Button
-                  size="sm"
-                  variant="outline-success"
-                  onClick={generateOutputTriggered}
-                  disabled={isGeneratingInProgress}
-                >
-                  {!isGeneratingInProgress ? (
-                    <FontAwesomeIcon icon={faCog} />
-                  ) : (
-                    <Spinner
-                      as="span"
-                      animation="grow"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                    />
-                  )}
-                  {!isGeneratingInProgress
-                    ? " Generate Output"
-                    : " Generating Output"}
-                </Button>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12}>
-            <br />
-            {generatorExecResult &&
-              generatorExecResult?.compilationError === "" && (
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  placeholder="Enter directory where you want to save the output files"
+                  disabled={outputGenerateRequest.isForParsedProblem}
+                  value={outputGenerateRequest.outputDirectoryPath}
+                  onChange={e =>
+                    setOutputGenerateRequest({
+                      ...outputGenerateRequest,
+                      outputDirectoryPath: e.target.value
+                    })
+                  }
+                  onBlur={() =>
+                    checkDirectoryPathValidity(
+                      outputGenerateRequest.outputDirectoryPath
+                    )
+                  }
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={{ span: 2, offset: 5 }}>
+              <Row>
+                <Col xs={12} className="d-flex justify-content-center">
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    onClick={generateOutputTriggered}
+                    disabled={isGeneratingInProgress}
+                  >
+                    {!isGeneratingInProgress ? (
+                      <FontAwesomeIcon icon={faCog} />
+                    ) : (
+                      <Spinner
+                        as="span"
+                        animation="grow"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                      />
+                    )}
+                    {!isGeneratingInProgress
+                      ? " Generate Output"
+                      : " Generating Output"}
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12}>
+              <br />
+              {generatorExecResult &&
+                generatorExecResult?.compilationError === "" && (
+                  <div
+                    style={{
+                      height: "35vh",
+                      overflowY: "auto",
+                      overflowX: "auto",
+                      border: "2px solid transparent",
+                      borderColor: "black",
+                      borderRadius: "5px"
+                    }}
+                  >
+                    <Table bordered responsive="sm" size="sm">
+                      <tbody>
+                        {generatorExecResult.testcaseExecutionDetailsList
+                          .filter(e => e.status === "success")
+                          .slice(0)
+                          .reverse()
+                          .map((t, id) => (
+                            <tr
+                              key={id}
+                              className={
+                                t.testcaseExecutionResult.executionError !== ""
+                                  ? "table-danger"
+                                  : "table-success"
+                              }
+                            >
+                              <td>
+                                <pre>{t.testcase.execOutputFilePath}</pre>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                )}
+              {generatorExecResult && generatorExecResult?.compilationError && (
                 <div
                   style={{
-                    height: "35vh",
+                    maxHeight: "30vh",
                     overflowY: "auto",
-                    overflowX: "auto",
-                    border: "2px solid transparent",
-                    borderColor: "black",
-                    borderRadius: "5px"
+                    overflowX: "auto"
                   }}
                 >
                   <Table bordered responsive="sm" size="sm">
                     <tbody>
-                      {generatorExecResult.testcaseExecutionDetailsList
-                        .filter(e => e.status === "success")
-                        .slice(0)
-                        .reverse()
-                        .map((t, id) => (
-                          <tr
-                            key={id}
-                            className={
-                              t.testcaseExecutionResult.executionError !== ""
-                                ? "table-danger"
-                                : "table-success"
-                            }
-                          >
-                            <td>
-                              <pre>{t.testcase.execOutputFilePath}</pre>
-                            </td>
-                          </tr>
-                        ))}
+                      <tr>
+                        <td
+                          style={{
+                            border: "2px solid transparent",
+                            borderColor: "black",
+                            borderRadius: "5px"
+                          }}
+                          className="table-danger"
+                        >
+                          <pre>{generatorExecResult?.compilationError}</pre>
+                        </td>
+                      </tr>
                     </tbody>
                   </Table>
                 </div>
               )}
-            {generatorExecResult && generatorExecResult?.compilationError && (
-              <div
-                style={{
-                  maxHeight: "30vh",
-                  overflowY: "auto",
-                  overflowX: "auto"
-                }}
-              >
-                <Table bordered responsive="sm" size="sm">
-                  <tbody>
-                    <tr>
-                      <td
-                        style={{
-                          border: "2px solid transparent",
-                          borderColor: "black",
-                          borderRadius: "5px"
-                        }}
-                        className="table-danger"
-                      >
-                        <pre>{generatorExecResult?.compilationError}</pre>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-              </div>
-            )}
-          </Col>
-        </Row>
-      </Card>
+            </Col>
+          </Row>
+        </div>
+      </div>
       {showToast && (
         <ShowToast toastMsgObj={toastMsgObj} setShowToast={setShowToast} />
       )}

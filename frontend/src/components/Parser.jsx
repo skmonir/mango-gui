@@ -189,63 +189,65 @@ function Parser({ appState }) {
 
   return (
     <div>
-      <Card body bg="light">
-        <Row>
-          <Col xs={6}>
-            <Form.Control
-              type="text"
-              size="sm"
-              autoCorrect="off"
-              autoComplete="off"
-              autoCapitalize="none"
-              placeholder="Enter Contest/Problem URL [Codeforces, AtCoder]"
-              value={parseUrl}
-              disabled={!appState.config.workspaceDirectory}
-              onChange={e => setParseUrl(e.target.value)}
-            />
-          </Col>
-          <Col>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => parseTriggerred()}
-                disabled={
-                  disableActionButtons() || Utils.isStrNullOrEmpty(parseUrl)
-                }
-              >
-                <FontAwesomeIcon icon={faDownload} /> Parse Testcases
-              </Button>
-            </div>
-          </Col>
-          <Col xs={3}>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => createCustomProblem()}
-                disabled={disableActionButtons()}
-              >
-                <FontAwesomeIcon icon={faFileCirclePlus} /> Create Custom
-                Problem
-              </Button>
-            </div>
-          </Col>
-        </Row>
-        <hr />
-        {getParserBody()}
-        {!appState.config.workspaceDirectory && (
+      <div className="panel">
+        <div className="panel-body">
           <Row>
+            <Col xs={6}>
+              <Form.Control
+                type="text"
+                size="sm"
+                autoCorrect="off"
+                autoComplete="off"
+                autoCapitalize="none"
+                placeholder="Enter Contest/Problem URL [Codeforces, AtCoder]"
+                value={parseUrl}
+                disabled={!appState.config.workspaceDirectory}
+                onChange={e => setParseUrl(e.target.value)}
+              />
+            </Col>
             <Col>
-              <br />
-              <Alert variant="danger" className="text-center">
-                Configuration is not set properly. Please go to Settings and set
-                necessary fields.
-              </Alert>
+              <div className="d-grid gap-2">
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  onClick={() => parseTriggerred()}
+                  disabled={
+                    disableActionButtons() || Utils.isStrNullOrEmpty(parseUrl)
+                  }
+                >
+                  <FontAwesomeIcon icon={faDownload} /> Parse Testcases
+                </Button>
+              </div>
+            </Col>
+            <Col xs={3}>
+              <div className="d-grid gap-2">
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  onClick={() => createCustomProblem()}
+                  disabled={disableActionButtons()}
+                >
+                  <FontAwesomeIcon icon={faFileCirclePlus} /> Create Custom
+                  Problem
+                </Button>
+              </div>
             </Col>
           </Row>
-        )}
-      </Card>
+          <hr />
+          {getParserBody()}
+          {!appState.config.workspaceDirectory && (
+            <Row>
+              <Col>
+                <br />
+                <Alert variant="danger" className="text-center">
+                  Configuration is not set properly. Please go to Settings and
+                  set necessary fields.
+                </Alert>
+              </Col>
+            </Row>
+          )}
+        </div>
+      </div>
       {showAddCustomProblemModal && (
         <AddCustomProblemModal
           closeAddCustomProblemModal={closeAddCustomProblemModal}

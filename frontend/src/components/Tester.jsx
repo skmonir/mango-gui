@@ -495,229 +495,232 @@ export default function Tester({ appState }) {
 
   return (
     <div>
-      <Card body bg="light">
-        <Row>
-          <Col xs={9}>
-            <Form.Group className="mb-3">
-              <Form.Control
-                type="text"
-                size="sm"
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="none"
-                placeholder="Enter Contest/Problem URL [Codeforces, AtCoder, Custom]"
-                value={testContestUrl}
-                disabled={!appState.config.workspaceDirectory}
-                onChange={e => setTestContestUrl(e.target.value)}
-              />
-            </Form.Group>
-          </Col>
-          <Col xs={3}>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => getProblemList()}
-                disabled={
-                  disableActionButtons() ||
-                  Utils.isStrNullOrEmpty(testContestUrl)
-                }
-              >
-                <FontAwesomeIcon icon={faTasks} /> Load Problems
-              </Button>
-            </div>
-          </Col>
-        </Row>
-        {/*<hr />*/}
-        {selectedProblem && (
-          <>
-            <Row>
-              <Col xs={4}>
-                <Form.Group className="mb-3">
-                  <Form.Select
-                    size="sm"
-                    aria-label="Default select example"
-                    value={selectedProblemMetadata}
-                    onChange={e =>
-                      changeSelectedProblemMetadata(e.currentTarget.value)
-                    }
-                  >
-                    {problemList.map((problem, id) => (
-                      <option
-                        key={id}
-                        value={
-                          problem.platform +
-                          "/" +
-                          problem.contestId +
-                          "/" +
-                          problem.label
-                        }
-                      >
-                        {problem.label + " - " + problem.name}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-              <Col xs={6}>
-                <Form.Group className="mb-3">
-                  <Form.Control
-                    type="text"
-                    size="sm"
-                    autoCorrect="off"
-                    autoComplete="off"
-                    autoCapitalize="none"
-                    value={
-                      selectedProblemFilteredExecResult &&
-                      selectedProblemFilteredExecResult.testcaseExecutionDetailsList &&
-                      selectedProblemFilteredExecResult
-                        .testcaseExecutionDetailsList.length > 0
-                        ? selectedProblemFilteredExecResult
-                            .testcaseExecutionDetailsList[0]?.testcase
-                            ?.sourceBinaryPath
-                        : ""
-                    }
-                    disabled={true}
-                  />
-                </Form.Group>
-              </Col>
-              <Col xs={2}>
-                <div className="d-grid gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline-success"
-                    onClick={() => runTest()}
-                    disabled={!selectedProblemFilteredExecResult}
-                  >
-                    <FontAwesomeIcon icon={faTerminal} /> Run Test
-                  </Button>
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={4}>
-                <Form.Group className="mb-3">
-                  <Form.Select
-                    size="sm"
-                    aria-label="Default select example"
-                    value={selectedVerdictKey}
-                    onChange={e => filterVerdicts(e.currentTarget.value)}
-                  >
-                    {verdicts.map((ver, id) => (
-                      <option key={id} value={ver.value}>
-                        {ver.label}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-              <Col xs={2}>
-                <div className="d-grid gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline-success"
-                    onClick={() => addCustomTest()}
-                  >
-                    <FontAwesomeIcon icon={faPlus} /> Add Custom Test
-                  </Button>
-                </div>
-              </Col>
-              <Col xs={2}>
-                <div className="d-grid gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline-success"
-                    onClick={() => setShowCodeModal(true)}
-                    disabled={!selectedProblemFilteredExecResult}
-                  >
-                    <FontAwesomeIcon icon={faCode} /> View Code
-                  </Button>
-                </div>
-              </Col>
-              <Col xs={2}>
-                <div className="d-grid gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline-success"
-                    onClick={() => openSource()}
-                    disabled={!selectedProblemFilteredExecResult}
-                  >
-                    <FontAwesomeIcon icon={faFileCode} /> Open Source
-                  </Button>
-                </div>
-              </Col>
-              <Col xs={2}>
-                <div className="d-grid gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline-success"
-                    onClick={generateSourceCode}
-                    disabled={!selectedProblemFilteredExecResult}
-                  >
-                    <FontAwesomeIcon icon={faFileCirclePlus} /> Generate Source
-                  </Button>
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={8}>
-                <Form.Text style={{ color: "darkcyan" }}>
-                  <strong>
-                    {selectedProblem.label +
-                      " - " +
-                      selectedProblem.name +
-                      ", Time Limit: " +
-                      selectedProblem.timeLimit +
-                      " sec, Memory Limit: " +
-                      selectedProblem.memoryLimit +
-                      " MB"}
-                  </strong>
-                </Form.Text>
-              </Col>
-              <Col xs={4} style={{ textAlign: "right" }}>
-                <Form.Text> {getTestStatusText()} </Form.Text>
-              </Col>
-            </Row>
-            <Row>
-              {selectedProblemFilteredExecResult &&
-                selectedProblemFilteredExecResult?.compilationError && (
-                  <Col xs={12}>
-                    <div
-                      style={{
-                        maxHeight: "50vh",
-                        overflowY: "auto",
-                        overflowX: "auto"
-                      }}
+      <div className="panel">
+        <div className="panel-body">
+          <Row>
+            <Col xs={9}>
+              <Form.Group className="mb-3">
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  placeholder="Enter Contest/Problem URL [Codeforces, AtCoder, Custom]"
+                  value={testContestUrl}
+                  disabled={!appState.config.workspaceDirectory}
+                  onChange={e => setTestContestUrl(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+            <Col xs={3}>
+              <div className="d-grid gap-2">
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  onClick={() => getProblemList()}
+                  disabled={
+                    disableActionButtons() ||
+                    Utils.isStrNullOrEmpty(testContestUrl)
+                  }
+                >
+                  <FontAwesomeIcon icon={faTasks} /> Load Problems
+                </Button>
+              </div>
+            </Col>
+          </Row>
+          {/*<hr />*/}
+          {selectedProblem && (
+            <>
+              <Row>
+                <Col xs={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Select
+                      size="sm"
+                      aria-label="Default select example"
+                      value={selectedProblemMetadata}
+                      onChange={e =>
+                        changeSelectedProblemMetadata(e.currentTarget.value)
+                      }
                     >
-                      <Table bordered responsive="sm" size="sm">
-                        <tbody>
-                          <tr>
-                            <td
-                              style={{
-                                border: "2px solid transparent",
-                                borderColor: "black",
-                                borderRadius: "5px"
-                              }}
-                              className="table-danger"
-                            >
-                              <pre>
-                                {
-                                  selectedProblemFilteredExecResult?.compilationError
-                                }
-                              </pre>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </Table>
-                    </div>
-                  </Col>
-                )}
-            </Row>
-          </>
-        )}
-        <Row>{getExecutionTable()}</Row>
-        <Row>{getAlert()}</Row>
-      </Card>
+                      {problemList.map((problem, id) => (
+                        <option
+                          key={id}
+                          value={
+                            problem.platform +
+                            "/" +
+                            problem.contestId +
+                            "/" +
+                            problem.label
+                          }
+                        >
+                          {problem.label + " - " + problem.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                      type="text"
+                      size="sm"
+                      autoCorrect="off"
+                      autoComplete="off"
+                      autoCapitalize="none"
+                      value={
+                        selectedProblemFilteredExecResult &&
+                        selectedProblemFilteredExecResult.testcaseExecutionDetailsList &&
+                        selectedProblemFilteredExecResult
+                          .testcaseExecutionDetailsList.length > 0
+                          ? selectedProblemFilteredExecResult
+                              .testcaseExecutionDetailsList[0]?.testcase
+                              ?.sourceBinaryPath
+                          : ""
+                      }
+                      disabled={true}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col xs={2}>
+                  <div className="d-grid gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline-success"
+                      onClick={() => runTest()}
+                      disabled={!selectedProblemFilteredExecResult}
+                    >
+                      <FontAwesomeIcon icon={faTerminal} /> Run Test
+                    </Button>
+                  </div>
+                </Col>
+              </Row>
+              <Row>
+                <Col xs={4}>
+                  <Form.Group className="mb-3">
+                    <Form.Select
+                      size="sm"
+                      aria-label="Default select example"
+                      value={selectedVerdictKey}
+                      onChange={e => filterVerdicts(e.currentTarget.value)}
+                    >
+                      {verdicts.map((ver, id) => (
+                        <option key={id} value={ver.value}>
+                          {ver.label}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+                <Col xs={2}>
+                  <div className="d-grid gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline-success"
+                      onClick={() => addCustomTest()}
+                    >
+                      <FontAwesomeIcon icon={faPlus} /> Add Custom Test
+                    </Button>
+                  </div>
+                </Col>
+                <Col xs={2}>
+                  <div className="d-grid gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline-success"
+                      onClick={() => setShowCodeModal(true)}
+                      disabled={!selectedProblemFilteredExecResult}
+                    >
+                      <FontAwesomeIcon icon={faCode} /> View Code
+                    </Button>
+                  </div>
+                </Col>
+                <Col xs={2}>
+                  <div className="d-grid gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline-success"
+                      onClick={() => openSource()}
+                      disabled={!selectedProblemFilteredExecResult}
+                    >
+                      <FontAwesomeIcon icon={faFileCode} /> Open Source
+                    </Button>
+                  </div>
+                </Col>
+                <Col xs={2}>
+                  <div className="d-grid gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline-success"
+                      onClick={generateSourceCode}
+                      disabled={!selectedProblemFilteredExecResult}
+                    >
+                      <FontAwesomeIcon icon={faFileCirclePlus} /> Generate
+                      Source
+                    </Button>
+                  </div>
+                </Col>
+              </Row>
+              <Row>
+                <Col xs={8}>
+                  <Form.Text style={{ color: "darkcyan" }}>
+                    <strong>
+                      {selectedProblem.label +
+                        " - " +
+                        selectedProblem.name +
+                        ", Time Limit: " +
+                        selectedProblem.timeLimit +
+                        " sec, Memory Limit: " +
+                        selectedProblem.memoryLimit +
+                        " MB"}
+                    </strong>
+                  </Form.Text>
+                </Col>
+                <Col xs={4} style={{ textAlign: "right" }}>
+                  <Form.Text> {getTestStatusText()} </Form.Text>
+                </Col>
+              </Row>
+              <Row>
+                {selectedProblemFilteredExecResult &&
+                  selectedProblemFilteredExecResult?.compilationError && (
+                    <Col xs={12}>
+                      <div
+                        style={{
+                          maxHeight: "50vh",
+                          overflowY: "auto",
+                          overflowX: "auto"
+                        }}
+                      >
+                        <Table bordered responsive="sm" size="sm">
+                          <tbody>
+                            <tr>
+                              <td
+                                style={{
+                                  border: "2px solid transparent",
+                                  borderColor: "black",
+                                  borderRadius: "5px"
+                                }}
+                                className="table-danger"
+                              >
+                                <pre>
+                                  {
+                                    selectedProblemFilteredExecResult?.compilationError
+                                  }
+                                </pre>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </Table>
+                      </div>
+                    </Col>
+                  )}
+              </Row>
+            </>
+          )}
+          <Row>{getExecutionTable()}</Row>
+          <Row>{getAlert()}</Row>
+        </div>
+      </div>
       {showCodeModal && (
         <ViewCodeModal
           metadata={selectedProblemMetadata}

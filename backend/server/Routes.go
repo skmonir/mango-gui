@@ -76,4 +76,6 @@ func SetRoutes(app fiber.Router) {
 	app.Put("/misc/resource/open", controllers.OpenResource)
 
 	app.Get("/misc/history", controllers.GetHistory)
+
+	app.Get("/misc/init", controllers.InitApp)
 }

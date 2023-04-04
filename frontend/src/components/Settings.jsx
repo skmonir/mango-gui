@@ -267,150 +267,104 @@ export default function Settings({ appState, setAppState }) {
 
   return (
     <div>
-      <Card body bg="light">
-        <Row>
-          <Col xs={9}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>
-                  Workspace Directory<span style={{ color: "red" }}>*</span>
-                </strong>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                size="sm"
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="none"
-                placeholder="Enter your workspace directory absolute path. All the testcases and sources will be saved here."
-                value={config.workspaceDirectory}
-                onChange={e =>
-                  setConfig({ ...config, workspaceDirectory: e.target.value })
-                }
-                onBlur={() =>
-                  checkDirectoryPathValidity(config.workspaceDirectory)
-                }
-              />
-            </Form.Group>
-          </Col>
-          <Col sm={3}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>Author Name</strong>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                size="sm"
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="none"
-                placeholder="Enter your name"
-                value={config.author}
-                onChange={e => setConfig({ ...config, author: e.target.value })}
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-      </Card>
+      <div className="panel">
+        <div className="panel-body">
+          <Row>
+            <Col xs={9}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>
+                    Workspace Directory<span style={{ color: "red" }}>*</span>
+                  </strong>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  placeholder="Enter your workspace directory absolute path. All the testcases and sources will be saved here."
+                  value={config.workspaceDirectory}
+                  onChange={e =>
+                    setConfig({ ...config, workspaceDirectory: e.target.value })
+                  }
+                  onBlur={() =>
+                    checkDirectoryPathValidity(config.workspaceDirectory)
+                  }
+                />
+              </Form.Group>
+            </Col>
+            <Col sm={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Author Name</strong>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  placeholder="Enter your name"
+                  value={config.author}
+                  onChange={e =>
+                    setConfig({ ...config, author: e.target.value })
+                  }
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+        </div>
+      </div>
       <br />
-      <Card body bg="light">
-        <Row>
-          <Col sm={2}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>
-                  Active Language<span style={{ color: "red" }}>*</span>
-                </strong>
-              </Form.Label>
-              <Form.Select
-                size="sm"
-                aria-label="Default select example"
-                value={config.activeLang}
-                onChange={e =>
-                  setConfig({ ...config, activeLang: e.currentTarget.value })
-                }
-              >
-                <option value="cpp">CPP</option>
-                <option value="java">Java</option>
-                <option value="python">Python</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col sm={2}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>Configure Language</strong>
-              </Form.Label>
-              <Form.Select
-                size="sm"
-                aria-label="Default select example"
-                value={selectedLang}
-                onChange={e => selectedLangChanged(e.currentTarget.value)}
-              >
-                <option value="cpp">CPP</option>
-                <option value="java">Java</option>
-                <option value="python">Python</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={4}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>
-                  Compilation Command<span style={{ color: "red" }}>*</span>
-                </strong>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                size="sm"
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="none"
-                placeholder={
-                  "Example: " + placeholders[selectedLang].compCommand
-                }
-                value={selectedLangConfig.compilationCommand}
-                onChange={e =>
-                  setSelectedLangConfig({
-                    ...selectedLangConfig,
-                    compilationCommand: e.target.value
-                  })
-                }
-              />
-            </Form.Group>
-          </Col>
-          <Col sm={8}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>Compilation Flags [Space Separated]</strong>
-              </Form.Label>
-              <Form.Control
-                type="text"
-                size="sm"
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="none"
-                placeholder={"Example: " + placeholders[selectedLang].compFlags}
-                value={selectedLangConfig.compilationFlags}
-                onChange={e =>
-                  setSelectedLangConfig({
-                    ...selectedLangConfig,
-                    compilationFlags: e.target.value
-                  })
-                }
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-        {["java", "python"].includes(selectedLang) && (
+      <div className="panel">
+        <div className="panel-body">
+          <Row>
+            <Col sm={2}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>
+                    Active Language<span style={{ color: "red" }}>*</span>
+                  </strong>
+                </Form.Label>
+                <Form.Select
+                  size="sm"
+                  aria-label="Default select example"
+                  value={config.activeLang}
+                  onChange={e =>
+                    setConfig({ ...config, activeLang: e.currentTarget.value })
+                  }
+                >
+                  <option value="cpp">CPP</option>
+                  <option value="java">Java</option>
+                  <option value="python">Python</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col sm={2}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Configure Language</strong>
+                </Form.Label>
+                <Form.Select
+                  size="sm"
+                  aria-label="Default select example"
+                  value={selectedLang}
+                  onChange={e => selectedLangChanged(e.currentTarget.value)}
+                >
+                  <option value="cpp">CPP</option>
+                  <option value="java">Java</option>
+                  <option value="python">Python</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
           <Row>
             <Col sm={4}>
               <Form.Group className="mb-3">
                 <Form.Label>
                   <strong>
-                    Execution Command<span style={{ color: "red" }}>*</span>
+                    Compilation Command<span style={{ color: "red" }}>*</span>
                   </strong>
                 </Form.Label>
                 <Form.Control
@@ -420,13 +374,13 @@ export default function Settings({ appState, setAppState }) {
                   autoComplete="off"
                   autoCapitalize="none"
                   placeholder={
-                    "Example: " + placeholders[selectedLang].execCommand
+                    "Example: " + placeholders[selectedLang].compCommand
                   }
-                  value={selectedLangConfig.executionCommand}
+                  value={selectedLangConfig.compilationCommand}
                   onChange={e =>
                     setSelectedLangConfig({
                       ...selectedLangConfig,
-                      executionCommand: e.target.value
+                      compilationCommand: e.target.value
                     })
                   }
                 />
@@ -435,7 +389,7 @@ export default function Settings({ appState, setAppState }) {
             <Col sm={8}>
               <Form.Group className="mb-3">
                 <Form.Label>
-                  <strong>Execution Flags [Space Separated]</strong>
+                  <strong>Compilation Flags [Space Separated]</strong>
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -444,79 +398,133 @@ export default function Settings({ appState, setAppState }) {
                   autoComplete="off"
                   autoCapitalize="none"
                   placeholder={
-                    "Example: " + placeholders[selectedLang].execFlags
+                    "Example: " + placeholders[selectedLang].compFlags
                   }
-                  value={selectedLangConfig.executionFlags}
+                  value={selectedLangConfig.compilationFlags}
                   onChange={e =>
                     setSelectedLangConfig({
                       ...selectedLangConfig,
-                      executionFlags: e.target.value
+                      compilationFlags: e.target.value
                     })
                   }
                 />
               </Form.Group>
             </Col>
           </Row>
-        )}
-        <Row>
-          <Col sm={4}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>Default Template Code</strong>
-              </Form.Label>
-              <InputGroup className="mb-3">
-                <Button
-                  size="sm"
-                  variant="outline-success"
-                  disabled={!selectedLangConfig.defaultTemplatePath}
-                  onClick={() =>
-                    showCodeTriggered(selectedLangConfig.defaultTemplatePath)
-                  }
-                >
-                  <FontAwesomeIcon icon={faCode} /> View Edit Default Template{" "}
-                </Button>
-              </InputGroup>
-            </Form.Group>
-          </Col>
-          <Col sm={8}>
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <strong>User Template Code File Path</strong>
-              </Form.Label>
-              <InputGroup className="mb-3">
-                <Form.Control
-                  type="text"
-                  size="sm"
-                  autoCorrect="off"
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  value={selectedLangConfig.userTemplatePath}
-                  onChange={e =>
-                    setSelectedLangConfig({
-                      ...selectedLangConfig,
-                      userTemplatePath: e.target.value
-                    })
-                  }
-                  onBlur={() =>
-                    checkFilePathValidity(selectedLangConfig.userTemplatePath)
-                  }
-                  placeholder={`Template file ends with extension(${placeholders[selectedLang].ext}). The template file will be used to create source files.`}
-                />
-                <Button
-                  size="sm"
-                  variant="outline-success"
-                  disabled={!selectedLangConfig.userTemplatePath}
-                  onClick={() =>
-                    showCodeTriggered(selectedLangConfig.userTemplatePath)
-                  }
-                >
-                  <FontAwesomeIcon icon={faCode} /> View Code{" "}
-                </Button>
-              </InputGroup>
-            </Form.Group>
-          </Col>
-        </Row>
-      </Card>
+          {["java", "python"].includes(selectedLang) && (
+            <Row>
+              <Col sm={4}>
+                <Form.Group className="mb-3">
+                  <Form.Label>
+                    <strong>
+                      Execution Command<span style={{ color: "red" }}>*</span>
+                    </strong>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    size="sm"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    placeholder={
+                      "Example: " + placeholders[selectedLang].execCommand
+                    }
+                    value={selectedLangConfig.executionCommand}
+                    onChange={e =>
+                      setSelectedLangConfig({
+                        ...selectedLangConfig,
+                        executionCommand: e.target.value
+                      })
+                    }
+                  />
+                </Form.Group>
+              </Col>
+              <Col sm={8}>
+                <Form.Group className="mb-3">
+                  <Form.Label>
+                    <strong>Execution Flags [Space Separated]</strong>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    size="sm"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    placeholder={
+                      "Example: " + placeholders[selectedLang].execFlags
+                    }
+                    value={selectedLangConfig.executionFlags}
+                    onChange={e =>
+                      setSelectedLangConfig({
+                        ...selectedLangConfig,
+                        executionFlags: e.target.value
+                      })
+                    }
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          )}
+          <Row>
+            <Col sm={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Default Template Code</strong>
+                </Form.Label>
+                <InputGroup className="mb-3">
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    disabled={!selectedLangConfig.defaultTemplatePath}
+                    onClick={() =>
+                      showCodeTriggered(selectedLangConfig.defaultTemplatePath)
+                    }
+                  >
+                    <FontAwesomeIcon icon={faCode} /> View Edit Default Template{" "}
+                  </Button>
+                </InputGroup>
+              </Form.Group>
+            </Col>
+            <Col sm={8}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>User Template Code File Path</strong>
+                </Form.Label>
+                <InputGroup className="mb-3">
+                  <Form.Control
+                    type="text"
+                    size="sm"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    value={selectedLangConfig.userTemplatePath}
+                    onChange={e =>
+                      setSelectedLangConfig({
+                        ...selectedLangConfig,
+                        userTemplatePath: e.target.value
+                      })
+                    }
+                    onBlur={() =>
+                      checkFilePathValidity(selectedLangConfig.userTemplatePath)
+                    }
+                    placeholder={`Template file ends with extension(${placeholders[selectedLang].ext}). The template file will be used to create source files.`}
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    disabled={!selectedLangConfig.userTemplatePath}
+                    onClick={() =>
+                      showCodeTriggered(selectedLangConfig.userTemplatePath)
+                    }
+                  >
+                    <FontAwesomeIcon icon={faCode} /> View Code{" "}
+                  </Button>
+                </InputGroup>
+              </Form.Group>
+            </Col>
+          </Row>
+        </div>
+      </div>
       <br />
       <Row>
         <Col md={{ span: 6, offset: 3 }}>
