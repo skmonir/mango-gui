@@ -1,7 +1,12 @@
 import { Button, Col, Modal, Row, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookOpenReader, faCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBookOpenReader,
+  faCheck,
+  faGift
+} from "@fortawesome/free-solid-svg-icons";
 import appLogo from "../assets/icons/logo.png";
+import github from "../assets/icons/github.svg";
 import DataService from "../services/DataService.js";
 import { useEffect, useState } from "react";
 import Loading from "./Loading.jsx";
@@ -115,13 +120,20 @@ export default function Home({ appState }) {
       </Row>
       <br />
       <Row>
-        <Col md={{ span: 4, offset: 4 }}>
+        <Col md={{ span: 6, offset: 3 }}>
           <Row>
-            <Col xs={12}>
+            <Col xs={6}>
               <div className="d-grid gap-2">
                 <Button variant="outline-success">
                   <FontAwesomeIcon icon={faBookOpenReader} /> Read the
                   documentations
+                </Button>
+              </div>
+            </Col>
+            <Col xs={6}>
+              <div className="d-grid gap-2">
+                <Button variant="outline-secondary">
+                  <img src={github} style={{ maxWidth: "19px" }} /> Github
                 </Button>
               </div>
             </Col>
