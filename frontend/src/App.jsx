@@ -1,8 +1,8 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Col, Row, Tab } from "react-bootstrap";
-import Tester from "./components/Tester.jsx";
-import Parser from "./components/Parser.jsx";
+import Tester from "./components/pages/Tester.jsx";
+import Parser from "./components/pages/Parser.jsx";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,11 +15,11 @@ import {
   faTools
 } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import Settings from "./components/Settings.jsx";
+import Settings from "./components/pages/Settings.jsx";
 import Navbar from "react-bootstrap/Navbar";
-import InputGenerator from "./components/InputGenerator.jsx";
-import OutputGenerator from "./components/OutputGenerator.jsx";
-import Home from "./components/Home.jsx";
+import InputGenerator from "./components/pages/InputGenerator.jsx";
+import OutputGenerator from "./components/pages/OutputGenerator.jsx";
+import Home from "./components/pages/Home.jsx";
 
 function App() {
   const [currentTab, setCurrentTab] = useState("home");

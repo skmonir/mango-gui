@@ -4,7 +4,7 @@ import DataService from "../../services/DataService.js";
 import ShowToast from "../Toast/ShowToast.jsx";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import CodeEditor from "../CodeEditor.jsx";
+import CodeEditor from "../misc/CodeEditor.jsx";
 
 export default function ViewCodeModal({
   codePath,
