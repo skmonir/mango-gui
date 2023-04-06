@@ -268,6 +268,20 @@ export default function Tester({ appState }) {
     });
   };
 
+  const scrollToId = id => {
+    document.getElementById(id).scrollIntoView({
+      behavior: "smooth"
+    });
+  };
+
+  const scrollToTableTow = (id, row) => {
+    const rows = document.querySelectorAll(`#${id} tr`);
+    rows[row].scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  };
+
   const getTestStatusText = () => {
     if (testStatusMessage) {
       if (testStatusMessage.type === "info") {
