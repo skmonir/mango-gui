@@ -79,7 +79,9 @@ func ExtractInfoFromUrl(url string) (string, string, string) {
 	} else if strings.Contains(url, "codeforces.com") {
 		platform = "codeforces"
 		ctype := ""
-		if strings.Contains(url, "codeforces.com/contest") {
+		if strings.Contains(url, "codeforces.com/contests") {
+			ctype = "contests"
+		} else if strings.Contains(url, "codeforces.com/contest") {
 			ctype = "contest"
 		} else if strings.Contains(url, "codeforces.com/gym") {
 			ctype = "gym"
@@ -87,7 +89,7 @@ func ExtractInfoFromUrl(url string) (string, string, string) {
 			return platform, cid, pid
 		}
 		index := strings.Index(url, "codeforces.com/"+ctype)
-		path := strings.Trim(url[index+len("codeforces.com/"+ctype):], "/")
+		path := strings.Trim(url[index+len("codeforces.com/"+ctype):], "/ \n\t")
 		values := splitUrlPath(path)
 		if len(values) > 0 {
 			cid = values[0]
