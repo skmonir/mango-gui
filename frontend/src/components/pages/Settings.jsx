@@ -548,15 +548,13 @@ export default function Settings({ appState, setAppState }) {
                   ) : (
                     <Spinner
                       as="span"
-                      animation="grow"
+                      animation="border"
                       size="sm"
                       role="status"
                       aria-hidden="true"
                     />
                   )}
-                  {flags.fetchingInProgress
-                    ? " Refreshing Settings"
-                    : " Refresh Settings"}
+                  {" Refresh Settings"}
                 </Button>
               </div>
             </Col>
@@ -573,15 +571,13 @@ export default function Settings({ appState, setAppState }) {
                   ) : (
                     <Spinner
                       as="span"
-                      animation="grow"
+                      animation="border"
                       size="sm"
                       role="status"
                       aria-hidden="true"
                     />
                   )}
-                  {flags.savingInProgress
-                    ? " Saving Settings"
-                    : " Save Settings"}
+                  {" Save Settings"}
                 </Button>
               </div>
             </Col>
@@ -593,7 +589,18 @@ export default function Settings({ appState, setAppState }) {
                   onClick={resetSettingsTriggered}
                   disabled={flags.resetInProgress}
                 >
-                  <FontAwesomeIcon icon={faSyncAlt} /> Reset Settings
+                  {!flags.resetInProgress ? (
+                    <FontAwesomeIcon icon={faSyncAlt} />
+                  ) : (
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {" Reset Settings"}
                 </Button>
               </div>
             </Col>
