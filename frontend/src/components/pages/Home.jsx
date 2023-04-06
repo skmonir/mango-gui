@@ -5,12 +5,12 @@ import {
   faCheck,
   faGift
 } from "@fortawesome/free-solid-svg-icons";
-import appLogo from "../assets/icons/logo.png";
-import github from "../assets/icons/github.svg";
-import DataService from "../services/DataService.js";
+import appLogo from "../../assets/icons/logo.png";
+import github from "../../assets/icons/github.svg";
+import DataService from "../../services/DataService.js";
 import { useEffect, useState } from "react";
-import Loading from "./Loading.jsx";
-import SocketClient from "../socket/SocketClient.js";
+import Loading from "../misc/Loading.jsx";
+import SocketClient from "../../socket/SocketClient.js";
 
 export default function Home({ appState }) {
   const socketClient = new SocketClient();

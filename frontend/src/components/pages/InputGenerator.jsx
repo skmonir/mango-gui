@@ -1,4 +1,4 @@
-import SocketClient from "../socket/SocketClient.js";
+import SocketClient from "../../socket/SocketClient.js";
 import {
   Button,
   Card,
@@ -12,11 +12,11 @@ import Form from "react-bootstrap/Form";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faCog, faPlus } from "@fortawesome/free-solid-svg-icons";
-import DataService from "../services/DataService.js";
-import ShowToast from "./Toast/ShowToast.jsx";
-import ViewCodeModal from "./modals/ViewCodeModal.jsx";
-import Utils from "../Utils.js";
-import CodeEditor from "./CodeEditor.jsx";
+import DataService from "../../services/DataService.js";
+import ShowToast from "../Toast/ShowToast.jsx";
+import ViewCodeModal from "../modals/ViewCodeModal.jsx";
+import Utils from "../../Utils.js";
+import CodeEditor from "../misc/CodeEditor.jsx";
 
 export default function InputGenerator() {
   const socketClient = new SocketClient();

@@ -9,11 +9,11 @@ import {
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import SocketClient from "../socket/SocketClient.js";
-import DataService from "../services/DataService.js";
-import Loading from "./Loading.jsx";
-import Utils from "../Utils.js";
-import AddCustomProblemModal from "./modals/AddCustomProblemModal.jsx";
+import SocketClient from "../../socket/SocketClient.js";
+import DataService from "../../services/DataService.js";
+import Loading from "../misc/Loading.jsx";
+import Utils from "../../Utils.js";
+import AddCustomProblemModal from "../modals/AddCustomProblemModal.jsx";
 
 function Parser({ appState }) {
   const socketClient = new SocketClient();

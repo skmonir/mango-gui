@@ -3,10 +3,10 @@ import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode, faSave, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import DataService from "../services/DataService.js";
-import ViewCodeModal from "./modals/ViewCodeModal.jsx";
-import ShowToast from "./Toast/ShowToast.jsx";
-import Utils from "../Utils.js";
+import DataService from "../../services/DataService.js";
+import ViewCodeModal from "../modals/ViewCodeModal.jsx";
+import ShowToast from "../Toast/ShowToast.jsx";
+import Utils from "../../Utils.js";
 import { confirmAlert } from "react-confirm-alert";
 
 export default function Settings({ appState, setAppState }) {

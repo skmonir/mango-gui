@@ -22,20 +22,20 @@ import {
   faTrashAlt
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import SocketClient from "../socket/SocketClient.js";
-import DataService from "../services/DataService.js";
-import ViewCodeModal from "./modals/ViewCodeModal.jsx";
-import AddEditCustomTestModal from "./modals/AddEditCustomTestModal.jsx";
-import AC from "../assets/icons/AC.svg";
-import CE from "../assets/icons/CE.svg";
-import RE from "../assets/icons/RE.svg";
-import TLE from "../assets/icons/TLE.svg";
-import WA from "../assets/icons/WA.svg";
-import Utils from "../Utils.js";
-import ShowToast from "./Toast/ShowToast.jsx";
+import SocketClient from "../../socket/SocketClient.js";
+import DataService from "../../services/DataService.js";
+import ViewCodeModal from "../modals/ViewCodeModal.jsx";
+import AddEditCustomTestModal from "../modals/AddEditCustomTestModal.jsx";
+import AC from "../../assets/icons/AC.svg";
+import CE from "../../assets/icons/CE.svg";
+import RE from "../../assets/icons/RE.svg";
+import TLE from "../../assets/icons/TLE.svg";
+import WA from "../../assets/icons/WA.svg";
+import Utils from "../../Utils.js";
+import ShowToast from "../Toast/ShowToast.jsx";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import CompilationErrorMessage from "./CompilationErrorMessage.jsx";
+import CompilationErrorMessage from "../misc/CompilationErrorMessage.jsx";
 
 export default function Tester({ appState }) {
   const socketClient = new SocketClient();
