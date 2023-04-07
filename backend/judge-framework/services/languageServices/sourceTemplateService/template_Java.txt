@@ -7,18 +7,18 @@
 import java.util.*;
 
 public class {%CLASS_NAME%} {
-	private final static Scanner in = new Scanner(System.in);
-	private final static int N = (int) 1e5+7;
-	private final static int INF = (int) 1e9+7;
-	private final static int MOD = (int) 1e9+7;
+    private final static Scanner in = new Scanner(System.in);
+    private final static int N = (int) 1e5+7;
+    private final static int INF = (int) 1e9+7;
+    private final static int MOD = (int) 1e9+7;
 
-	public static void main(String[] args) {
-		int tc = in.nextInt();
-		while (tc-- > 0) {
-			solver();
-		}
-	}
+    public static void main(String[] args) {
+        int tc = in.nextInt();
+        while (tc-- > 0) {
+            solver();
+        }
+    }
 
-	private static void solver() {
-	}
+    private static void solver() {
+    }
 }
