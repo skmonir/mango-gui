@@ -6,6 +6,7 @@ require (
 	github.com/anaskhan96/soup v1.2.5
 	github.com/gofiber/fiber/v2 v2.42.0
 	github.com/gofiber/websocket/v2 v2.1.4
+	github.com/procyon-projects/chrono v1.1.2
 	github.com/shirou/gopsutil/v3 v3.23.2
 	github.com/wailsapp/wails/v2 v2.4.1
 )

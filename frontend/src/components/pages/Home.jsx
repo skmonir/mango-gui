@@ -12,6 +12,7 @@ import DataService from "../../services/DataService.js";
 import { useEffect, useState } from "react";
 import Loading from "../misc/Loading.jsx";
 import SocketClient from "../../socket/SocketClient.js";
+import InitializerModal from "../modals/InitializerModal.jsx";
 
 export default function Home({ appState }) {
   const socketClient = new SocketClient();
@@ -157,24 +158,7 @@ export default function Home({ appState }) {
         </Col>
       </Row>
 
-      <Modal show={showInitModal} size="sm" centered>
-        <Modal.Body style={{ paddingBottom: "2px", paddingTop: "5px" }}>
-          <Row>
-            <Col xs={12}>
-              <Loading />
-            </Col>
-          </Row>
-          <Row
-            className="d-flex text-center"
-            style={{ fontSize: 22, color: "darkcyan", fontWeight: 500 }}
-          >
-            <pre>{initMessage}</pre>
-          </Row>
-          <Row className="d-flex text-center">
-            <pre>Please wait a moment</pre>
-          </Row>
-        </Modal.Body>
-      </Modal>
+      <InitializerModal showModal={showInitModal} initMessage={initMessage} />
     </div>
   );
 }

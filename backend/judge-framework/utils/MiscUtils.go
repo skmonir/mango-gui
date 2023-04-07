@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 func GetHtmlBody(URL string) (string, error) {
@@ -195,4 +197,21 @@ func GetBinaryFileExt() string {
 		return ".exe"
 	}
 	return ""
+}
+
+func ParseQueryMapFromUrl(URL string) url.Values {
+	u, err := url.Parse(URL)
+	if err != nil {
+		return url.Values{}
+	}
+	q, err := url.ParseQuery(u.RawQuery)
+	if err != nil {
+		return url.Values{}
+	}
+	return q
+}
+
+func IsTimeInFuture(ctime time.Time) bool {
+	today := time.Now()
+	return today.Before(ctime)
 }

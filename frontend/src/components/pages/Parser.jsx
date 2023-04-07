@@ -7,6 +7,7 @@ import {
   faDownload,
   faFileCirclePlus,
   faSyncAlt,
+  faTerminal,
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
@@ -15,6 +16,7 @@ import DataService from "../../services/DataService.js";
 import Loading from "../misc/Loading.jsx";
 import Utils from "../../Utils.js";
 import AddCustomProblemModal from "../modals/AddCustomProblemModal.jsx";
+import ShowToast from "../Toast/ShowToast.jsx";
 
 function Parser({ appState }) {
   const socketClient = new SocketClient();
@@ -22,6 +24,18 @@ function Parser({ appState }) {
   const [parseUrl, setParseUrl] = useState("");
   const [initAlert, setInitAlert] = useState(false);
   const [parsingInProgress, setParsingInProgress] = useState(false);
+  const [scheduler, setScheduler] = useState({
+    inProgress: false,
+    parsing: false,
+    scheduled: false,
+    url: "",
+    startTime: ""
+  });
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsgObj, setToastMsgObj] = useState({
+    variant: "",
+    message: ""
+  });
   const [parsingSingleProblem, setParsingSingleProblem] = useState(false);
   const [parsedProblemList, setParsedProblemList] = useState([]);
   const [showAddCustomProblemModal, setShowAddCustomProblemModal] = useState(
@@ -30,12 +44,17 @@ function Parser({ appState }) {
 
   useEffect(() => {
     fetchHistory();
-    let socketConn = socketClient.initSocketConnection(
+    let socketConnParse = socketClient.initSocketConnection(
       "parse_problems_event",
       updateParseStatusFromSocket
     );
+    let socketConnSchedule = socketClient.initSocketConnection(
+      "parse_schedule_event",
+      updateParseScheduleStatusFromSocket
+    );
     return () => {
-      socketConn.close();
+      socketConnParse.close();
+      socketConnSchedule.close();
     };
   }, []);
 
@@ -79,11 +98,49 @@ function Parser({ appState }) {
     });
   };
 
+  const scheduleParse = () => {
+    setScheduler({ ...scheduler, inProgress: true });
+    DataService.scheduleParse(window.btoa(parseUrl))
+      .then(data => {
+        console.log(data);
+        setScheduler({
+          ...scheduler,
+          inProgress: false,
+          scheduled: true,
+          url: data.url,
+          startTime: data.startTime
+        });
+      })
+      .catch(error => {
+        console.log(error);
+        showToastMessage("Error", error.response.data.message);
+        setScheduler({ ...scheduler, inProgress: false });
+      });
+  };
+
   const updateParseStatusFromSocket = data => {
     console.log(data);
     if (data.length > 1) {
       setParsedProblemList(data);
+      setInitAlert(false);
       setParsingInProgress(false);
+    }
+  };
+
+  const updateParseScheduleStatusFromSocket = data => {
+    if (data.message === "done") {
+      setScheduler({
+        inProgress: false,
+        parsing: false,
+        scheduled: false,
+        url: "",
+        startTime: ""
+      });
+    } else if (data.message === "running") {
+      setScheduler({
+        ...scheduler,
+        parsing: true
+      });
     }
   };
 
@@ -111,8 +168,20 @@ function Parser({ appState }) {
     }
   };
 
+  const showToastMessage = (variant, message) => {
+    setShowToast(true);
+    setToastMsgObj({
+      variant: variant,
+      message: message
+    });
+  };
+
   const disableActionButtons = () => {
-    return parsingInProgress || !appState.config.workspaceDirectory;
+    return (
+      parsingInProgress ||
+      scheduler.inProgress ||
+      !appState.config.workspaceDirectory
+    );
   };
 
   const getParsingTable = () => {
@@ -180,7 +249,7 @@ function Parser({ appState }) {
       return getParsingTable();
     } else if (initAlert) {
       return (
-        <Alert variant="warning" className="text-center">
+        <Alert variant="warning" className="text-center p-1 mb-2">
           Oops! Something went wrong! Please <strong>check the URL</strong> or
           try again.
         </Alert>
@@ -216,7 +285,18 @@ function Parser({ appState }) {
                     disableActionButtons() || Utils.isStrNullOrEmpty(parseUrl)
                   }
                 >
-                  <FontAwesomeIcon icon={faDownload} /> Parse Testcases
+                  {parsingInProgress ? (
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <FontAwesomeIcon icon={faDownload} />
+                  )}{" "}
+                  {" Parse Testcases"}
                 </Button>
               </div>
             </Col>
@@ -225,10 +305,25 @@ function Parser({ appState }) {
                 <Button
                   size="sm"
                   variant="outline-success"
-                  onClick={() => createCustomProblem()}
-                  disabled={disableActionButtons()}
+                  onClick={scheduleParse}
+                  disabled={
+                    disableActionButtons() ||
+                    Utils.isStrNullOrEmpty(parseUrl) ||
+                    scheduler?.scheduled
+                  }
                 >
-                  <FontAwesomeIcon icon={faClock} /> Schedule
+                  {scheduler?.inProgress ? (
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <FontAwesomeIcon icon={faClock} />
+                  )}{" "}
+                  {` Schedule${scheduler.scheduled ? "d" : ""}`}
                 </Button>
               </div>
             </Col>
@@ -247,12 +342,33 @@ function Parser({ appState }) {
             </Col>
           </Row>
           <hr />
+          {scheduler?.scheduled && (
+            <Row>
+              <Col xs={12}>
+                <Alert variant="success" className="text-center p-1 mb-2">
+                  <span>
+                    {scheduler.parsing && (
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </span>{" "}
+                  <strong>{scheduler?.url}</strong> is scheduled to be parsed at{" "}
+                  <strong>{scheduler?.startTime}</strong>
+                </Alert>
+              </Col>
+            </Row>
+          )}
           {getParserBody()}
           {!appState.config.workspaceDirectory && (
             <Row>
               <Col>
                 <br />
-                <Alert variant="danger" className="text-center">
+                <Alert variant="danger" className="text-center p-1 mb-2">
                   Configuration is not set properly. Please go to Settings and
                   set necessary fields.
                 </Alert>
@@ -266,6 +382,9 @@ function Parser({ appState }) {
           closeAddCustomProblemModal={closeAddCustomProblemModal}
           insertCustomProblemIntoList={insertCustomProblemIntoList}
         />
+      )}
+      {showToast && (
+        <ShowToast toastMsgObj={toastMsgObj} setShowToast={setShowToast} />
       )}
     </div>
   );

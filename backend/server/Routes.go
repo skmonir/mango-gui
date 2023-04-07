@@ -16,6 +16,8 @@ func SetRoutes(app fiber.Router) {
 	// Parse Routes
 	app.Get("/parse/:encoded_url", controllers.Parse)
 
+	app.Get("/parse/schedule/:encoded_url", controllers.ScheduleParse)
+
 	// Problem Routes
 	app.Get("/problem/:encoded_url", controllers.GetProblemList)
 

@@ -59,6 +59,10 @@ class DataService {
     return this.getData("parse/" + encodedUrl);
   }
 
+  scheduleParse(encodedUrl) {
+    return this.getData("parse/schedule/" + encodedUrl);
+  }
+
   getProblem(path) {
     return this.getData("problem/" + path);
   }
