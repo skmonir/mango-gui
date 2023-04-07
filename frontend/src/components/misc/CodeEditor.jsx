@@ -26,8 +26,9 @@ import Utils from "../../Utils.js";
 export default function CodeEditor({
   codeContent,
   onChange,
+  onBlur,
   readOnly,
-  customElemsOnTop
+  customElementsOnHeader
 }) {
   const themes = ["monokai", "xcode", "textmate", "twilight", "terminal"];
   const fontSizes = ["13", "14", "16", "18", "20", "24", "28", "32", "40"];
@@ -98,7 +99,16 @@ export default function CodeEditor({
   return (
     <div>
       <Row style={{ marginTop: "3px", marginBottom: "5px" }}>
-        <Col xs={2}>
+        {!readOnly.preference && (
+          <Col xs="auto">
+            <FontAwesomeIcon
+              icon={faCog}
+              onClick={openEditorPrefModal}
+              style={{ cursor: "pointer", marginTop: "8px" }}
+            />
+          </Col>
+        )}
+        <Col xs="auto">
           <Form.Select size="sm" value={codeContent.lang} disabled={true}>
             <option value=""></option>
             <option value="cpp">CPP</option>
@@ -107,24 +117,15 @@ export default function CodeEditor({
             <option value="tgen">TGen</option>
           </Form.Select>
         </Col>
-        {!readOnly.preference && (
-          <Col xs={1}>
-            <FontAwesomeIcon
-              icon={faCog}
-              onClick={openEditorPrefModal}
-              style={{ cursor: "pointer", marginTop: "8px" }}
-            />
-          </Col>
-        )}
-        {customElemsOnTop &&
-          customElemsOnTop.map((elem, idx) => (
+        {customElementsOnHeader &&
+          customElementsOnHeader.map((elem, idx) => (
             <Col key={idx} xs={elem.colSpan}>
               {elem.elem}
             </Col>
           ))}
       </Row>
       <Row>
-        <Col xs={12} style={{ minHeight: "81vh", overflowY: "auto" }}>
+        <Col xs={12} style={{ minHeight: "86vh", overflowY: "auto" }}>
           <AceEditor
             height={"100%"}
             width={"100%"}
@@ -132,6 +133,7 @@ export default function CodeEditor({
             theme={editorPref.theme}
             name="code_editor"
             onChange={code => onChange(code)}
+            onBlur={onBlur}
             showPrintMargin={false}
             showGutter={true}
             highlightActiveLine={true}

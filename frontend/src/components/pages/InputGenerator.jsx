@@ -567,7 +567,7 @@ export default function InputGenerator() {
                       })
                     }
                     readOnly={{ editor: false, preference: true }}
-                    customElemsOnTop={[
+                    customElementsOnHeader={[
                       {
                         colSpan: 7,
                         elem: getTgenKeywordsSelectElement()

@@ -2,6 +2,7 @@ import { Button, Col, Modal, Row, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBookOpenReader,
+  faBug,
   faCheck,
   faGift
 } from "@fortawesome/free-solid-svg-icons";
@@ -124,7 +125,15 @@ export default function Home({ appState }) {
           <Row>
             <Col xs={6}>
               <div className="d-grid gap-2">
-                <Button variant="outline-success">
+                <Button
+                  variant="outline-success"
+                  onClick={() =>
+                    DataService.openResource({
+                      path:
+                        "https://github.com/skmonir/mango-gui/blob/main/README.md"
+                    })
+                  }
+                >
                   <FontAwesomeIcon icon={faBookOpenReader} /> Read the
                   documentations
                 </Button>
@@ -132,8 +141,15 @@ export default function Home({ appState }) {
             </Col>
             <Col xs={6}>
               <div className="d-grid gap-2">
-                <Button variant="outline-secondary">
-                  <img src={github} style={{ maxWidth: "19px" }} /> Github
+                <Button
+                  variant="outline-dark"
+                  onClick={() =>
+                    DataService.openResource({
+                      path: "https://github.com/skmonir/mango-gui/issues"
+                    })
+                  }
+                >
+                  <FontAwesomeIcon icon={faBug} /> Report issues
                 </Button>
               </div>
             </Col>

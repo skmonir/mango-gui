@@ -61,6 +61,7 @@ export default function Tester({ appState }) {
 
   const [testContestUrl, setTestContestUrl] = useState("");
   const [loadingInProgress, setLoadingInProgress] = useState(false);
+  const [testingInProgress, setTestingInProgress] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [showAddEditTestModal, setShowAddEditTestModal] = useState(false);
 
@@ -165,11 +166,14 @@ export default function Tester({ appState }) {
   };
 
   const runTest = () => {
-    DataService.runTest(selectedProblemMetadata).then(data => {
-      setSelectedProblemOriginalExecResult(data);
-      setSelectedProblemFilteredExecResult(data);
-      setSelectedVerdictKey("");
-    });
+    setTestingInProgress(true);
+    DataService.runTest(selectedProblemMetadata)
+      .then(data => {
+        setSelectedProblemOriginalExecResult(data);
+        setSelectedProblemFilteredExecResult(data);
+        setSelectedVerdictKey("");
+      })
+      .finally(() => setTestingInProgress(false));
   };
 
   const updateTestStatusMessageFromSocket = message => {
@@ -300,6 +304,19 @@ export default function Tester({ appState }) {
         return (
           <strong style={{ color: "red" }}>{testStatusMessage.message}</strong>
         );
+      } else if (testStatusMessage.type === "test_stat") {
+        console.log(testStatusMessage.message);
+        const stat = JSON.parse(testStatusMessage.message);
+        return (
+          <strong>
+            <span style={{ color: "#262625FF" }}>{`Done: ${stat.passed +
+              stat.failed} of ${stat.total}`}</span>
+            <span>{", "}</span>
+            <span style={{ color: "green" }}>{`Passed: ${stat.passed}`}</span>
+            <span>{", "}</span>
+            <span style={{ color: "red" }}>{`Failed: ${stat.failed}`}</span>
+          </strong>
+        );
       }
     } else {
       return "";
@@ -369,7 +386,35 @@ export default function Tester({ appState }) {
   };
 
   const disableActionButtons = () => {
-    return loadingInProgress || !appState.config.workspaceDirectory;
+    return (
+      loadingInProgress ||
+      testingInProgress ||
+      !appState.config.workspaceDirectory
+    );
+  };
+
+  const getRunTestButton = () => {
+    return (
+      <Button
+        size="sm"
+        variant="success"
+        onClick={() => runTest()}
+        disabled={disableActionButtons() || !selectedProblemFilteredExecResult}
+      >
+        {testingInProgress ? (
+          <Spinner
+            as="span"
+            animation="border"
+            size="sm"
+            role="status"
+            aria-hidden="true"
+          />
+        ) : (
+          <FontAwesomeIcon icon={faTerminal} />
+        )}{" "}
+        {" Run Test"}
+      </Button>
+    );
   };
 
   const getQueryForm = () => {
@@ -394,7 +439,7 @@ export default function Tester({ appState }) {
           <div className="d-grid gap-2">
             <Button
               size="sm"
-              variant="outline-success"
+              variant="outline-primary"
               onClick={() => getProblemList()}
               disabled={
                 disableActionButtons() || Utils.isStrNullOrEmpty(testContestUrl)
@@ -421,6 +466,7 @@ export default function Tester({ appState }) {
                 onChange={e =>
                   changeSelectedProblemMetadata(e.currentTarget.value)
                 }
+                disabled={disableActionButtons()}
               >
                 {problemList.map((problem, id) => (
                   <option
@@ -462,16 +508,7 @@ export default function Tester({ appState }) {
             </Form.Group>
           </Col>
           <Col xs={2}>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => runTest()}
-                disabled={!selectedProblemFilteredExecResult}
-              >
-                <FontAwesomeIcon icon={faTerminal} /> Run Test
-              </Button>
-            </div>
+            <div className="d-grid gap-2">{getRunTestButton()}</div>
           </Col>
         </Row>
         <Row>
@@ -497,6 +534,7 @@ export default function Tester({ appState }) {
                 size="sm"
                 variant="outline-success"
                 onClick={() => addCustomTest()}
+                disabled={disableActionButtons()}
               >
                 <FontAwesomeIcon icon={faPlus} /> Add Custom Test
               </Button>
@@ -570,111 +608,90 @@ export default function Tester({ appState }) {
   const getExecutionTable = () => {
     return (
       <div>
-        <div
-          style={{
-            maxHeight: "88vh",
-            overflowX: "auto",
-            overflowY: "auto"
-          }}
-        >
-          <Table bordered responsive="sm" size="sm">
-            <thead
-              style={{
-                position: "sticky",
-                top: 0,
-                zIndex: 1,
-                background: "#fff"
-              }}
-            >
-              <tr className="text-center">
-                <th>#</th>
-                <th>Input</th>
-                <th>Expected Output</th>
-                <th>Program Output</th>
-                <th>Result</th>
-                <th>Time</th>
-                <th>Mem.</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {selectedProblemFilteredExecResult.testcaseExecutionDetailsList.map(
-                (execDetails, id) => (
-                  <tr key={id} className={getTestcaseRowColor(execDetails)}>
-                    <td>{id + 1}</td>
-                    <td>
-                      <pre>{execDetails.testcase.input}</pre>
-                    </td>
-                    <td>
-                      <pre>{execDetails.testcase.output}</pre>
-                    </td>
-                    <td>
-                      <pre>{execDetails.testcaseExecutionResult?.output}</pre>
-                    </td>
-                    <td className="text-center">{getVerdict(execDetails)}</td>
-                    <td className="text-center">
-                      <pre>
-                        {execDetails.testcaseExecutionResult?.consumedTime +
-                          " ms"}
-                      </pre>
-                    </td>
-                    <td className="text-center">
-                      <pre>
-                        {execDetails.testcaseExecutionResult?.consumedMemory +
-                          " KB"}
-                      </pre>
-                    </td>
-                    <td className="text-center">
-                      <ButtonGroup>
-                        <Button
-                          size="sm"
-                          variant="success"
-                          title="Clone"
-                          onClick={() =>
-                            cloneUpdateCustomTest(execDetails.testcase, "Clone")
-                          }
-                        >
-                          <FontAwesomeIcon icon={faClone} />
-                        </Button>
-                        {execDetails.testcase.inputFilePath.includes(
-                          "01_custom_input_"
-                        ) && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="primary"
-                              title="Edit"
-                              onClick={() =>
-                                cloneUpdateCustomTest(
-                                  execDetails.testcase,
-                                  "Update"
-                                )
-                              }
-                            >
-                              <FontAwesomeIcon icon={faEdit} />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="danger"
-                              title="Delete"
-                              onClick={() =>
-                                deleteCustomTestTriggered(
-                                  execDetails.testcase.inputFilePath
-                                )
-                              }
-                            >
-                              <FontAwesomeIcon icon={faTrashAlt} />
-                            </Button>
-                          </>
-                        )}
-                      </ButtonGroup>
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </Table>
-        </div>
+        <Table bordered responsive="sm" size="sm">
+          <thead>
+            <tr className="text-center">
+              <th>#</th>
+              <th>Input</th>
+              <th>Expected Output</th>
+              <th>Program Output</th>
+              <th>Result</th>
+              <th>Time</th>
+              <th>Mem.</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedProblemFilteredExecResult.testcaseExecutionDetailsList.map(
+              (execDetails, id) => (
+                <tr key={id} className={getTestcaseRowColor(execDetails)}>
+                  <td>{id + 1}</td>
+                  <td>
+                    <pre>{execDetails.testcase.input}</pre>
+                  </td>
+                  <td>
+                    <pre>{execDetails.testcase.output}</pre>
+                  </td>
+                  <td>
+                    <pre>{execDetails.testcaseExecutionResult?.output}</pre>
+                  </td>
+                  <td className="text-center">{getVerdict(execDetails)}</td>
+                  <td className="text-center">
+                    <pre>
+                      {execDetails.testcaseExecutionResult?.consumedTime +
+                        " ms"}
+                    </pre>
+                  </td>
+                  <td className="text-center">
+                    <pre>
+                      {execDetails.testcaseExecutionResult?.consumedMemory +
+                        " KB"}
+                    </pre>
+                  </td>
+                  <td className="text-center">
+                    <ButtonGroup>
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        title="Edit"
+                        onClick={() =>
+                          cloneUpdateCustomTest(execDetails.testcase, "Update")
+                        }
+                        disabled={disableActionButtons()}
+                      >
+                        <FontAwesomeIcon icon={faEdit} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="success"
+                        title="Clone"
+                        onClick={() =>
+                          cloneUpdateCustomTest(execDetails.testcase, "Clone")
+                        }
+                        disabled={disableActionButtons()}
+                      >
+                        <FontAwesomeIcon icon={faClone} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        title="Delete"
+                        onClick={() =>
+                          deleteCustomTestTriggered(
+                            execDetails.testcase.inputFilePath
+                          )
+                        }
+                        disabled={disableActionButtons()}
+                      >
+                        <FontAwesomeIcon icon={faTrashAlt} />
+                      </Button>
+                    </ButtonGroup>
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </Table>
       </div>
     );
   };
@@ -730,6 +747,16 @@ export default function Tester({ appState }) {
         <ViewCodeModal
           metadata={selectedProblemMetadata}
           setShowCodeModal={setShowCodeModal}
+          customElementsOnHeader={[
+            {
+              colSpan: "auto",
+              elem: getRunTestButton()
+            },
+            {
+              colSpan: "auto",
+              elem: <Form.Text> {getTestStatusText()} </Form.Text>
+            }
+          ]}
         />
       )}
       {showAddEditTestModal && (

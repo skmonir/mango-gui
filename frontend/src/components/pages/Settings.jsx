@@ -316,7 +316,6 @@ export default function Settings({ appState, setAppState }) {
           </Row>
         </div>
       </div>
-      <br />
       <div className="panel">
         <div className="panel-body">
           <Row>

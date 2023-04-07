@@ -80,24 +80,24 @@ func PublishExecutionResult(execResult dto.ProblemExecutionResult, socketEvent s
 }
 
 func PublishPreviousRunStatus(execResult dto.ProblemExecutionResult) {
-	testcaseExecutionDetailsList := execResult.TestcaseExecutionDetailsList
-	totalPassed, totalTests, isExecutedOnce := 0, len(testcaseExecutionDetailsList), false
-	for _, execDetails := range testcaseExecutionDetailsList {
-		isExecutedOnce = isExecutedOnce || (execDetails.Status != "none")
-		if execDetails.TestcaseExecutionResult.Verdict == "AC" {
-			totalPassed++
-		}
-	}
-	if isExecutedOnce {
-		testStatus := fmt.Sprintf("%v/%v Tests Passed", totalPassed, totalTests)
-		if totalPassed == totalTests {
-			PublishStatusMessage("test_status", testStatus, "success")
-		} else {
-			PublishStatusMessage("test_status", testStatus, "error")
-		}
-	} else if execResult.CompilationError != "" {
+	if execResult.CompilationError != "" {
 		PublishStatusMessage("test_status", "Compilation error!", "error")
+		return
 	}
+	testcaseExecutionDetailsList := execResult.TestcaseExecutionDetailsList
+	totalPassed, totalFailed, totalTests := 0, 0, len(testcaseExecutionDetailsList)
+	for _, execDetails := range testcaseExecutionDetailsList {
+		if execDetails.Status == "success" {
+			if execDetails.TestcaseExecutionResult.Verdict == "AC" {
+				totalPassed++
+			} else {
+				totalFailed++
+			}
+		}
+	}
+
+	testStatus := fmt.Sprintf("{\"total\": %v,\"passed\": %v,\"failed\": %v}", totalTests, totalPassed, totalFailed)
+	PublishStatusMessage("test_status", testStatus, "test_stat")
 }
 
 func PublishAppConfig(conf config.JudgeConfig) {

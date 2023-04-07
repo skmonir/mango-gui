@@ -3,6 +3,7 @@ import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
+  faClock,
   faDownload,
   faFileCirclePlus,
   faSyncAlt,
@@ -192,7 +193,7 @@ function Parser({ appState }) {
       <div className="panel">
         <div className="panel-body">
           <Row>
-            <Col xs={6}>
+            <Col xs={5}>
               <Form.Control
                 type="text"
                 size="sm"
@@ -205,17 +206,29 @@ function Parser({ appState }) {
                 onChange={e => setParseUrl(e.target.value)}
               />
             </Col>
-            <Col>
+            <Col xs={2}>
               <div className="d-grid gap-2">
                 <Button
                   size="sm"
-                  variant="outline-success"
+                  variant="outline-primary"
                   onClick={() => parseTriggerred()}
                   disabled={
                     disableActionButtons() || Utils.isStrNullOrEmpty(parseUrl)
                   }
                 >
                   <FontAwesomeIcon icon={faDownload} /> Parse Testcases
+                </Button>
+              </div>
+            </Col>
+            <Col xs={2}>
+              <div className="d-grid gap-2">
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  onClick={() => createCustomProblem()}
+                  disabled={disableActionButtons()}
+                >
+                  <FontAwesomeIcon icon={faClock} /> Schedule
                 </Button>
               </div>
             </Col>

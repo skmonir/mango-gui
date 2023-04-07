@@ -9,7 +9,8 @@ import CodeEditor from "../misc/CodeEditor.jsx";
 export default function ViewCodeModal({
   codePath,
   metadata,
-  setShowCodeModal
+  setShowCodeModal,
+  customElementsOnHeader
 }) {
   const [isCodeUpdated, setIsCodeUpdated] = useState(false);
   const [codeContent, setCodeContent] = useState({
@@ -76,26 +77,27 @@ export default function ViewCodeModal({
     });
   };
 
-  const updateAndCloseModal = () => {
-    if (codePath) {
-      updateCodeByFilePath()
-        .then(resp => closeModal())
-        .catch(e => {
-          showToastMessage(
-            "Error",
-            "Oops! Something went wrong while saving the code!"
-          );
-        });
-    } else if (metadata) {
-      updateCodeByProblemPath()
-        .then(resp => closeModal())
-        .catch(e => {
-          showToastMessage(
-            "Error",
-            "Oops! Something went wrong while saving the code!"
-          );
-        });
+  const updateCode = () => {
+    if (isCodeUpdated) {
+      if (codePath) {
+        return updateCodeByFilePath();
+      } else if (metadata) {
+        return updateCodeByProblemPath();
+      }
+    } else {
+      return Promise.resolve(true);
     }
+  };
+
+  const updateAndCloseModal = () => {
+    updateCode()
+      .then(resp => closeModal())
+      .catch(e => {
+        showToastMessage(
+          "Error",
+          "Oops! Something went wrong while saving the code!"
+        );
+      });
   };
 
   const onCodeChange = code => {
@@ -128,6 +130,7 @@ export default function ViewCodeModal({
         aria-labelledby="contained-modal-title-vcenter"
         centered
         fullscreen={true}
+        keyboard={false}
       >
         <Modal.Header
           style={{ paddingBottom: "5px", paddingTop: "5px" }}
@@ -139,26 +142,11 @@ export default function ViewCodeModal({
           <CodeEditor
             codeContent={codeContent}
             onChange={onCodeChange}
+            onBlur={updateCode}
             readOnly={{ editor: false, preference: false }}
+            customElementsOnHeader={customElementsOnHeader}
           />
         </Modal.Body>
-        <Modal.Footer style={{ paddingBottom: "5px", paddingTop: "5px" }}>
-          <Button
-            size="sm"
-            variant="outline-success"
-            disabled={!isCodeUpdated}
-            onClick={() => updateAndCloseModal()}
-          >
-            <FontAwesomeIcon icon={faSave} /> Save Changes and Close
-          </Button>
-          <Button
-            size="sm"
-            variant="outline-danger"
-            onClick={() => closeModal()}
-          >
-            Close
-          </Button>
-        </Modal.Footer>
       </Modal>
       {showToast && (
         <ShowToast toastMsgObj={toastMsgObj} setShowToast={setShowToast} />
