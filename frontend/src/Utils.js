@@ -14,6 +14,17 @@ class Utils {
       Number(n) <= max
     );
   }
+
+  dateStringToUiFormat(dateStr) {
+    const formattedDate = new Date(dateStr).toLocaleString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+    return formattedDate;
+  }
 }
 
 export default new Utils();

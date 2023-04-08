@@ -357,8 +357,10 @@ function Parser({ appState }) {
                       />
                     )}
                   </span>{" "}
-                  <strong>{scheduler?.url}</strong> is scheduled to be parsed at{" "}
-                  <strong>{scheduler?.startTime}</strong>
+                  <strong>{scheduler?.url}</strong> is scheduled to be parsed on{" "}
+                  <strong>
+                    {Utils.dateStringToUiFormat(scheduler?.startTime)}
+                  </strong>
                 </Alert>
               </Col>
             </Row>

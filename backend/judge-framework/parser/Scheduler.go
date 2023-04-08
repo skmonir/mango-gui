@@ -114,7 +114,6 @@ func getAtcoderContestStartTime(body soup.Root) (time.Time, error) {
 	datetimeUrl := strings.TrimSpace(timeDataElement.Attrs()["href"])
 	queries := utils.ParseQueryMapFromUrl(datetimeUrl)
 	iso := queries.Get("iso")
-	// 2023 04 08 T 21 00
 	dateStr := fmt.Sprintf("%v-%v-%v %v:%v", iso[0:4], iso[4:6], iso[6:8], iso[9:11], iso[11:13])
 	startTime, err := time.ParseInLocation("2006-01-02 15:04", dateStr, time.FixedZone("UTC+9", 9*60*60))
 	if err != nil {
