@@ -19,7 +19,7 @@ import Utils from "../../Utils.js";
 import CompilationErrorMessage from "../misc/CompilationErrorMessage.jsx";
 import GeneratorLogs from "../misc/GeneratorLogs.jsx";
 
-export default function OutputGenerator() {
+export default function OutputGenerator({ appData }) {
   const socketClient = new SocketClient();
 
   const [toastMsgObj, setToastMsgObj] = useState({
@@ -43,7 +43,7 @@ export default function OutputGenerator() {
   const [generatorExecResult, setGeneratorExecResult] = useState({});
 
   useEffect(() => {
-    fetchHistory();
+    // fetchHistory();
     let socketConnGenerator = socketClient.initSocketConnection(
       "output_generate_result_event",
       updateExecResultFromSocket

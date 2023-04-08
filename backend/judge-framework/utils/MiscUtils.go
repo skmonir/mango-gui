@@ -215,3 +215,12 @@ func IsTimeInFuture(ctime time.Time) bool {
 	today := time.Now()
 	return today.Before(ctime)
 }
+
+func SliceContains[T comparable](s []T, e T) bool {
+	for _, v := range s {
+		if v == e {
+			return true
+		}
+	}
+	return false
+}

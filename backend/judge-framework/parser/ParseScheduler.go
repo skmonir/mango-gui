@@ -1,14 +1,15 @@
 package parser
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"github.com/anaskhan96/soup"
-	"github.com/procyon-projects/chrono"
+	"github.com/google/uuid"
 	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/scheduler"
+	"github.com/skmonir/mango-gui/backend/judge-framework/services"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
-	"github.com/skmonir/mango-gui/backend/socket"
 	"strconv"
 	"strings"
 	"time"
@@ -16,51 +17,64 @@ import (
 
 const genericError = "Something went wrong!"
 
-func ScheduleParse(url string) (time.Time, error) {
+func ScheduleParse(url string) error {
+	if checkIfParsingIsAlreadyScheduledForThisURL(url) {
+		return errors.New("This URL is already scheduled for parsing.")
+	}
 	startTime := time.Time{}
 
 	platform, cid, _ := utils.ExtractInfoFromUrl(url)
 	if platform == "" || cid == "" {
-		return startTime, errors.New("Error! Please check the url.")
+		return errors.New("Error! Please check the url.")
 	}
 
 	if platform == "codeforces" && strings.Contains(url, "codeforces.com/contest") {
 		err, body := getContestDetailPage("https://codeforces.com/contests")
 		if err != nil {
-			return time.Time{}, err
+			return err
 		}
 		startTime, err = getCodeforcesContestStartTime(body, cid, 2)
 		if err != nil {
-			return startTime, err
+			return err
 		}
 	} else if platform == "codeforces" && strings.Contains(url, "codeforces.com/gym") {
 		err, body := getContestDetailPage("https://codeforces.com/gyms")
 		if err != nil {
-			return time.Time{}, err
+			return err
 		}
 		startTime, err = getCodeforcesContestStartTime(body, cid, 1)
 		if err != nil {
-			return startTime, err
+			return err
 		}
 	} else if platform == "atcoder" {
 		err, body := getContestDetailPage(url)
 		if err != nil {
-			return startTime, err
+			return err
 		}
 		startTime, err = getAtcoderContestStartTime(body)
 		if err != nil {
-			return startTime, err
+			return err
 		}
 	} else {
-		return startTime, errors.New("Platform is not recognized")
+		return errors.New("Platform is not recognized")
 	}
 
 	fmt.Println(startTime)
 	if err := scheduleTheParsing(url, startTime); err != nil {
-		return time.Time{}, err
+		return err
 	}
 
-	return startTime, nil
+	return nil
+}
+
+func checkIfParsingIsAlreadyScheduledForThisURL(url string) bool {
+	tasks := services.GetFutureParseScheduledTasks()
+	for _, task := range tasks {
+		if task.Url == url {
+			return true
+		}
+	}
+	return false
 }
 
 func getContestDetailPage(url string) (error, soup.Root) {
@@ -135,26 +149,44 @@ func getAtcoderContestStartTime(body soup.Root) (time.Time, error) {
 }
 
 func scheduleTheParsing(url string, parsingTime time.Time) error {
-	taskScheduler := chrono.NewDefaultTaskScheduler()
-	_, err := taskScheduler.Schedule(func(ctx context.Context) {
-		go parseWithRetry(url)
-	}, chrono.WithTime(parsingTime))
-	if err != nil {
-		logger.Error(err.Error())
+	scheduleTask := models.ParseSchedulerTask{
+		Id:        uuid.New().String(),
+		Url:       url,
+		StartTime: parsingTime,
+		Stage:     "SCHEDULED",
+	}
+
+	if err := ScheduleTaskInScheduler(scheduleTask); err != nil {
 		return errors.New(genericError)
 	}
+	services.AddParseScheduledTask(scheduleTask)
 	fmt.Println("Parse scheduled successfully")
 	return nil
 }
 
-func parseWithRetry(url string) {
+func ScheduleTaskInScheduler(scheduleTask models.ParseSchedulerTask) error {
+	return scheduler.ScheduleOneTimeTask(scheduleTask.Id, func() { go parseWithRetry(scheduleTask) }, scheduleTask.StartTime)
+}
+
+func parseWithRetry(scheduleTask models.ParseSchedulerTask) {
+	isParsed := false
 	for i := 0; i < 10; i++ {
+		services.UpdateParseScheduledTask(scheduleTask.Id, "RUNNING")
 		time.Sleep(15 * time.Second)
-		socket.PublishStatusMessage("parse_schedule_event", "running", "info")
-		probs := Parse(url)
-		if len(probs) > 0 {
-			socket.PublishStatusMessage("parse_schedule_event", "done", "info")
+		problems := Parse(scheduleTask.Url)
+		if len(problems) > 0 {
+			isParsed = true
+			scheduler.RemoveScheduledTask(scheduleTask.Id)
+			services.UpdateParseScheduledTask(scheduleTask.Id, "COMPLETE")
 			break
 		}
 	}
+	if !isParsed {
+		services.UpdateParseScheduledTask(scheduleTask.Id, "FAILED")
+	}
+}
+
+func RemoveParseSchedule(taskId string) {
+	scheduler.RemoveScheduledTask(taskId)
+	services.RemoveParseScheduledTasksByIds([]string{taskId})
 }

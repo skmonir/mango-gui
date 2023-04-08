@@ -20,7 +20,7 @@ type ParseProblemPublishDetails struct {
 }
 
 func PublishParseMessage(parsedProblemList []models.Problem) {
-	fmt.Println("publishing parse result.....")
+	fmt.Println("Publishing parse result.....")
 
 	parseResponseListJson, err := json.Marshal(parsedProblemList)
 	if err != nil {
@@ -35,7 +35,7 @@ func PublishParseMessage(parsedProblemList []models.Problem) {
 }
 
 func PublishStatusMessage(topic string, message string, messageType string) {
-	fmt.Println("publishing test status message.....")
+	fmt.Println("Publishing test status message.....")
 
 	messageContent := struct {
 		Message string `json:"message"`
@@ -65,7 +65,7 @@ func PublishExecutionResult(execResult dto.ProblemExecutionResult, socketEvent s
 		PublishPreviousRunStatus(execResult)
 	}
 
-	fmt.Println("publishing execution result.....")
+	fmt.Println("Publishing execution result.....")
 
 	execResultJson, err := json.Marshal(execResult)
 	if err != nil {
@@ -101,7 +101,7 @@ func PublishPreviousRunStatus(execResult dto.ProblemExecutionResult) {
 }
 
 func PublishAppConfig(conf config.JudgeConfig) {
-	fmt.Println("publishing app config.....")
+	fmt.Println("Publishing app config.....")
 
 	confJson, err := json.Marshal(conf)
 	if err != nil {
@@ -112,5 +112,20 @@ func PublishAppConfig(conf config.JudgeConfig) {
 	broadcastMessage(Message{
 		Key:     "app_conf_get_event",
 		Content: string(confJson),
+	})
+}
+
+func PublishParseScheduledTasks(tasks []models.ParseSchedulerTask) {
+	fmt.Println("Publishing parse scheduled tasks.....")
+
+	tasksJson, err := json.Marshal(tasks)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	broadcastMessage(Message{
+		Key:     "parse_schedule_event",
+		Content: string(tasksJson),
 	})
 }

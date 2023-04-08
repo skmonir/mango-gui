@@ -14,9 +14,7 @@ import Loading from "../misc/Loading.jsx";
 import SocketClient from "../../socket/SocketClient.js";
 import InitializerModal from "../modals/InitializerModal.jsx";
 
-export default function Home({ appState }) {
-  const socketClient = new SocketClient();
-
+export default function Home() {
   const features = [
     "Supports C++, Java and Python",
     "Configure and set active language as per your need",
@@ -28,32 +26,6 @@ export default function Home({ appState }) {
     "Generate random testcases easily with Input/Output Generator",
     "TGen script works like magic to generate testcases with few lines of code"
   ];
-
-  const [showInitModal, setShowInitModal] = useState(true);
-  const [initMessage, setInitMessage] = useState("Initializing...(0/5)");
-
-  useEffect(() => {
-    initApp();
-    let socketConn = socketClient.initSocketConnection(
-      "init_app_event",
-      updateInitMessageFromSocket
-    );
-    return () => {
-      socketConn.close();
-    };
-  }, []);
-
-  const initApp = () => {
-    setTimeout(() => {
-      DataService.initApp().then(resp => {
-        setShowInitModal(false);
-      });
-    }, 1000);
-  };
-
-  const updateInitMessageFromSocket = data => {
-    setInitMessage(data.message);
-  };
 
   return (
     <div
@@ -158,8 +130,6 @@ export default function Home({ appState }) {
           </Row>
         </Col>
       </Row>
-
-      <InitializerModal showModal={showInitModal} initMessage={initMessage} />
     </div>
   );
 }

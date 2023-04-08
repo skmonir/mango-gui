@@ -59,10 +59,6 @@ class DataService {
     return this.getData("parse/" + encodedUrl);
   }
 
-  scheduleParse(encodedUrl) {
-    return this.getData("parse/schedule/" + encodedUrl);
-  }
-
   getProblem(path) {
     return this.getData("problem/" + path);
   }
@@ -167,12 +163,20 @@ class DataService {
     return this.putData("misc/resource/open/", openResourceRequest);
   }
 
-  getHistory() {
-    return this.getData("misc/history").then(response => JSON.parse(response));
-  }
-
   initApp() {
     return this.getData("misc/init");
+  }
+
+  getAppData() {
+    return this.getData("appdata/");
+  }
+
+  scheduleParse(req) {
+    return this.postData("schedule/", req);
+  }
+
+  removeParseScheduledTask(id) {
+    return this.deleteData("schedule/" + id);
   }
 }
 

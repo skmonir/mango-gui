@@ -52,11 +52,6 @@ func OpenResource(ctx *fiber.Ctx) error {
 	})
 }
 
-func GetHistory(ctx *fiber.Ctx) error {
-	response := services.GetHistory()
-	return ctx.Status(fiber.StatusOK).JSON(response)
-}
-
 func InitApp(ctx *fiber.Ctx) error {
 	initializer.InitializeJudgeFramework()
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{

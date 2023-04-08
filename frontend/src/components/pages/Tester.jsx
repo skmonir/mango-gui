@@ -37,7 +37,7 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import CompilationErrorMessage from "../misc/CompilationErrorMessage.jsx";
 
-export default function Tester({ appState }) {
+export default function Tester({ config, appData }) {
   const socketClient = new SocketClient();
 
   const verdicts = [
@@ -86,7 +86,7 @@ export default function Tester({ appState }) {
   const [customTestEvent, setCustomTestEvent] = useState("");
 
   useEffect(() => {
-    fetchHistory();
+    // fetchHistory();
     let socketConnTest = socketClient.initSocketConnection(
       "test_exec_result_event",
       updateExecResultFromSocket
@@ -386,11 +386,7 @@ export default function Tester({ appState }) {
   };
 
   const disableActionButtons = () => {
-    return (
-      loadingInProgress ||
-      testingInProgress ||
-      !appState.config.workspaceDirectory
-    );
+    return loadingInProgress || testingInProgress || !config.workspaceDirectory;
   };
 
   const getRunTestButton = () => {
@@ -430,7 +426,7 @@ export default function Tester({ appState }) {
               autoCapitalize="none"
               placeholder="Enter Contest/Problem URL [Codeforces, AtCoder, Custom]"
               value={testContestUrl}
-              disabled={!appState.config.workspaceDirectory}
+              disabled={!config.workspaceDirectory}
               onChange={e => setTestContestUrl(e.target.value)}
             />
           </Form.Group>
@@ -697,7 +693,7 @@ export default function Tester({ appState }) {
   };
 
   const getConfigAlert = () => {
-    if (!appState.config.workspaceDirectory) {
+    if (!config.workspaceDirectory) {
       return (
         <Row>
           <Col>

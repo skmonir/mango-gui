@@ -6,6 +6,7 @@ require (
 	github.com/anaskhan96/soup v1.2.5
 	github.com/gofiber/fiber/v2 v2.42.0
 	github.com/gofiber/websocket/v2 v2.1.4
+	github.com/google/uuid v1.3.0
 	github.com/procyon-projects/chrono v1.1.2
 	github.com/shirou/gopsutil/v3 v3.23.2
 	github.com/wailsapp/wails/v2 v2.4.1
@@ -16,7 +17,6 @@ require (
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/fasthttp/websocket v1.5.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/klauspost/compress v1.15.15 // indirect
 	github.com/labstack/echo/v4 v4.9.0 // indirect

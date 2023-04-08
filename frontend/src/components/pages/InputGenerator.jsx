@@ -18,7 +18,7 @@ import ViewCodeModal from "../modals/ViewCodeModal.jsx";
 import Utils from "../../Utils.js";
 import CodeEditor from "../misc/CodeEditor.jsx";
 
-export default function InputGenerator() {
+export default function InputGenerator({ appData }) {
   const socketClient = new SocketClient();
 
   const tgenKeywords = [
@@ -87,7 +87,7 @@ export default function InputGenerator() {
   const [generatorExecResult, setGeneratorExecResult] = useState(null);
 
   useEffect(() => {
-    fetchHistory();
+    // fetchHistory();
     let socketConnGenerator = socketClient.initSocketConnection(
       "input_generate_result_event",
       updateExecResultFromSocket

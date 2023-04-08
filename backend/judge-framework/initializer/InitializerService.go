@@ -32,8 +32,8 @@ func InitializeJudgeFramework() {
 	socket.PublishStatusMessage("init_app_event", "Initializing...(4/5)", "info")
 	time.Sleep(300 * time.Millisecond)
 
-	// Init history file
-	services.InitHistory()
+	// Init AppData
+	services.InitAppDataIfNotAvailable()
 	socket.PublishStatusMessage("init_app_event", "Initializing...(5/5)", "info")
 	time.Sleep(300 * time.Millisecond)
 }

@@ -2,12 +2,12 @@ import { Alert, Button, Card, Col, Row, Spinner, Table } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faBan,
   faCheckCircle,
   faClock,
   faDownload,
   faFileCirclePlus,
   faSyncAlt,
-  faTerminal,
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
@@ -17,20 +17,16 @@ import Loading from "../misc/Loading.jsx";
 import Utils from "../../Utils.js";
 import AddCustomProblemModal from "../modals/AddCustomProblemModal.jsx";
 import ShowToast from "../Toast/ShowToast.jsx";
+import { confirmAlert } from "react-confirm-alert";
 
-function Parser({ appState }) {
+function Parser({ config, appData }) {
   const socketClient = new SocketClient();
 
   const [parseUrl, setParseUrl] = useState("");
   const [initAlert, setInitAlert] = useState(false);
   const [parsingInProgress, setParsingInProgress] = useState(false);
-  const [scheduler, setScheduler] = useState({
-    inProgress: false,
-    parsing: false,
-    scheduled: false,
-    url: "",
-    startTime: ""
-  });
+  const [schedulerInProgress, setSchedulerInProgress] = useState(false);
+  const [parseSchedulerTasks, setParseSchedulerTasks] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMsgObj, setToastMsgObj] = useState({
     variant: "",
@@ -43,26 +39,22 @@ function Parser({ appState }) {
   );
 
   useEffect(() => {
-    fetchHistory();
+    setParseUrl(appData?.queryHistories?.parseUrl);
+    setParseSchedulerTasks(appData?.parseSchedulerTasks);
+
     let socketConnParse = socketClient.initSocketConnection(
       "parse_problems_event",
       updateParseStatusFromSocket
     );
     let socketConnSchedule = socketClient.initSocketConnection(
       "parse_schedule_event",
-      updateParseScheduleStatusFromSocket
+      updateParseScheduledTasksFromSocket
     );
     return () => {
       socketConnParse.close();
       socketConnSchedule.close();
     };
   }, []);
-
-  const fetchHistory = () => {
-    DataService.getHistory().then(appHistory => {
-      setParseUrl(appHistory?.parseUrl);
-    });
-  };
 
   const parseTriggerred = () => {
     setParsingInProgress(true);
@@ -99,23 +91,38 @@ function Parser({ appState }) {
   };
 
   const scheduleParse = () => {
-    setScheduler({ ...scheduler, inProgress: true });
-    DataService.scheduleParse(window.btoa(parseUrl))
+    setSchedulerInProgress(true);
+    DataService.scheduleParse({ url: parseUrl })
       .then(data => {
         console.log(data);
-        setScheduler({
-          ...scheduler,
-          inProgress: false,
-          scheduled: true,
-          url: data.url,
-          startTime: data.startTime
-        });
       })
       .catch(error => {
         console.log(error);
         showToastMessage("Error", error.response.data.message);
-        setScheduler({ ...scheduler, inProgress: false });
-      });
+      })
+      .finally(() => setSchedulerInProgress(false));
+  };
+
+  const removeScheduledTaskTriggered = taskId => {
+    confirmAlert({
+      title: "",
+      message: "Are you sure to cancel this scheduled task?",
+      buttons: [
+        {
+          label: "No"
+        },
+        {
+          label: "Yes, Cancel!",
+          onClick: () => removeScheduledTask(taskId)
+        }
+      ]
+    });
+  };
+
+  const removeScheduledTask = taskId => {
+    DataService.removeParseScheduledTask(taskId).then(data => {
+      console.log(data);
+    });
   };
 
   const updateParseStatusFromSocket = data => {
@@ -127,21 +134,9 @@ function Parser({ appState }) {
     }
   };
 
-  const updateParseScheduleStatusFromSocket = data => {
-    if (data.message === "done") {
-      setScheduler({
-        inProgress: false,
-        parsing: false,
-        scheduled: false,
-        url: "",
-        startTime: ""
-      });
-    } else if (data.message === "running") {
-      setScheduler({
-        ...scheduler,
-        parsing: true
-      });
-    }
+  const updateParseScheduledTasksFromSocket = tasks => {
+    console.log(tasks);
+    setParseSchedulerTasks(tasks);
   };
 
   const createCustomProblem = () => {
@@ -178,10 +173,18 @@ function Parser({ appState }) {
 
   const disableActionButtons = () => {
     return (
-      parsingInProgress ||
-      scheduler.inProgress ||
-      !appState.config.workspaceDirectory
+      parsingInProgress || schedulerInProgress || !config.workspaceDirectory
     );
+  };
+
+  const getSchedulerRowColor = stage => {
+    if (stage === "SCHEDULED" || stage === "COMPLETE") {
+      return "table-success";
+    } else if (stage === "RUNNING") {
+      return "table-warning";
+    } else {
+      return "table-danger";
+    }
   };
 
   const getParsingTable = () => {
@@ -228,11 +231,74 @@ function Parser({ appState }) {
                   onClick={() => parseSingleProblem(id, problem?.url)}
                   disabled={
                     parsingInProgress ||
-                    !appState.config.workspaceDirectory ||
+                    !config.workspaceDirectory ||
                     problem?.url.startsWith("custom/")
                   }
                 >
                   <FontAwesomeIcon icon={faSyncAlt} /> Refresh
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    );
+  };
+
+  const getParseSchedulerTasksTable = () => {
+    return (
+      <Table bordered responsive="sm" size="sm">
+        <thead>
+          <tr className="text-center">
+            <th style={{ minWidth: "60vh", maxWidth: "60vh" }}>Parsing URL</th>
+            <th>Scheduled Time</th>
+            <th>Stage</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {parseSchedulerTasks.map(scheduledTask => (
+            <tr
+              key={scheduledTask.id}
+              className={getSchedulerRowColor(scheduledTask.stage)}
+            >
+              <td>
+                <a
+                  href="#"
+                  onClick={() =>
+                    DataService.openResource({ path: scheduledTask.url })
+                  }
+                >
+                  {scheduledTask.url}
+                </a>{" "}
+                {scheduledTask?.stage === "RUNNING" && (
+                  <span>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                      variant="success"
+                    />
+                  </span>
+                )}
+              </td>
+              <td className="text-center">
+                {Utils.dateToLocaleString(scheduledTask.startTime)}
+              </td>
+              <td className="text-center">{scheduledTask?.stage}</td>
+              <td className="text-center">
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  disabled={
+                    disableActionButtons() ||
+                    scheduledTask.stage !== "SCHEDULED"
+                  }
+                  onClick={() => removeScheduledTaskTriggered(scheduledTask.id)}
+                >
+                  <FontAwesomeIcon icon={faBan} /> Cancel Schedule
                 </Button>
               </td>
             </tr>
@@ -271,7 +337,7 @@ function Parser({ appState }) {
                 autoCapitalize="none"
                 placeholder="Enter Contest/Problem URL [Codeforces, AtCoder]"
                 value={parseUrl}
-                disabled={!appState.config.workspaceDirectory}
+                disabled={!config.workspaceDirectory}
                 onChange={e => setParseUrl(e.target.value)}
               />
             </Col>
@@ -307,12 +373,10 @@ function Parser({ appState }) {
                   variant="outline-success"
                   onClick={scheduleParse}
                   disabled={
-                    disableActionButtons() ||
-                    Utils.isStrNullOrEmpty(parseUrl) ||
-                    scheduler?.scheduled
+                    disableActionButtons() || Utils.isStrNullOrEmpty(parseUrl)
                   }
                 >
-                  {scheduler?.inProgress ? (
+                  {schedulerInProgress ? (
                     <Spinner
                       as="span"
                       animation="border"
@@ -322,8 +386,8 @@ function Parser({ appState }) {
                     />
                   ) : (
                     <FontAwesomeIcon icon={faClock} />
-                  )}{" "}
-                  {` Schedule${scheduler.scheduled ? "d" : ""}`}
+                  )}
+                  {" Schedule"}
                 </Button>
               </div>
             </Col>
@@ -342,31 +406,13 @@ function Parser({ appState }) {
             </Col>
           </Row>
           <hr />
-          {scheduler?.scheduled && (
+          {parseSchedulerTasks?.length > 0 && (
             <Row>
-              <Col xs={12}>
-                <Alert variant="success" className="text-center p-1 mb-2">
-                  <span>
-                    {scheduler.parsing && (
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </span>{" "}
-                  <strong>{scheduler?.url}</strong> is scheduled to be parsed on{" "}
-                  <strong>
-                    {Utils.dateStringToUiFormat(scheduler?.startTime)}
-                  </strong>
-                </Alert>
-              </Col>
+              <Col xs={12}>{getParseSchedulerTasksTable()}</Col>
             </Row>
           )}
           {getParserBody()}
-          {!appState.config.workspaceDirectory && (
+          {!config.workspaceDirectory && (
             <Row>
               <Col>
                 <br />

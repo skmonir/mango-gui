@@ -14,18 +14,57 @@ import {
   faMicrochip,
   faTools
 } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Settings from "./components/pages/Settings.jsx";
 import Navbar from "react-bootstrap/Navbar";
 import InputGenerator from "./components/pages/InputGenerator.jsx";
 import OutputGenerator from "./components/pages/OutputGenerator.jsx";
 import Home from "./components/pages/Home.jsx";
+import DataService from "./services/DataService.js";
+import SocketClient from "./socket/SocketClient.js";
+import InitializerModal from "./components/modals/InitializerModal.jsx";
 
 function App() {
+  const socketClient = new SocketClient();
+
   const [currentTab, setCurrentTab] = useState("home");
-  const [appState, setAppState] = useState({
-    config: {}
-  });
+  const [config, setConfig] = useState({});
+  const [appData, setAppData] = useState({});
+  const [appDataLoaded, setAppDataLoaded] = useState(false);
+
+  const [showInitModal, setShowInitModal] = useState(true);
+  const [initMessage, setInitMessage] = useState("Initializing...(0/5)");
+
+  useEffect(() => {
+    initApp();
+    let socketConn = socketClient.initSocketConnection(
+      "init_app_event",
+      updateInitMessageFromSocket
+    );
+    return () => {
+      socketConn.close();
+    };
+  }, []);
+
+  const initApp = () => {
+    setTimeout(() => {
+      DataService.initApp().then(resp => {
+        setShowInitModal(false);
+        fetchAppData();
+      });
+    }, 1000);
+  };
+
+  const updateInitMessageFromSocket = data => {
+    setInitMessage(data.message);
+  };
+
+  const fetchAppData = () => {
+    DataService.getAppData().then(appData => {
+      setAppData(appData);
+      setAppDataLoaded(true);
+    });
+  };
 
   return (
     <div className="App" style={{ height: "100vh" }}>
@@ -105,28 +144,33 @@ function App() {
             <Col xs={12}>
               <Tab.Content>
                 <Tab.Pane eventKey="home">
-                  <Home appState={appState} />
+                  <Home />
                 </Tab.Pane>
-                <Tab.Pane eventKey="parser">
-                  <Parser appState={appState} />
-                </Tab.Pane>
-                <Tab.Pane eventKey="tester">
-                  <Tester appState={appState} />
-                </Tab.Pane>
-                <Tab.Pane eventKey="input_generator">
-                  <InputGenerator appState={appState} />
-                </Tab.Pane>
-                <Tab.Pane eventKey="output_generator">
-                  <OutputGenerator appState={appState} />
-                </Tab.Pane>
+                {appDataLoaded && (
+                  <>
+                    <Tab.Pane eventKey="parser">
+                      <Parser config={config} appData={appData} />
+                    </Tab.Pane>
+                    <Tab.Pane eventKey="tester">
+                      <Tester config={config} appData={appData} />
+                    </Tab.Pane>
+                    <Tab.Pane eventKey="input_generator">
+                      <InputGenerator appData={appData} />
+                    </Tab.Pane>
+                    <Tab.Pane eventKey="output_generator">
+                      <OutputGenerator appData={appData} />
+                    </Tab.Pane>
+                  </>
+                )}
                 <Tab.Pane eventKey="settings">
-                  <Settings appState={appState} setAppState={setAppState} />
+                  <Settings setConfig={setConfig} />
                 </Tab.Pane>
               </Tab.Content>
             </Col>
           </Row>
         </Tab.Container>
       </Container>
+      <InitializerModal showModal={showInitModal} initMessage={initMessage} />
     </div>
   );
 }

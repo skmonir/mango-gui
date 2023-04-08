@@ -9,7 +9,7 @@ import ShowToast from "../Toast/ShowToast.jsx";
 import Utils from "../../Utils.js";
 import { confirmAlert } from "react-confirm-alert";
 
-export default function Settings({ appState, setAppState }) {
+export default function Settings({ setConfig }) {
   const placeholders = {
     cpp: {
       compCommand: "g++",
@@ -33,7 +33,7 @@ export default function Settings({ appState, setAppState }) {
     "": {}
   };
 
-  const [config, setConfig] = useState({});
+  const [currentConfig, setCurrentConfig] = useState({});
   const [selectedLang, setSelectedLang] = useState("");
   const [selectedLangConfig, setSelectedLangConfig] = useState({});
 
@@ -68,7 +68,7 @@ export default function Settings({ appState, setAppState }) {
       .catch(e => {
         showToastMessage(
           "Error",
-          "Oops! Something went wrong while fetching the config!"
+          "Oops! Something went wrong while fetching the currentConfig!"
         );
       })
       .finally(() =>
@@ -80,8 +80,8 @@ export default function Settings({ appState, setAppState }) {
   };
 
   const updateConfig = config => {
+    setCurrentConfig(config);
     setConfig(config);
-    setAppState({ ...appState, config: config });
     setSelectedLang(config?.activeLang);
     setSelectedLangConfig(config.langConfigs[config.activeLang]);
   };
@@ -154,13 +154,13 @@ export default function Settings({ appState, setAppState }) {
       });
       DataService.updateConfig(confToSave)
         .then(config => {
-          setAppState({ ...appState, config: config });
+          setConfig(config);
           showToastMessage("Success", "Settings saved successfully!");
         })
         .catch(e => {
           showToastMessage(
             "Error",
-            "Oops! Something went wrong while saving the config!"
+            "Oops! Something went wrong while saving the currentConfig!"
           );
         })
         .finally(() =>
@@ -214,19 +214,19 @@ export default function Settings({ appState, setAppState }) {
       updateLangConfigs();
     }
     setSelectedLang(lang);
-    setSelectedLangConfig(config.langConfigs[lang]);
+    setSelectedLangConfig(currentConfig.langConfigs[lang]);
   };
 
   const updateLangConfigs = () => {
     let updatedLangConfigs = {
-      ...config.langConfigs
+      ...currentConfig.langConfigs
     };
     updatedLangConfigs[selectedLang] = { ...selectedLangConfig };
     const updatedConfig = {
-      ...config,
+      ...currentConfig,
       langConfigs: updatedLangConfigs
     };
-    setConfig(updatedConfig);
+    setCurrentConfig(updatedConfig);
     return updatedConfig;
   };
 
@@ -284,12 +284,15 @@ export default function Settings({ appState, setAppState }) {
                   autoComplete="off"
                   autoCapitalize="none"
                   placeholder="Enter your workspace directory absolute path. All the testcases and sources will be saved here."
-                  value={config.workspaceDirectory}
+                  value={currentConfig.workspaceDirectory}
                   onChange={e =>
-                    setConfig({ ...config, workspaceDirectory: e.target.value })
+                    setCurrentConfig({
+                      ...currentConfig,
+                      workspaceDirectory: e.target.value
+                    })
                   }
                   onBlur={() =>
-                    checkDirectoryPathValidity(config.workspaceDirectory)
+                    checkDirectoryPathValidity(currentConfig.workspaceDirectory)
                   }
                 />
               </Form.Group>
@@ -306,9 +309,12 @@ export default function Settings({ appState, setAppState }) {
                   autoComplete="off"
                   autoCapitalize="none"
                   placeholder="Enter your name"
-                  value={config.author}
+                  value={currentConfig.author}
                   onChange={e =>
-                    setConfig({ ...config, author: e.target.value })
+                    setCurrentConfig({
+                      ...currentConfig,
+                      author: e.target.value
+                    })
                   }
                 />
               </Form.Group>
@@ -329,9 +335,12 @@ export default function Settings({ appState, setAppState }) {
                 <Form.Select
                   size="sm"
                   aria-label="Default select example"
-                  value={config.activeLang}
+                  value={currentConfig.activeLang}
                   onChange={e =>
-                    setConfig({ ...config, activeLang: e.currentTarget.value })
+                    setCurrentConfig({
+                      ...currentConfig,
+                      activeLang: e.currentTarget.value
+                    })
                   }
                 >
                   <option value="cpp">CPP</option>
