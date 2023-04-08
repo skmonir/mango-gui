@@ -19,10 +19,11 @@ export default function Home({ appState }) {
 
   const features = [
     "Supports C++, Java and Python",
-    "Configure and set active language to work with",
-    "Auto generates source files with user specified or default template",
-    "Integrated rich Code Editor to view or edit code",
+    "Configure and set active language as per your need",
+    "Auto generate source files with user specified or default template code",
+    "Edit or view code with integrated rich Code Editor",
     "Parse and store testcases for offline testing",
+    "Schedule upcoming contests to parse automatically",
     "Add custom tests to cover all the corner cases",
     "Generate random testcases easily with Input/Output Generator",
     "TGen script works like magic to generate testcases with few lines of code"
@@ -107,7 +108,7 @@ export default function Home({ appState }) {
       <br />
       <Row
         className="d-flex justify-content-center"
-        style={{ fontSize: 22, color: "#07285b", fontWeight: 300 }}
+        style={{ fontSize: 20, color: "#07285b", fontWeight: 300 }}
       >
         <Col xs={8}>
           <ul className="nav flex-column">

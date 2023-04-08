@@ -548,7 +548,7 @@ export default function Tester({ appState }) {
                 onClick={() => setShowCodeModal(true)}
                 disabled={!selectedProblemFilteredExecResult}
               >
-                <FontAwesomeIcon icon={faCode} /> View Code
+                <FontAwesomeIcon icon={faCode} /> Open Editor
               </Button>
             </div>
           </Col>
