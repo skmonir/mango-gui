@@ -434,7 +434,6 @@ export default function InputGenerator({ appData }) {
                   autoComplete="off"
                   autoCapitalize="none"
                   placeholder="Default '02_random_input'"
-                  disabled={inputGenerateRequest.isForParsedProblem}
                   value={inputGenerateRequest.fileName}
                   onChange={e =>
                     setInputGenerateRequest({
