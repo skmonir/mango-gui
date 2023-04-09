@@ -41,7 +41,7 @@ func GetAppData() AppData {
 	if len(expiredTasks) > 0 {
 		slightExpiredTasks := []models.ParseSchedulerTask{}
 		for i := 0; i < len(expiredTasks); i++ {
-			if utils.IsTimeInFuture(expiredTasks[i].StartTime.Add(2 * time.Hour)) {
+			if utils.IsTimeInFuture(expiredTasks[i].StartTime.Add(30 * time.Minute)) {
 				if expiredTasks[i].Stage == "RUNNING" {
 					expiredTasks[i].Stage = "ABORTED"
 				}
