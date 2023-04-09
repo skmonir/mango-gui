@@ -174,11 +174,23 @@ func RemoveParseScheduledTasksByIds(taskIds []string) {
 	socket.PublishParseScheduledTasks(newTasks)
 }
 
-func UpdateParseScheduledTask(taskId, stage string) {
+func UpdateParseScheduledTaskStage(taskId, stage string) {
 	appData := GetAppData()
 	for i := 0; i < len(appData.ParseSchedulerTasks); i++ {
 		if appData.ParseSchedulerTasks[i].Id == taskId {
 			appData.ParseSchedulerTasks[i].Stage = stage
+		}
+	}
+	UpdateAppDataIntoFile(appData)
+
+	socket.PublishParseScheduledTasks(appData.ParseSchedulerTasks)
+}
+
+func UpdateParseScheduledTask(updatedScheduleTask models.ParseSchedulerTask) {
+	appData := GetAppData()
+	for i := 0; i < len(appData.ParseSchedulerTasks); i++ {
+		if appData.ParseSchedulerTasks[i].Id == updatedScheduleTask.Id {
+			appData.ParseSchedulerTasks[i] = updatedScheduleTask
 		}
 	}
 	UpdateAppDataIntoFile(appData)

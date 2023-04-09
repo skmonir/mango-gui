@@ -21,42 +21,14 @@ func ScheduleParse(url string) error {
 	if checkIfParsingIsAlreadyScheduledForThisURL(url) {
 		return errors.New("This URL is already scheduled for parsing.")
 	}
-	startTime := time.Time{}
 
-	platform, cid, _ := utils.ExtractInfoFromUrl(url)
-	if platform == "" || cid == "" {
-		return errors.New("Error! Please check the url.")
+	startTime, err := fetchStartTime(url)
+	if err != nil {
+		return err
 	}
 
-	if platform == "codeforces" && strings.Contains(url, "codeforces.com/contest") {
-		err, body := getContestDetailPage("https://codeforces.com/contests")
-		if err != nil {
-			return err
-		}
-		startTime, err = getCodeforcesContestStartTime(body, cid, 2)
-		if err != nil {
-			return err
-		}
-	} else if platform == "codeforces" && strings.Contains(url, "codeforces.com/gym") {
-		err, body := getContestDetailPage("https://codeforces.com/gyms")
-		if err != nil {
-			return err
-		}
-		startTime, err = getCodeforcesContestStartTime(body, cid, 1)
-		if err != nil {
-			return err
-		}
-	} else if platform == "atcoder" {
-		err, body := getContestDetailPage(url)
-		if err != nil {
-			return err
-		}
-		startTime, err = getAtcoderContestStartTime(body)
-		if err != nil {
-			return err
-		}
-	} else {
-		return errors.New("Platform is not recognized")
+	if !utils.IsTimeInFuture(startTime) {
+		return errors.New("Schedule only upcoming contests")
 	}
 
 	fmt.Println(startTime)
@@ -65,6 +37,47 @@ func ScheduleParse(url string) error {
 	}
 
 	return nil
+}
+
+func fetchStartTime(url string) (time.Time, error) {
+	startTime := time.Time{}
+
+	platform, cid, _ := utils.ExtractInfoFromUrl(url)
+	if platform == "" || cid == "" {
+		return time.Time{}, errors.New("Error! Please check the url.")
+	}
+
+	if platform == "codeforces" && strings.Contains(url, "codeforces.com/contest") {
+		err, body := getContestDetailPage("https://codeforces.com/contests")
+		if err != nil {
+			return time.Time{}, err
+		}
+		startTime, err = getCodeforcesContestStartTime(body, cid, 2)
+		if err != nil {
+			return time.Time{}, err
+		}
+	} else if platform == "codeforces" && strings.Contains(url, "codeforces.com/gym") {
+		err, body := getContestDetailPage("https://codeforces.com/gyms")
+		if err != nil {
+			return time.Time{}, err
+		}
+		startTime, err = getCodeforcesContestStartTime(body, cid, 1)
+		if err != nil {
+			return time.Time{}, err
+		}
+	} else if platform == "atcoder" {
+		err, body := getContestDetailPage(url)
+		if err != nil {
+			return time.Time{}, err
+		}
+		startTime, err = getAtcoderContestStartTime(body)
+		if err != nil {
+			return time.Time{}, err
+		}
+	} else {
+		return time.Time{}, errors.New("Platform is not recognized")
+	}
+	return startTime, nil
 }
 
 func checkIfParsingIsAlreadyScheduledForThisURL(url string) bool {
@@ -119,10 +132,6 @@ func getCodeforcesContestStartTime(body soup.Root, cid string, childId int) (tim
 	}
 	startTimeLocal := startTime.In(loc)
 
-	if !utils.IsTimeInFuture(startTimeLocal) {
-		return time.Time{}, errors.New("Schedule only upcoming contests")
-	}
-
 	return startTimeLocal, nil
 }
 
@@ -144,10 +153,6 @@ func getAtcoderContestStartTime(body soup.Root) (time.Time, error) {
 		return time.Time{}, errors.New(genericError)
 	}
 	startTimeLocal := startTime.In(loc)
-
-	if !utils.IsTimeInFuture(startTimeLocal) {
-		return time.Time{}, errors.New("Schedule only upcoming contests")
-	}
 
 	return startTimeLocal, nil
 }
@@ -173,21 +178,34 @@ func ScheduleTaskInScheduler(scheduleTask models.ParseSchedulerTask) error {
 }
 
 func parseWithRetry(scheduleTask models.ParseSchedulerTask) {
+	if timeChanged, newStartTime := checkIfScheduledTimeChanged(scheduleTask.Url, scheduleTask.StartTime); timeChanged {
+		scheduleTask.StartTime = newStartTime
+		services.UpdateParseScheduledTask(scheduleTask)
+		return
+	}
 	isParsed := false
 	for i := 0; i < 10; i++ {
-		services.UpdateParseScheduledTask(scheduleTask.Id, "RUNNING")
+		services.UpdateParseScheduledTaskStage(scheduleTask.Id, "RUNNING")
 		time.Sleep(15 * time.Second)
 		problems := Parse(scheduleTask.Url)
 		if len(problems) > 0 {
 			isParsed = true
 			scheduler.RemoveScheduledTask(scheduleTask.Id)
-			services.UpdateParseScheduledTask(scheduleTask.Id, "COMPLETE")
+			services.UpdateParseScheduledTaskStage(scheduleTask.Id, "COMPLETE")
 			break
 		}
 	}
 	if !isParsed {
-		services.UpdateParseScheduledTask(scheduleTask.Id, "FAILED")
+		services.UpdateParseScheduledTaskStage(scheduleTask.Id, "FAILED")
 	}
+}
+
+func checkIfScheduledTimeChanged(url string, prevStartTime time.Time) (bool, time.Time) {
+	newStartTime, err := fetchStartTime(url)
+	if err != nil || newStartTime == prevStartTime {
+		return false, time.Time{}
+	}
+	return true, newStartTime
 }
 
 func RemoveParseSchedule(taskId string) {
