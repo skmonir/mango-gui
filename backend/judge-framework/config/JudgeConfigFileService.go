@@ -120,7 +120,7 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 		},
 		EditorPreference: EditorPreferences{
 			Theme:    "monokai",
-			FontSize: "14",
+			FontSize: "13",
 			TabSize:  "4",
 		},
 	}
