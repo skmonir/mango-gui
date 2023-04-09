@@ -89,7 +89,11 @@ func getContestDetailPage(url string) (error, soup.Root) {
 
 func getCodeforcesContestStartTime(body soup.Root, cid string, childId int) (time.Time, error) {
 	defer utils.PanicRecovery()
-	timeDataElement := body.Find("tr", "data-contestid", cid).FindAll("td")[childId].Find("a")
+	contestElement := body.Find("tr", "data-contestid", cid)
+	if contestElement.Error != nil {
+		return time.Time{}, errors.New("Schedule only upcoming contests")
+	}
+	timeDataElement := contestElement.FindAll("td")[childId].Find("a")
 	if timeDataElement.Error != nil {
 		return time.Time{}, errors.New("Schedule only upcoming contests")
 	}
