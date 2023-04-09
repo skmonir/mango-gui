@@ -97,16 +97,25 @@ func (parser *CodeforcesParser) extractSamples(sampleElement soup.Root, ioType s
 	var ios []string
 	for _, element := range ioElements {
 		preElement := element.Find("pre")
-		if strings.TrimSpace(preElement.Text()) != "" {
-			ios = append(ios, strings.TrimSpace(preElement.Text()))
+		innerText := strings.TrimSpace(preElement.Text())
+		if innerText != "" {
+			innerText = strings.TrimSpace(preElement.HTML())
+			innerText = strings.Replace(innerText, "<pre>", "", -1)
+			innerText = strings.Replace(innerText, "</pre>", "", -1)
+			innerText = strings.Replace(innerText, "<br>", "\n", -1)
+			innerText = strings.Replace(innerText, "<br/>", "\n", -1)
+			ios = append(ios, strings.TrimSpace(innerText))
 		} else {
 			io := ""
 			for _, line := range preElement.Children() {
 				if len(io) > 0 {
 					io += "\n"
 				}
-				if len(strings.TrimSpace(line.Text())) > 0 {
-					io += strings.TrimSpace(line.Text())
+				innerText = strings.TrimSpace(line.FullText())
+				innerText = strings.Replace(innerText, "<br>", "\n", -1)
+				innerText = strings.Replace(innerText, "<br/>", "\n", -1)
+				if len(strings.TrimSpace(innerText)) > 0 {
+					io += strings.TrimSpace(innerText)
 				}
 			}
 			if len(io) > 0 {
