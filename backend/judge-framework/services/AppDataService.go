@@ -9,6 +9,7 @@ import (
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"github.com/skmonir/mango-gui/backend/socket"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -141,7 +142,7 @@ func getFilteredParseScheduledTasks(tasks []models.ParseSchedulerTask) ([]models
 		if utils.IsTimeInFuture(tasks[i].StartTime) {
 			futureTasks = append(futureTasks, tasks[i])
 		} else {
-			if tasks[i].Stage == "SCHEDULED" {
+			if strings.Contains(tasks[i].Stage, "SCHEDULED") {
 				tasks[i].Stage = "EXPIRED"
 			}
 			expiredTasks = append(expiredTasks, tasks[i])

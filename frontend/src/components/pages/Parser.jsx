@@ -178,7 +178,11 @@ function Parser({ config, appData }) {
   };
 
   const getSchedulerRowColor = stage => {
-    if (stage === "SCHEDULED" || stage === "COMPLETE") {
+    if (
+      stage === "SCHEDULED" ||
+      stage === "RE_SCHEDULED" ||
+      stage === "COMPLETE"
+    ) {
       return "table-success";
     } else if (stage === "RUNNING") {
       return "table-warning";
@@ -294,7 +298,8 @@ function Parser({ config, appData }) {
                   size="sm"
                   disabled={
                     disableActionButtons() ||
-                    scheduledTask.stage !== "SCHEDULED"
+                    (scheduledTask.stage !== "SCHEDULED" &&
+                      scheduledTask.stage !== "RE_SCHEDULED")
                   }
                   onClick={() => removeScheduledTaskTriggered(scheduledTask.id)}
                 >

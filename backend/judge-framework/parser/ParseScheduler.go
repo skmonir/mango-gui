@@ -48,7 +48,7 @@ func fetchStartTime(url string) (time.Time, error) {
 	}
 
 	if platform == "codeforces" && strings.Contains(url, "codeforces.com/contest") {
-		err, body := getContestDetailPage("https://codeforces.com/contests")
+		err, body := getContestDetailPage("https://codeforces.com/contests?complete=true")
 		if err != nil {
 			return time.Time{}, err
 		}
@@ -180,6 +180,7 @@ func ScheduleTaskInScheduler(scheduleTask models.ParseSchedulerTask) error {
 func parseWithRetry(scheduleTask models.ParseSchedulerTask) {
 	if timeChanged, newStartTime := checkIfScheduledTimeChanged(scheduleTask.Url, scheduleTask.StartTime); timeChanged {
 		scheduleTask.StartTime = newStartTime
+		scheduleTask.Stage = "RE_SCHEDULED"
 		services.UpdateParseScheduledTask(scheduleTask)
 		return
 	}
