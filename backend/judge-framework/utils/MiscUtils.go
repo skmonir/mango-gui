@@ -116,7 +116,7 @@ func ParseMemoryInKb(memory uint64) string {
 	return fmt.Sprintf("%v KB", memory/1024)
 }
 
-func GetAppDataDirectoryPath() string {
+func GetAppHomeDirectoryPath() string {
 	configPath := ""
 	switch runtime.GOOS {
 	case "linux":
@@ -169,7 +169,7 @@ func IsOsMac() bool {
 }
 
 func GetDefaultTemplateFilePathByLang(lang string) string {
-	templateDirectory := filepath.Join(GetAppDataDirectoryPath(), "source_templates")
+	templateDirectory := filepath.Join(GetAppHomeDirectoryPath(), "source_templates")
 	templateFilePath := ""
 	if lang == "cpp" {
 		templateFilePath = filepath.Join(templateDirectory, "template_CPP.cpp")

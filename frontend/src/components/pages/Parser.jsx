@@ -415,7 +415,6 @@ function Parser({ config, appData }) {
           {!config.workspaceDirectory && (
             <Row>
               <Col>
-                <br />
                 <Alert variant="danger" className="text-center p-1 mb-2">
                   Configuration is not set properly. Please go to Settings and
                   set necessary fields.

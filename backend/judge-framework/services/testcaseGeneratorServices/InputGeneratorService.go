@@ -166,7 +166,7 @@ func compileScript(filePathWithExt string, skipIfCompiled bool) string {
 }
 
 func getScriptDirectory() string {
-	appdataDirectory := utils.GetAppDataDirectoryPath()
+	appdataDirectory := utils.GetAppHomeDirectoryPath()
 	scriptDirectory := filepath.Join(appdataDirectory, "tgen_scripts")
 	return scriptDirectory
 }

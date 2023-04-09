@@ -29,6 +29,7 @@ func ResetConfig(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON("Oops! Something went wrong!")
 	}
+	config.UpdateJudgeConfigIntoCache(conf)
 	sourceTemplateService.CreateDefaultTemplateFiles()
 	return ctx.Status(fiber.StatusOK).JSON(conf)
 }

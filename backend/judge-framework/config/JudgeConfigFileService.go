@@ -16,13 +16,13 @@ import (
 func GetJudgeConfigFromFile() *JudgeConfig {
 	var err error
 	config := JudgeConfig{}
-	if !isConfigExist() {
+	configFilePath := getConfigFilePath()
+
+	if !utils.IsFileExist(configFilePath) {
 		if config, err = CreateDefaultConfig(); err != nil {
 			return &config
 		}
 	}
-
-	configFilePath := getConfigFilePath()
 
 	data, e := ioutil.ReadFile(configFilePath)
 	if e != nil {
@@ -59,11 +59,11 @@ func SaveConfigIntoJsonFile(config JudgeConfig) error {
 }
 
 func getConfigFilePath() string {
-	return filepath.Join(utils.GetAppDataDirectoryPath(), "config.json")
+	return filepath.Join(getConfigDirectoryPath(), "config.json")
 }
 
 func isConfigDirExist() bool {
-	_, err := os.Stat(utils.GetAppDataDirectoryPath())
+	_, err := os.Stat(getConfigDirectoryPath())
 	if err != nil || os.IsNotExist(err) {
 		return false
 	}
@@ -72,8 +72,8 @@ func isConfigDirExist() bool {
 
 func createConfigDir() error {
 	if !isConfigDirExist() {
-		fmt.Println("Creating config directory " + utils.GetAppDataDirectoryPath())
-		if err := os.MkdirAll(utils.GetAppDataDirectoryPath(), os.ModePerm); err != nil {
+		fmt.Println("Creating config directory " + getConfigDirectoryPath())
+		if err := os.MkdirAll(getConfigDirectoryPath(), os.ModePerm); err != nil {
 			fmt.Println(err)
 			return err
 		}
@@ -81,13 +81,8 @@ func createConfigDir() error {
 	return nil
 }
 
-func isConfigExist() bool {
-	cfgFilePath := getConfigFilePath()
-	info, err := os.Stat(cfgFilePath)
-	if err != nil || os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
+func getConfigDirectoryPath() string {
+	return filepath.Join(utils.GetAppHomeDirectoryPath(), "appdata")
 }
 
 func CreateDefaultConfig() (JudgeConfig, error) {

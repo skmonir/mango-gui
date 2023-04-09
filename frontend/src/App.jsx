@@ -160,11 +160,11 @@ function App() {
                     <Tab.Pane eventKey="output_generator">
                       <OutputGenerator appData={appData} />
                     </Tab.Pane>
+                    <Tab.Pane eventKey="settings">
+                      <Settings setConfig={setConfig} />
+                    </Tab.Pane>
                   </>
                 )}
-                <Tab.Pane eventKey="settings">
-                  <Settings setConfig={setConfig} />
-                </Tab.Pane>
               </Tab.Content>
             </Col>
           </Row>

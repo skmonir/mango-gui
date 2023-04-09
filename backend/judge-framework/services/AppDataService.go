@@ -27,7 +27,7 @@ type AppData struct {
 /* App Data Section */
 
 func InitAppDataIfNotAvailable() {
-	appDataPath := filepath.Join(utils.GetAppDataDirectoryPath(), "appdata", "AppData.json")
+	appDataPath := filepath.Join(utils.GetAppHomeDirectoryPath(), "appdata", "appdata.json")
 	if !utils.IsFileExist(appDataPath) {
 		appData := getDefaultAppData()
 		UpdateAppDataIntoFile(appData)
@@ -61,7 +61,7 @@ func GetAppData() AppData {
 
 func fetchAppDataFromFile() AppData {
 	appData := getDefaultAppData()
-	appDataPath := filepath.Join(utils.GetAppDataDirectoryPath(), "appdata", "AppData.json")
+	appDataPath := filepath.Join(utils.GetAppHomeDirectoryPath(), "appdata", "appdata.json")
 	appDataStr := utils.ReadFileContent(appDataPath, constants.IO_MAX_ROW_FOR_TEST, constants.IO_MAX_COL_FOR_TEST)
 	if len(appDataStr) == 0 {
 		return appData
@@ -77,7 +77,7 @@ func UpdateAppDataIntoFile(appData AppData) {
 	if err != nil {
 		logger.Error(err.Error())
 	}
-	utils.WriteFileContent(filepath.Join(utils.GetAppDataDirectoryPath(), "appdata"), "AppData.json", appDataBytes)
+	utils.WriteFileContent(filepath.Join(utils.GetAppHomeDirectoryPath(), "appdata"), "appdata.json", appDataBytes)
 }
 
 func getDefaultAppData() AppData {

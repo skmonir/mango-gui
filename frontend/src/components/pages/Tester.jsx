@@ -691,8 +691,7 @@ export default function Tester({ config, appData }) {
       return (
         <Row>
           <Col>
-            <br />
-            <Alert variant="danger" className="text-center">
+            <Alert variant="danger" className="text-center p-1 mb-2">
               Configuration is not set properly. Please go to Settings and set
               necessary fields.
             </Alert>

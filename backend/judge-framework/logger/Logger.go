@@ -32,7 +32,7 @@ func Error(message string) {
 
 func getLogFile() (*os.File, error) {
 	currentTime := time.Now()
-	logDir := filepath.Join(utils.GetAppDataDirectoryPath(), "logs")
+	logDir := filepath.Join(utils.GetAppHomeDirectoryPath(), "logs")
 	filename := currentTime.Format("2006-01-02") + ".log"
 	logfile := filepath.Join(logDir, filename)
 
@@ -48,7 +48,7 @@ func getLogFile() (*os.File, error) {
 }
 
 func InvalidateLogFiles() {
-	logDir := filepath.Join(utils.GetAppDataDirectoryPath(), "logs")
+	logDir := filepath.Join(utils.GetAppHomeDirectoryPath(), "logs")
 	logFiles := utils.GetFileNamesInDirectory(logDir)
 	currentTime, _ := time.Parse("2006-01-02", time.Now().Format("2006-01-02"))
 

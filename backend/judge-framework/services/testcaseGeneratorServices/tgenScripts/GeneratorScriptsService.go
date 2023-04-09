@@ -17,7 +17,7 @@ var generatorContent []byte
 var testlibContent []byte
 
 func CreateGeneratorScriptsIfNotAvailable() {
-	appdataDirectory := utils.GetAppDataDirectoryPath()
+	appdataDirectory := utils.GetAppHomeDirectoryPath()
 	scriptDirectory := filepath.Join(appdataDirectory, "tgen_scripts")
 	scriptFiles := []string{"validator.cpp", "generator.cpp", "testlib.h"}
 
@@ -33,7 +33,7 @@ func CreateGeneratorScriptsIfNotAvailable() {
 }
 
 func createScriptFiles() {
-	appdataDirectory := utils.GetAppDataDirectoryPath()
+	appdataDirectory := utils.GetAppHomeDirectoryPath()
 	scriptDirectory := filepath.Join(appdataDirectory, "tgen_scripts")
 	utils.WriteFileContent(scriptDirectory, "validator.cpp", validatorContent)
 	utils.WriteFileContent(scriptDirectory, "generator.cpp", generatorContent)
