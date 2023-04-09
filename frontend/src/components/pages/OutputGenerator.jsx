@@ -43,7 +43,7 @@ export default function OutputGenerator({ appData }) {
   const [generatorExecResult, setGeneratorExecResult] = useState({});
 
   useEffect(() => {
-    // fetchHistory();
+    setOutputGenerateRequest(appData?.queryHistories?.outputGenerateRequest);
     let socketConnGenerator = socketClient.initSocketConnection(
       "output_generate_result_event",
       updateExecResultFromSocket
@@ -52,12 +52,6 @@ export default function OutputGenerator({ appData }) {
       socketConnGenerator.close();
     };
   }, []);
-
-  const fetchHistory = () => {
-    DataService.getHistory().then(appHistory => {
-      setOutputGenerateRequest(appHistory.outputGenerateRequest);
-    });
-  };
 
   const fetchIODirectories = () => {
     if (!Utils.isStrNullOrEmpty(outputGenerateRequest.parsedProblemUrl)) {

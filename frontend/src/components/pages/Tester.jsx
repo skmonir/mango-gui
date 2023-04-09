@@ -86,7 +86,7 @@ export default function Tester({ config, appData }) {
   const [customTestEvent, setCustomTestEvent] = useState("");
 
   useEffect(() => {
-    // fetchHistory();
+    setTestContestUrl(appData?.queryHistories?.testContestUrl);
     let socketConnTest = socketClient.initSocketConnection(
       "test_exec_result_event",
       updateExecResultFromSocket
@@ -100,12 +100,6 @@ export default function Tester({ config, appData }) {
       socketConnStatus.close();
     };
   }, []);
-
-  const fetchHistory = () => {
-    DataService.getHistory().then(appHistory => {
-      setTestContestUrl(appHistory?.testContestUrl);
-    });
-  };
 
   const getProblemList = () => {
     setLoadingInProgress(true);

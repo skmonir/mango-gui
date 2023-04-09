@@ -87,7 +87,7 @@ export default function InputGenerator({ appData }) {
   const [generatorExecResult, setGeneratorExecResult] = useState(null);
 
   useEffect(() => {
-    // fetchHistory();
+    setInputGenerateRequest(appData?.queryHistories?.inputGenerateRequest);
     let socketConnGenerator = socketClient.initSocketConnection(
       "input_generate_result_event",
       updateExecResultFromSocket
@@ -96,12 +96,6 @@ export default function InputGenerator({ appData }) {
       socketConnGenerator.close();
     };
   }, []);
-
-  const fetchHistory = () => {
-    DataService.getHistory().then(appHistory => {
-      setInputGenerateRequest(appHistory.inputGenerateRequest);
-    });
-  };
 
   const insertScript = () => {
     let keyword = selectedScriptKeyword;
