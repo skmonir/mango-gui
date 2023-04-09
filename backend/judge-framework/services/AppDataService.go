@@ -39,7 +39,7 @@ func GetAppData() AppData {
 	futureTasks, expiredTasks := getFilteredParseScheduledTasks(appData.ParseSchedulerTasks)
 
 	if len(expiredTasks) > 0 {
-		var slightExpiredTasks []models.ParseSchedulerTask
+		slightExpiredTasks := []models.ParseSchedulerTask{}
 		for i := 0; i < len(expiredTasks); i++ {
 			if utils.IsTimeInFuture(expiredTasks[i].StartTime.Add(2 * time.Hour)) {
 				if expiredTasks[i].Stage == "RUNNING" {
@@ -135,8 +135,8 @@ func GetFutureParseScheduledTasks() []models.ParseSchedulerTask {
 }
 
 func getFilteredParseScheduledTasks(tasks []models.ParseSchedulerTask) ([]models.ParseSchedulerTask, []models.ParseSchedulerTask) {
-	var futureTasks []models.ParseSchedulerTask
-	var expiredTasks []models.ParseSchedulerTask
+	futureTasks := []models.ParseSchedulerTask{}
+	expiredTasks := []models.ParseSchedulerTask{}
 	for i := 0; i < len(tasks); i++ {
 		if utils.IsTimeInFuture(tasks[i].StartTime) {
 			futureTasks = append(futureTasks, tasks[i])
@@ -162,7 +162,7 @@ func AddParseScheduledTask(newTask models.ParseSchedulerTask) {
 
 func RemoveParseScheduledTasksByIds(taskIds []string) {
 	appData := GetAppData()
-	var newTasks []models.ParseSchedulerTask
+	newTasks := []models.ParseSchedulerTask{}
 	for i := 0; i < len(appData.ParseSchedulerTasks); i++ {
 		if !utils.SliceContains(taskIds, appData.ParseSchedulerTasks[i].Id) {
 			newTasks = append(newTasks, appData.ParseSchedulerTasks[i])
