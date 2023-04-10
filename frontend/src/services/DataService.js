@@ -172,11 +172,15 @@ class DataService {
   }
 
   scheduleParse(req) {
-    return this.postData("schedule/", req);
+    return this.postData("schedule/parse/", req);
+  }
+
+  getParseScheduledTasks() {
+    return this.getData("schedule/parse/");
   }
 
   removeParseScheduledTask(id) {
-    return this.deleteData("schedule/" + id);
+    return this.deleteData("schedule/parse/" + id);
   }
 }
 

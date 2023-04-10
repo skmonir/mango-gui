@@ -32,7 +32,7 @@ func ScheduleParse(url string) error {
 	}
 
 	fmt.Println(startTime)
-	if err := scheduleTheParsing(url, startTime); err != nil {
+	if err := scheduleTheParsing(url, "SCHEDULED", startTime); err != nil {
 		return err
 	}
 
@@ -157,12 +157,12 @@ func getAtcoderContestStartTime(body soup.Root) (time.Time, error) {
 	return startTimeLocal, nil
 }
 
-func scheduleTheParsing(url string, parsingTime time.Time) error {
+func scheduleTheParsing(url, stage string, parsingTime time.Time) error {
 	scheduleTask := models.ParseSchedulerTask{
 		Id:        uuid.New().String(),
 		Url:       url,
 		StartTime: parsingTime,
-		Stage:     "SCHEDULED",
+		Stage:     stage,
 	}
 
 	if err := ScheduleTaskInScheduler(scheduleTask); err != nil {
@@ -174,14 +174,16 @@ func scheduleTheParsing(url string, parsingTime time.Time) error {
 }
 
 func ScheduleTaskInScheduler(scheduleTask models.ParseSchedulerTask) error {
+	if !utils.IsTimeInFuture(scheduleTask.StartTime) {
+		return errors.New("Schedule only upcoming contests")
+	}
 	return scheduler.ScheduleOneTimeTask(scheduleTask.Id, func() { go parseWithRetry(scheduleTask) }, scheduleTask.StartTime)
 }
 
 func parseWithRetry(scheduleTask models.ParseSchedulerTask) {
 	if timeChanged, newStartTime := checkIfScheduledTimeChanged(scheduleTask.Url, scheduleTask.StartTime); timeChanged {
-		scheduleTask.StartTime = newStartTime
-		scheduleTask.Stage = "RE_SCHEDULED"
-		services.UpdateParseScheduledTask(scheduleTask)
+		RemoveParseSchedule(scheduleTask.Id)
+		_ = scheduleTheParsing(scheduleTask.Url, "RE_SCHEDULED", newStartTime)
 		return
 	}
 	isParsed := false

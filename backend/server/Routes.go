@@ -81,7 +81,9 @@ func SetRoutes(app fiber.Router) {
 	app.Get("/appdata", controllers.GetAppData)
 
 	// Parse Scheduler Routes
-	app.Post("/schedule", controllers.ScheduleParse)
+	app.Post("/schedule/parse", controllers.ScheduleParse)
 
-	app.Delete("/schedule/:id", controllers.RemoveParseScheduledTask)
+	app.Get("/schedule/parse", controllers.GetParseScheduledTasks)
+
+	app.Delete("/schedule/parse/:id", controllers.RemoveParseScheduledTask)
 }

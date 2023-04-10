@@ -32,6 +32,11 @@ func ScheduleParse(ctx *fiber.Ctx) error {
 	})
 }
 
+func GetParseScheduledTasks(ctx *fiber.Ctx) error {
+	appData := services.GetAppData()
+	return ctx.Status(fiber.StatusOK).JSON(appData.ParseSchedulerTasks)
+}
+
 func RemoveParseScheduledTask(ctx *fiber.Ctx) error {
 	taskId := ctx.Params("id")
 	parser.RemoveParseSchedule(taskId)

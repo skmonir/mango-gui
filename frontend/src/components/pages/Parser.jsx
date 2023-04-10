@@ -7,6 +7,7 @@ import {
   faClock,
   faDownload,
   faFileCirclePlus,
+  faRefresh,
   faSyncAlt,
   faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
@@ -24,19 +25,22 @@ function Parser({ config, appData }) {
 
   const [parseUrl, setParseUrl] = useState("");
   const [initAlert, setInitAlert] = useState(false);
-  const [parsingInProgress, setParsingInProgress] = useState(false);
-  const [schedulerInProgress, setSchedulerInProgress] = useState(false);
   const [parseSchedulerTasks, setParseSchedulerTasks] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMsgObj, setToastMsgObj] = useState({
     variant: "",
     message: ""
   });
-  const [parsingSingleProblem, setParsingSingleProblem] = useState(false);
   const [parsedProblemList, setParsedProblemList] = useState([]);
   const [showAddCustomProblemModal, setShowAddCustomProblemModal] = useState(
     false
   );
+  const [ipFlags, setIpFlags] = useState({
+    parsingWithUrl: false,
+    parsingWithRefresh: false,
+    scheduling: false,
+    refreshingScheduledTasks: false
+  });
 
   useEffect(() => {
     setParseUrl(appData?.queryHistories?.parseUrl);
@@ -57,19 +61,28 @@ function Parser({ config, appData }) {
   }, []);
 
   const parseTriggerred = () => {
-    setParsingInProgress(true);
+    setIpFlags({
+      ...ipFlags,
+      parsingWithUrl: true
+    });
     setTimeout(() => {
       DataService.parse(window.btoa(parseUrl)).then(data => {
         setParsedProblemList(data);
-        setParsingInProgress(false);
+        setIpFlags({
+          ...ipFlags,
+          parsingWithUrl: false
+        });
         setInitAlert(true);
       });
     }, 0);
   };
 
   const parseSingleProblem = (index, url) => {
-    setParsingInProgress(true);
-    setParsingSingleProblem(true);
+    setIpFlags({
+      ...ipFlags,
+      parsingWithUrl: true,
+      parsingWithRefresh: true
+    });
     setParsedProblemList(
       parsedProblemList.map((prob, i) =>
         i === index
@@ -85,13 +98,19 @@ function Parser({ config, appData }) {
       setParsedProblemList(
         parsedProblemList.map((prob, i) => (i === index ? data[0] : prob))
       );
-      setParsingInProgress(false);
-      setParsingSingleProblem(false);
+      setIpFlags({
+        ...ipFlags,
+        parsingWithUrl: false,
+        parsingWithRefresh: false
+      });
     });
   };
 
   const scheduleParse = () => {
-    setSchedulerInProgress(true);
+    setIpFlags({
+      ...ipFlags,
+      scheduling: true
+    });
     DataService.scheduleParse({ url: parseUrl })
       .then(data => {
         console.log(data);
@@ -100,7 +119,12 @@ function Parser({ config, appData }) {
         console.log(error);
         showToastMessage("Error", error.response.data.message);
       })
-      .finally(() => setSchedulerInProgress(false));
+      .finally(() =>
+        setIpFlags({
+          ...ipFlags,
+          scheduling: false
+        })
+      );
   };
 
   const removeScheduledTaskTriggered = taskId => {
@@ -130,13 +154,35 @@ function Parser({ config, appData }) {
     if (data.length > 1) {
       setParsedProblemList(data);
       setInitAlert(false);
-      setParsingInProgress(false);
+      setIpFlags({
+        ...ipFlags,
+        parsingWithUrl: false
+      });
     }
   };
 
   const updateParseScheduledTasksFromSocket = tasks => {
     console.log(tasks);
     setParseSchedulerTasks(tasks);
+  };
+
+  const getScheduledTasks = () => {
+    setIpFlags({
+      ...ipFlags,
+      refreshingScheduledTasks: true
+    });
+    setTimeout(() => {
+      DataService.getParseScheduledTasks()
+        .then(tasks => {
+          setParseSchedulerTasks(tasks);
+        })
+        .finally(() => {
+          setIpFlags({
+            ...ipFlags,
+            refreshingScheduledTasks: false
+          });
+        });
+    }, 700);
   };
 
   const createCustomProblem = () => {
@@ -172,9 +218,11 @@ function Parser({ config, appData }) {
   };
 
   const disableActionButtons = () => {
-    return (
-      parsingInProgress || schedulerInProgress || !config.workspaceDirectory
-    );
+    let disable = false;
+    for (const [_, value] of Object.entries(ipFlags)) {
+      disable = disable || value;
+    }
+    return disable || !config.workspaceDirectory;
   };
 
   const getSchedulerRowColor = stage => {
@@ -234,7 +282,7 @@ function Parser({ config, appData }) {
                   size="sm"
                   onClick={() => parseSingleProblem(id, problem?.url)}
                   disabled={
-                    parsingInProgress ||
+                    ipFlags.parsingWithUrl ||
                     !config.workspaceDirectory ||
                     problem?.url.startsWith("custom/")
                   }
@@ -293,18 +341,19 @@ function Parser({ config, appData }) {
               </td>
               <td className="text-center">{scheduledTask?.stage}</td>
               <td className="text-center">
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  disabled={
-                    disableActionButtons() ||
-                    (scheduledTask.stage !== "SCHEDULED" &&
-                      scheduledTask.stage !== "RE_SCHEDULED")
-                  }
-                  onClick={() => removeScheduledTaskTriggered(scheduledTask.id)}
-                >
-                  <FontAwesomeIcon icon={faBan} /> Cancel Schedule
-                </Button>
+                {(scheduledTask.stage === "SCHEDULED" ||
+                  scheduledTask.stage === "RE_SCHEDULED") && (
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    disabled={disableActionButtons()}
+                    onClick={() =>
+                      removeScheduledTaskTriggered(scheduledTask.id)
+                    }
+                  >
+                    <FontAwesomeIcon icon={faBan} /> Cancel Schedule
+                  </Button>
+                )}
               </td>
             </tr>
           ))}
@@ -314,7 +363,7 @@ function Parser({ config, appData }) {
   };
 
   const getParserBody = () => {
-    if (parsingInProgress && !parsingSingleProblem) {
+    if (ipFlags.parsingWithUrl && !ipFlags.parsingWithRefresh) {
       return <Loading />;
     } else if (parsedProblemList && parsedProblemList.length > 0) {
       return getParsingTable();
@@ -356,7 +405,7 @@ function Parser({ config, appData }) {
                     disableActionButtons() || Utils.isStrNullOrEmpty(parseUrl)
                   }
                 >
-                  {parsingInProgress ? (
+                  {ipFlags.parsingWithUrl ? (
                     <Spinner
                       as="span"
                       animation="border"
@@ -381,7 +430,7 @@ function Parser({ config, appData }) {
                     disableActionButtons() || Utils.isStrNullOrEmpty(parseUrl)
                   }
                 >
-                  {schedulerInProgress ? (
+                  {ipFlags.scheduling ? (
                     <Spinner
                       as="span"
                       animation="border"
@@ -412,9 +461,36 @@ function Parser({ config, appData }) {
           </Row>
           <hr />
           {parseSchedulerTasks?.length > 0 && (
-            <Row>
-              <Col xs={12}>{getParseSchedulerTasksTable()}</Col>
-            </Row>
+            <>
+              <Row>
+                <Col xs="auto">
+                  <Button
+                    size="sm"
+                    variant="outline-secondary"
+                    className="mb-1"
+                    disabled={disableActionButtons()}
+                    onClick={getScheduledTasks}
+                  >
+                    {ipFlags.refreshingScheduledTasks ? (
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                        variant="success"
+                      />
+                    ) : (
+                      <FontAwesomeIcon icon={faRefresh} />
+                    )}{" "}
+                    Refresh Scheduled Tasks
+                  </Button>
+                </Col>
+              </Row>
+              <Row>
+                <Col xs={12}>{getParseSchedulerTasksTable()}</Col>
+              </Row>
+            </>
           )}
           {getParserBody()}
           {!config.workspaceDirectory && (

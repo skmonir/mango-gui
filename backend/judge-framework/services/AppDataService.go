@@ -43,9 +43,6 @@ func GetAppData() AppData {
 		slightExpiredTasks := []models.ParseSchedulerTask{}
 		for i := 0; i < len(expiredTasks); i++ {
 			if utils.IsTimeInFuture(expiredTasks[i].StartTime.Add(30 * time.Minute)) {
-				if expiredTasks[i].Stage == "RUNNING" {
-					expiredTasks[i].Stage = "ABORTED"
-				}
 				slightExpiredTasks = append(slightExpiredTasks, expiredTasks[i])
 			}
 		}
@@ -144,6 +141,8 @@ func getFilteredParseScheduledTasks(tasks []models.ParseSchedulerTask) ([]models
 		} else {
 			if strings.Contains(tasks[i].Stage, "SCHEDULED") {
 				tasks[i].Stage = "EXPIRED"
+			} else if tasks[i].Stage == "RUNNING" {
+				tasks[i].Stage = "ABORTED"
 			}
 			expiredTasks = append(expiredTasks, tasks[i])
 		}
