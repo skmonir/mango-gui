@@ -1,18 +1,12 @@
-import { Button, Col, Modal, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBookOpenReader,
   faBug,
-  faCheck,
-  faGift
+  faCheck
 } from "@fortawesome/free-solid-svg-icons";
 import appLogo from "../../assets/icons/logo.png";
-import github from "../../assets/icons/github.svg";
 import DataService from "../../services/DataService.js";
-import { useEffect, useState } from "react";
-import Loading from "../misc/Loading.jsx";
-import SocketClient from "../../socket/SocketClient.js";
-import InitializerModal from "../modals/InitializerModal.jsx";
 
 export default function Home() {
   const features = [
