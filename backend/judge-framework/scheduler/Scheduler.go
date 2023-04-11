@@ -20,19 +20,37 @@ func initScheduler() {
 	}
 }
 
-func ScheduleOneTimeTask(taskId string, action func(), timeToSchedule time.Time) error {
+func ScheduleOneTimeTask(taskId string, action func(), startTime time.Time) error {
 	initScheduler()
 
 	taskScheduler := chrono.NewDefaultTaskScheduler()
 	task, err := taskScheduler.Schedule(func(ctx context.Context) {
 		action()
-	}, chrono.WithTime(timeToSchedule))
+	}, chrono.WithTime(startTime))
 	if err != nil {
 		logger.Error(err.Error())
 		return err
 	}
 	scheduleTasks[taskId] = task
 	fmt.Println("Task scheduled successfully")
+	return nil
+}
+
+func ScheduleTaskWithFixedDelay(taskId string, action func(), delay time.Duration, startTime time.Time) error {
+	initScheduler()
+
+	taskScheduler := chrono.NewDefaultTaskScheduler()
+
+	task, err := taskScheduler.ScheduleWithFixedDelay(func(ctx context.Context) {
+		action()
+	}, delay, chrono.WithTime(startTime))
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	scheduleTasks[taskId] = task
+	fmt.Println("Task with fixed delay scheduled successfully")
 	return nil
 }
 
@@ -43,7 +61,7 @@ func RemoveScheduledTask(taskId string) {
 		delete(scheduleTasks, taskId)
 		if !task.IsCancelled() {
 			task.Cancel()
+			fmt.Println("Scheduled task canceled successfully")
 		}
 	}
-	fmt.Println("Scheduled task canceled successfully")
 }
