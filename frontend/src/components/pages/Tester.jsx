@@ -211,10 +211,14 @@ export default function Tester({ config, appData }) {
 
   const submitCode = () => {
     setSubmittingInProgress(true);
-    setTimeout(() => {
-      showToastMessage("Success", "Code submitted successfully!");
-      setSubmittingInProgress(false);
-    }, 1500);
+    DataService.submitCode(selectedProblemMetadata)
+      .then(resp => {
+        console.log(resp);
+      })
+      .catch(error => {
+        console.log(error.response.data.message);
+      })
+      .finally(() => setSubmittingInProgress(false));
   };
 
   const addCustomTest = () => {
@@ -428,7 +432,11 @@ export default function Tester({ config, appData }) {
         size="sm"
         variant="success"
         onClick={() => submitCode()}
-        disabled={disableActionButtons() || !selectedProblemFilteredExecResult}
+        disabled={
+          disableActionButtons() ||
+          !selectedProblemFilteredExecResult ||
+          selectedProblem.platform === "atcoder"
+        }
       >
         {submittingInProgress ? (
           <Spinner
@@ -782,6 +790,10 @@ export default function Tester({ config, appData }) {
             {
               colSpan: "auto",
               elem: getRunTestButton()
+            },
+            {
+              colSpan: "auto",
+              elem: getSubmitButton()
             },
             {
               colSpan: "auto",

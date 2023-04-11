@@ -32,7 +32,9 @@ func GetHtmlBody(URL string) (string, error) {
 }
 
 func GetBody(client *http.Client, URL string) ([]byte, error) {
+	log.Println("Fetching html from " + URL)
 	resp, err := client.Get(URL)
+	log.Println("Fetched html with status ", resp.StatusCode)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +43,9 @@ func GetBody(client *http.Client, URL string) ([]byte, error) {
 }
 
 func PostBody(client *http.Client, URL string, data url.Values) ([]byte, error) {
+	log.Println("Posting data to ", URL)
 	resp, err := client.PostForm(URL, data)
+	log.Println("Posted data with status ", resp.StatusCode)
 	if err != nil {
 		return nil, err
 	}

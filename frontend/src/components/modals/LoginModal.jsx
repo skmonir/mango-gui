@@ -1,17 +1,31 @@
-import { Alert, Button, Col, Modal, Row, Spinner } from "react-bootstrap";
+import {
+  Alert,
+  Button,
+  Col,
+  InputGroup,
+  Modal,
+  Row,
+  Spinner
+} from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEye,
+  faEyeSlash,
+  faRightToBracket
+} from "@fortawesome/free-solid-svg-icons";
 import DataService from "../../services/DataService.js";
 import { useState } from "react";
 import Utils from "../../Utils.js";
 
-export default function LoginModal({ setShowModal }) {
+export default function LoginModal({ setShowLoginModal }) {
   const [form, setForm] = useState({
     platform: "codeforces",
     handleOrEmail: "",
     password: ""
   });
+  const [showModal, setShowModal] = useState(true);
+  const [showPass, setShowPass] = useState(false);
   const [loginInProgress, setLoginInProgress] = useState(false);
   const [alert, setAlert] = useState({
     message: "",
@@ -45,9 +59,7 @@ export default function LoginModal({ setShowModal }) {
           message: `Hi, ${resp.handle}!`,
           variant: "success"
         });
-        setTimeout(() => {
-          setShowModal(false);
-        }, 1000);
+        setTimeout(() => closeModal(), 1000);
       })
       .catch(error => {
         setAlert({
@@ -58,9 +70,14 @@ export default function LoginModal({ setShowModal }) {
       .finally(() => setLoginInProgress(false));
   };
 
+  const closeModal = () => {
+    setShowModal(false);
+    setTimeout(() => setShowLoginModal(false), 500);
+  };
+
   return (
     <Modal
-      show={true}
+      show={showModal}
       size="sm"
       aria-labelledby="contained-modal-title-vcenter"
       centered
@@ -101,15 +118,24 @@ export default function LoginModal({ setShowModal }) {
           <Col xs={12}>
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                size="sm"
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="none"
-                value={form.password}
-                onChange={e => setForm({ ...form, password: e.target.value })}
-              />
+              <InputGroup className="mb-3">
+                <Form.Control
+                  type={showPass ? "text" : "password"}
+                  size="sm"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  value={form.password}
+                  onChange={e => setForm({ ...form, password: e.target.value })}
+                />
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setShowPass(!showPass)}
+                >
+                  <FontAwesomeIcon icon={showPass ? faEyeSlash : faEye} />
+                </Button>
+              </InputGroup>
             </Form.Group>
           </Col>
         </Row>
@@ -124,11 +150,7 @@ export default function LoginModal({ setShowModal }) {
         )}
       </Modal.Body>
       <Modal.Footer style={{ paddingBottom: "5px", paddingTop: "5px" }}>
-        <Button
-          size="sm"
-          variant="outline-secondary"
-          onClick={() => setShowModal(false)}
-        >
+        <Button size="sm" variant="outline-secondary" onClick={closeModal}>
           Cancel
         </Button>
         <Button size="sm" variant="outline-success" onClick={doLogin}>

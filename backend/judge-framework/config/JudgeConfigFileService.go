@@ -91,8 +91,9 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 	}
 
 	conf := JudgeConfig{
-		AppVersion: constants.APP_VERSION,
-		ActiveLang: "cpp",
+		AppVersion:   constants.APP_VERSION,
+		ActiveLang:   "cpp",
+		ActiveLangId: "",
 		LangConfigs: map[string]LanguageConfig{
 			"cpp": {
 				Lang:                "CPP",

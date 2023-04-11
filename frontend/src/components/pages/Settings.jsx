@@ -1,13 +1,20 @@
 import { Button, Card, Col, InputGroup, Row, Spinner } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCode, faSave, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCode,
+  faFileCode,
+  faRightToBracket,
+  faSave,
+  faSyncAlt
+} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import DataService from "../../services/DataService.js";
 import ViewCodeModal from "../modals/ViewCodeModal.jsx";
 import ShowToast from "../Toast/ShowToast.jsx";
 import Utils from "../../Utils.js";
 import { confirmAlert } from "react-confirm-alert";
+import LoginModal from "../modals/LoginModal.jsx";
 
 export default function Settings({ setConfig }) {
   const placeholders = {
@@ -44,6 +51,7 @@ export default function Settings({ setConfig }) {
   const [showToast, setShowToast] = useState(false);
   const [codePathForModal, setCodePathForModal] = useState("");
   const [showCodeModal, setShowCodeModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const [flags, setFlags] = useState({
     savingInProgress: false,
@@ -107,7 +115,7 @@ export default function Settings({ setConfig }) {
       errMessage += "Execution command of active language can't be empty\n";
     }
     if (
-      confToSave.activeLang != selectedLang &&
+      confToSave.activeLang !== selectedLang &&
       Utils.isStrNullOrEmpty(
         confToSave.langConfigs[selectedLang].compilationCommand
       )
@@ -115,7 +123,7 @@ export default function Settings({ setConfig }) {
       errMessage += "Compilation command of selected language can't be empty\n";
     }
     if (
-      confToSave.activeLang != selectedLang &&
+      confToSave.activeLang !== selectedLang &&
       ["java", "python"].includes(selectedLang) &&
       Utils.isStrNullOrEmpty(
         confToSave.langConfigs[selectedLang].executionCommand
@@ -270,7 +278,7 @@ export default function Settings({ setConfig }) {
       <div className="panel">
         <div className="panel-body">
           <Row>
-            <Col xs={9}>
+            <Col xs={6}>
               <Form.Group className="mb-3">
                 <Form.Label>
                   <strong>
@@ -317,6 +325,23 @@ export default function Settings({ setConfig }) {
                     })
                   }
                 />
+              </Form.Group>
+            </Col>
+            <Col sm={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Online Judge Login</strong>
+                </Form.Label>
+                <div className="d-grid gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    onClick={() => setShowLoginModal(true)}
+                  >
+                    <FontAwesomeIcon icon={faRightToBracket} /> Login to your OJ
+                    account
+                  </Button>
+                </div>
               </Form.Group>
             </Col>
           </Row>
@@ -624,6 +649,7 @@ export default function Settings({ setConfig }) {
           setShowCodeModal={setShowCodeModal}
         />
       )}
+      {showLoginModal && <LoginModal setShowLoginModal={setShowLoginModal} />}
     </div>
   );
 }

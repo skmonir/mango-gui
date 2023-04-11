@@ -6,6 +6,7 @@ type JudgeConfig struct {
 	SourceDirectory    string                    `json:"sourceDirectory"`
 	Author             string                    `json:"author"`
 	ActiveLang         string                    `json:"activeLang"`
+	ActiveLangId       string                    `json:"activeLangId"`
 	LangConfigs        map[string]LanguageConfig `json:"langConfigs"`
 	EditorPreference   EditorPreferences         `json:"editorPreference"`
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"github.com/skmonir/mango-gui/backend/judge-framework/oj/cookiejar"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
+	"github.com/skmonir/mango-gui/backend/socket"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -195,6 +196,7 @@ func (c *CodeforcesClient) Submit(problem models.Problem, langId, source string)
 	if !strings.Contains(msg, "submitted successfully") {
 		return errors.New(msg)
 	}
+	socket.PublishStatusMessage("test_status", "Submitted successfully", "success")
 
 	c.Handle = handle
 	return c.save()
