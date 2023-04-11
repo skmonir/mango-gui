@@ -16,6 +16,7 @@ import {
   faEdit,
   faFileCirclePlus,
   faFileCode,
+  faPaperPlane,
   faPlus,
   faTasks,
   faTerminal,
@@ -62,6 +63,7 @@ export default function Tester({ config, appData }) {
   const [testContestUrl, setTestContestUrl] = useState("");
   const [loadingInProgress, setLoadingInProgress] = useState(false);
   const [testingInProgress, setTestingInProgress] = useState(false);
+  const [submittingInProgress, setSubmittingInProgress] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [showAddEditTestModal, setShowAddEditTestModal] = useState(false);
 
@@ -205,6 +207,14 @@ export default function Tester({ config, appData }) {
     } else {
       setSelectedProblem(null);
     }
+  };
+
+  const submitCode = () => {
+    setSubmittingInProgress(true);
+    setTimeout(() => {
+      showToastMessage("Success", "Code submitted successfully!");
+      setSubmittingInProgress(false);
+    }, 1500);
   };
 
   const addCustomTest = () => {
@@ -380,14 +390,19 @@ export default function Tester({ config, appData }) {
   };
 
   const disableActionButtons = () => {
-    return loadingInProgress || testingInProgress || !config.workspaceDirectory;
+    return (
+      loadingInProgress ||
+      testingInProgress ||
+      submittingInProgress ||
+      !config.workspaceDirectory
+    );
   };
 
   const getRunTestButton = () => {
     return (
       <Button
         size="sm"
-        variant="success"
+        variant="primary"
         onClick={() => runTest()}
         disabled={disableActionButtons() || !selectedProblemFilteredExecResult}
       >
@@ -403,6 +418,30 @@ export default function Tester({ config, appData }) {
           <FontAwesomeIcon icon={faTerminal} />
         )}{" "}
         {" Run Test"}
+      </Button>
+    );
+  };
+
+  const getSubmitButton = () => {
+    return (
+      <Button
+        size="sm"
+        variant="success"
+        onClick={() => submitCode()}
+        disabled={disableActionButtons() || !selectedProblemFilteredExecResult}
+      >
+        {submittingInProgress ? (
+          <Spinner
+            as="span"
+            animation="border"
+            size="sm"
+            role="status"
+            aria-hidden="true"
+          />
+        ) : (
+          <FontAwesomeIcon icon={faPaperPlane} />
+        )}{" "}
+        {" Submit Code"}
       </Button>
     );
   };
@@ -475,6 +514,54 @@ export default function Tester({ config, appData }) {
               </Form.Select>
             </Form.Group>
           </Col>
+          <Col xs={2}>
+            <div className="d-grid gap-2">
+              <Button
+                size="sm"
+                variant="outline-success"
+                onClick={() => setShowCodeModal(true)}
+                disabled={!selectedProblemFilteredExecResult}
+              >
+                <FontAwesomeIcon icon={faCode} /> Open Editor
+              </Button>
+            </div>
+          </Col>
+          <Col xs={2}>
+            <div className="d-grid gap-2">
+              <Button
+                size="sm"
+                variant="outline-success"
+                onClick={() => addCustomTest()}
+                disabled={disableActionButtons()}
+              >
+                <FontAwesomeIcon icon={faPlus} /> Add Custom Test
+              </Button>
+            </div>
+          </Col>
+          <Col xs={2}>
+            <div className="d-grid gap-2">{getRunTestButton()}</div>
+          </Col>
+          <Col xs={2}>
+            <div className="d-grid gap-2">{getSubmitButton()}</div>
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={2}>
+            <Form.Group className="mb-3">
+              <Form.Select
+                size="sm"
+                aria-label="Default select example"
+                value={selectedVerdictKey}
+                onChange={e => filterVerdicts(e.currentTarget.value)}
+              >
+                {verdicts.map((ver, id) => (
+                  <option key={id} value={ver.value}>
+                    {ver.label}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
           <Col xs={6}>
             <Form.Group className="mb-3">
               <Form.Control
@@ -496,51 +583,6 @@ export default function Tester({ config, appData }) {
                 disabled={true}
               />
             </Form.Group>
-          </Col>
-          <Col xs={2}>
-            <div className="d-grid gap-2">{getRunTestButton()}</div>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={4}>
-            <Form.Group className="mb-3">
-              <Form.Select
-                size="sm"
-                aria-label="Default select example"
-                value={selectedVerdictKey}
-                onChange={e => filterVerdicts(e.currentTarget.value)}
-              >
-                {verdicts.map((ver, id) => (
-                  <option key={id} value={ver.value}>
-                    {ver.label}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col xs={2}>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => addCustomTest()}
-                disabled={disableActionButtons()}
-              >
-                <FontAwesomeIcon icon={faPlus} /> Add Custom Test
-              </Button>
-            </div>
-          </Col>
-          <Col xs={2}>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => setShowCodeModal(true)}
-                disabled={!selectedProblemFilteredExecResult}
-              >
-                <FontAwesomeIcon icon={faCode} /> Open Editor
-              </Button>
-            </div>
           </Col>
           <Col xs={2}>
             <div className="d-grid gap-2">

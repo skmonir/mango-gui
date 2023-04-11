@@ -22,13 +22,31 @@ func GetHtmlBody(URL string) (string, error) {
 	defer resp.Body.Close()
 	log.Println("Fetched html with status ", resp.StatusCode)
 	if err != nil || resp.StatusCode >= 400 {
-		return "", errors.New("error while fetching web page")
+		return "", errors.New("Error while fetching web page")
 	}
 	bt, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
 	return string(bt), nil
+}
+
+func GetBody(client *http.Client, URL string) ([]byte, error) {
+	resp, err := client.Get(URL)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	return ioutil.ReadAll(resp.Body)
+}
+
+func PostBody(client *http.Client, URL string, data url.Values) ([]byte, error) {
+	resp, err := client.PostForm(URL, data)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	return ioutil.ReadAll(resp.Body)
 }
 
 func DecodeBase64(s string) string {
@@ -56,8 +74,8 @@ func splitUrlPath(path string) []string {
 	return values
 }
 
-func ExtractInfoFromUrl(url string) (string, string, string) {
-	platform, cid, pid := "", "", ""
+func ExtractInfoFromUrl(url string) (string, string, string, string) {
+	platform, cid, pid, ctype := "", "", "", ""
 	if strings.HasPrefix(url, "custom/") {
 		values := splitUrlPath(url)
 		platform = "custom"
@@ -80,7 +98,6 @@ func ExtractInfoFromUrl(url string) (string, string, string) {
 		}
 	} else if strings.Contains(url, "codeforces.com") {
 		platform = "codeforces"
-		ctype := ""
 		if strings.Contains(url, "codeforces.com/contests") {
 			ctype = "contests"
 		} else if strings.Contains(url, "codeforces.com/contest") {
@@ -88,7 +105,7 @@ func ExtractInfoFromUrl(url string) (string, string, string) {
 		} else if strings.Contains(url, "codeforces.com/gym") {
 			ctype = "gym"
 		} else {
-			return platform, cid, pid
+			return platform, cid, pid, ctype
 		}
 		index := strings.Index(url, "codeforces.com/"+ctype)
 		path := strings.Trim(url[index+len("codeforces.com/"+ctype):], "/ \n\t")
@@ -101,7 +118,7 @@ func ExtractInfoFromUrl(url string) (string, string, string) {
 		}
 	}
 	fmt.Println("Extracted", url, ", got", platform, cid, pid)
-	return platform, cid, pid
+	return platform, cid, pid, ctype
 }
 
 func ConvertMemoryInMb(memory uint64) uint64 {

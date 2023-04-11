@@ -42,7 +42,7 @@ func ScheduleParse(url string) error {
 func fetchStartTime(url string) (time.Time, error) {
 	startTime := time.Time{}
 
-	platform, cid, _ := utils.ExtractInfoFromUrl(url)
+	platform, cid, _, _ := utils.ExtractInfoFromUrl(url)
 	if platform == "" || cid == "" {
 		return time.Time{}, errors.New("Error! Please check the url.")
 	}

@@ -462,8 +462,9 @@ function Parser({ config, appData }) {
           <hr />
           {parseSchedulerTasks?.length > 0 && (
             <>
-              <Row>
-                <Col xs="auto">
+              <Row className="mt-0">
+                <Col xs="9"></Col>
+                <Col xs="3" className="d-grid gap-2">
                   <Button
                     size="sm"
                     variant="outline-secondary"

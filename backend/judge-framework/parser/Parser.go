@@ -31,7 +31,7 @@ type Parser struct {
 func (parser *Parser) ExtractUrlAndSetVars(url string) error {
 	fmt.Println("Extracting " + url)
 
-	platform, cid, pid := utils.ExtractInfoFromUrl(url)
+	platform, cid, pid, _ := utils.ExtractInfoFromUrl(url)
 
 	if platform == "" || cid == "" {
 		return errors.New("url is not correct")

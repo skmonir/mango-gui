@@ -3,9 +3,21 @@ package utils
 import (
 	"bufio"
 	"bytes"
+	"math/rand"
 	"strings"
 	"unicode"
 )
+
+const CHA = "abcdefghijklmnopqrstuvwxyz0123456789"
+
+// RandString n is the length. a-z 0-9
+func RandString(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = CHA[rand.Intn(len(CHA))]
+	}
+	return string(b)
+}
 
 func IsDigit(r rune) bool {
 	return '0' <= r && r <= '9'

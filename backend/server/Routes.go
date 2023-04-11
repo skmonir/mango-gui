@@ -86,4 +86,9 @@ func SetRoutes(app fiber.Router) {
 	app.Get("/schedule/parse", controllers.GetParseScheduledTasks)
 
 	app.Delete("/schedule/parse/:id", controllers.RemoveParseScheduledTask)
+
+	// Online Judge Routes
+	app.Put("oj/login", controllers.Login)
+
+	app.Get("oj/submit/:platform/:cid/:label", controllers.SubmitCode)
 }

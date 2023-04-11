@@ -182,6 +182,14 @@ class DataService {
   removeParseScheduledTask(id) {
     return this.deleteData("schedule/parse/" + id);
   }
+
+  login(req) {
+    return this.putData("oj/login/", req);
+  }
+
+  submitCode(path) {
+    return this.getData("oj/submit/" + path);
+  }
 }
 
 export default new DataService();

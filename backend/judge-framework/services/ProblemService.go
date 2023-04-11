@@ -21,7 +21,7 @@ func GetProblem(platform string, cid string, label string) models.Problem {
 }
 
 func GetProblemListByUrl(url string) []models.Problem {
-	platform, cid, pid := utils.ExtractInfoFromUrl(url)
+	platform, cid, pid, _ := utils.ExtractInfoFromUrl(url)
 
 	problems := GetProblemList(platform, cid)
 	if len(problems) == 0 || pid == "" {
