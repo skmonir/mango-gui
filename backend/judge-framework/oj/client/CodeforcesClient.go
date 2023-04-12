@@ -106,7 +106,7 @@ func (c *CodeforcesClient) login() (err error) {
 		"bfaa":          {bfaa},
 		"handleOrEmail": {c.HandleOrEmail},
 		"password":      {password},
-		"_tta":          {"176"},
+		"_tta":          {"253"},
 		"remember":      {"on"},
 	})
 	if err != nil {
