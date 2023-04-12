@@ -24,7 +24,7 @@ func Submit(platform, cid, pid string) (error, string) {
 	conf := config.GetJudgeConfigFromCache()
 	sourceResp := fileServices.GetCodeByMetadata(platform, cid, pid)
 	socket.PublishStatusMessage("test_status", "Submitting code...", "info")
-	err = ojClient.Submit(problem, conf.ActiveLang, sourceResp["code"])
+	err = ojClient.Submit(problem, conf.ActiveLangId, sourceResp["code"])
 	if err != nil {
 		socket.PublishStatusMessage("test_status", err.Error(), "error")
 		return err, ""

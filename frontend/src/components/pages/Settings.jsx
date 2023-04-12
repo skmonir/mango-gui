@@ -1,9 +1,8 @@
-import { Button, Card, Col, InputGroup, Row, Spinner } from "react-bootstrap";
+import { Button, Col, InputGroup, Row, Spinner } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCode,
-  faFileCode,
   faRightToBracket,
   faSave,
   faSyncAlt
@@ -217,6 +216,31 @@ export default function Settings({ setConfig }) {
       );
   };
 
+  const activeLangIdChanged = langId => {
+    setCurrentConfig({
+      ...currentConfig,
+      activeLang: getLangByLangId(langId),
+      activeLangId: langId
+    })
+  }
+
+  const getLangByLangId = (id) => {
+    const cppLangIds = ['50', '54', '73']
+    const javaLangIds = ['36', '60', '74']
+    const pythonLangIds = ['7', '31']
+
+    if (cppLangIds.includes(id)) {
+      return "cpp"
+    }
+    if (javaLangIds.includes(id)) {
+      return "java"
+    }
+    if (pythonLangIds.includes(id)) {
+      return "python"
+    }
+    return "unknown"
+  }
+
   const selectedLangChanged = lang => {
     if (!Utils.isStrNullOrEmpty(selectedLang)) {
       updateLangConfigs();
@@ -360,17 +384,19 @@ export default function Settings({ setConfig }) {
                 <Form.Select
                   size="sm"
                   aria-label="Default select example"
-                  value={currentConfig.activeLang}
+                  value={currentConfig.activeLangId}
                   onChange={e =>
-                    setCurrentConfig({
-                      ...currentConfig,
-                      activeLang: e.currentTarget.value
-                    })
+                    activeLangIdChanged(e.currentTarget.value)
                   }
                 >
-                  <option value="cpp">CPP</option>
-                  <option value="java">Java</option>
-                  <option value="python">Python</option>
+                  <option value="50">C++14</option>
+                  <option value="54">C++17</option>
+                  <option value="73">C++20</option>
+                  <option value="36">Java 1.8</option>
+                  <option value="60">Java 11</option>
+                  <option value="74">Java 17</option>
+                  <option value="7">Python 2</option>
+                  <option value="31">Python 3</option>
                 </Form.Select>
               </Form.Group>
             </Col>
