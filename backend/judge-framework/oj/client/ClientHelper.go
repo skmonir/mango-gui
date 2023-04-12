@@ -7,7 +7,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"io"
 )
@@ -66,12 +65,4 @@ func decrypt(handle, password string) (ret string, err error) {
 	}
 	ret = string(plain)
 	return
-}
-
-func getSubmitUrl(host, url string) string {
-	oj, cid, _, ctype := utils.ExtractInfoFromUrl(url)
-	if oj == "codeforces" {
-		return fmt.Sprintf(host+"/%v/%v/submit", ctype, cid)
-	}
-	return ""
 }

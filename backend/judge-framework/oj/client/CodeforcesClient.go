@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/anaskhan96/soup"
 	"github.com/skmonir/mango-gui/backend/judge-framework/constants"
 	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
@@ -18,6 +19,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 )
 
 type CodeforcesClient struct {
@@ -180,13 +182,13 @@ func (c *CodeforcesClient) Submit(problem models.Problem, langId, source string)
 	})
 	if err != nil {
 		logger.Error(err.Error())
-		return errors.New(constants.ErrorServerError)
+		return err
 	}
 
 	errMsg, err := findErrorMessage(body)
 	if err == nil {
 		logger.Error(errMsg)
-		return errors.New(constants.ErrorServerError)
+		return errors.New(errMsg)
 	}
 
 	msg, err := findMessage(body)
@@ -198,8 +200,56 @@ func (c *CodeforcesClient) Submit(problem models.Problem, langId, source string)
 	}
 	socket.PublishStatusMessage("test_status", "Submitted successfully", "success")
 
+	c.monitorSubmission(problem)
+
 	c.Handle = handle
 	return c.save()
+}
+
+func (c *CodeforcesClient) monitorSubmission(problem models.Problem) {
+	defer utils.PanicRecovery()
+
+	submissionId := ""
+	submissionUrl := getSubmissionUrl(c.host, problem.Url)
+	time.Sleep(2 * time.Second)
+	for {
+		st := time.Now()
+
+		body, err := utils.GetBody(c.httpClient, submissionUrl)
+		if err != nil {
+			logger.Error(err.Error())
+			return
+		}
+		handle, err := findHandle(body)
+		if err != nil {
+			return
+		}
+		fmt.Printf("Current user: %v\n", handle)
+
+		soupBody := soup.HTMLParse(string(body))
+		var verdictElem soup.Root
+		if submissionId == "" {
+			submissionElem := soupBody.Find("span", "class", "submissionVerdictWrapper")
+			submissionId = submissionElem.Attrs()["submissionid"]
+			verdictElem = submissionElem.Find("span")
+		} else {
+			submissionElem := soupBody.Find("span", "submissionid", submissionId)
+			verdictElem = submissionElem.Find("span")
+		}
+
+		verdictText := strings.TrimSpace(verdictElem.FullText())
+		fmt.Println(submissionId, verdictText)
+
+		socket.PublishStatusMessage("test_status", verdictText, "info")
+		if !strings.HasPrefix(verdictText, "Running") && !strings.HasPrefix(verdictText, "In queue") {
+			return
+		}
+
+		sub := time.Now().Sub(st)
+		if sub < time.Second {
+			time.Sleep(time.Duration(time.Second - sub))
+		}
+	}
 }
 
 func (c *CodeforcesClient) load() (err error) {
@@ -267,4 +317,20 @@ func findErrorMessage(body []byte) (string, error) {
 		return "", errors.New("Cannot find error")
 	}
 	return string(tmp[1]), nil
+}
+
+func getSubmitUrl(host, url string) string {
+	oj, cid, _, ctype := utils.ExtractInfoFromUrl(url)
+	if oj == "codeforces" {
+		return fmt.Sprintf(host+"/%v/%v/submit", ctype, cid)
+	}
+	return ""
+}
+
+func getSubmissionUrl(host, url string) string {
+	oj, cid, _, ctype := utils.ExtractInfoFromUrl(url)
+	if oj == "codeforces" {
+		return fmt.Sprintf(host+"/%v/%v/my", ctype, cid)
+	}
+	return ""
 }
