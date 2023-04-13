@@ -49,6 +49,10 @@ body {
 .panel-title {
     flex: 1 1 auto;
     display: block;
+    text-align: center;
+    font-size: large;
+    color: #07285b;
+    font-weight: 600;
 }
 
 .panel-body {

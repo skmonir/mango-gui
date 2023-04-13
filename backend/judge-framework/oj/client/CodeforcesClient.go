@@ -18,24 +18,22 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"sync"
 	"time"
 )
 
 type CodeforcesClient struct {
 	Jar           *cookiejar.Jar `json:"cookies"`
-	Handle        string         `json:"handle"`
-	HandleOrEmail string         `json:"handleOrEmail"`
-	Password      string         `json:"password"`
 	Ftaa          string         `json:"ftaa"`
 	Bfaa          string         `json:"bfaa"`
 	host          string
 	proxy         string
 	path          string
 	httpClient    *http.Client
+	Handle        string `json:"handle"`
+	HandleOrEmail string `json:"handleOrEmail"`
+	Password      string `json:"password"`
 }
 
-var once sync.Once
 var cfClient *CodeforcesClient
 
 func getCodeforcesClient() *CodeforcesClient {
@@ -74,9 +72,11 @@ func createClient() *CodeforcesClient {
 }
 
 func (c *CodeforcesClient) login() (err error) {
+	defer utils.PanicRecovery()
+
 	logger.Info(fmt.Sprintf("login %v...\n", c.HandleOrEmail))
 
-	password, err := decrypt(c.HandleOrEmail, c.Password)
+	password, err := utils.Decrypt(c.HandleOrEmail, c.Password)
 	if err != nil {
 		logger.Error(err.Error())
 		return errors.New(constants.ErrorServerError)
@@ -130,7 +130,7 @@ func (c *CodeforcesClient) login() (err error) {
 
 func (c *CodeforcesClient) DoLogin(handleOrEmail, password string) (err error, handle string) {
 	c.HandleOrEmail = handleOrEmail
-	c.Password, err = encrypt(handleOrEmail, password)
+	c.Password, err = utils.Encrypt(handleOrEmail, password)
 	if err != nil {
 		logger.Error(err.Error())
 		return errors.New(constants.ErrorServerError), ""
@@ -146,6 +146,8 @@ func (c *CodeforcesClient) DoLogin(handleOrEmail, password string) (err error, h
 }
 
 func (c *CodeforcesClient) Submit(problem models.Problem, langId, source string) (err error) {
+	defer utils.PanicRecovery()
+
 	submitUrl := getSubmitUrl(c.host, problem.Url)
 
 	body, err := utils.GetBody(c.httpClient, submitUrl)
@@ -320,17 +322,24 @@ func findErrorMessage(body []byte) (string, error) {
 }
 
 func getSubmitUrl(host, url string) string {
-	oj, cid, _, ctype := utils.ExtractInfoFromUrl(url)
-	if oj == "codeforces" {
-		return fmt.Sprintf(host+"/%v/%v/submit", ctype, cid)
-	}
-	return ""
+	_, cid, _, ctype := utils.ExtractInfoFromUrl(url)
+	return fmt.Sprintf(host+"/%v/%v/submit", ctype, cid)
 }
 
 func getSubmissionUrl(host, url string) string {
 	oj, cid, _, ctype := utils.ExtractInfoFromUrl(url)
 	if oj == "codeforces" {
 		return fmt.Sprintf(host+"/%v/%v/my", ctype, cid)
+	} else if oj == "atcoder" {
+		return fmt.Sprintf(host+"/%v/%v/submissions/me", ctype, cid)
 	}
 	return ""
+}
+
+func genFtaa() string {
+	return utils.RandString(18)
+}
+
+func genBfaa() string {
+	return "f1b3f18c715565b589b7823cda7448ce"
 }

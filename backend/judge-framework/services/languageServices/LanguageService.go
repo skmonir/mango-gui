@@ -42,9 +42,9 @@ func GetExecutionCommandByFilePath(filePathWithExt string) []string {
 	} else if fileExt == ".java" {
 		dirPath := filepath.Dir(filePathWithExt)
 		fileName := filepath.Base(filePathWithoutExt)
-		command = fmt.Sprintf("%v -cp %v %v %v", conf.LangConfigs[conf.ActiveLang].ExecutionCommand, dirPath, conf.LangConfigs[conf.ActiveLang].ExecutionFlags, fileName)
+		command = fmt.Sprintf("%v -cp %v %v %v", conf.TestingLangConfigs[conf.ActiveTestingLang].ExecutionCommand, dirPath, conf.TestingLangConfigs[conf.ActiveTestingLang].ExecutionFlags, fileName)
 	} else if fileExt == ".py" {
-		command = fmt.Sprintf("%v %v", conf.LangConfigs[conf.ActiveLang].ExecutionCommand, filePathWithExt)
+		command = fmt.Sprintf("%v %v", conf.TestingLangConfigs[conf.ActiveTestingLang].ExecutionCommand, filePathWithExt)
 	}
 
 	logger.Info("Prepared execution command: " + command)
@@ -61,7 +61,7 @@ func GetLangConfigFromFileExt(ext string) config.LanguageConfig {
 	} else if ext == ".py" {
 		lang = "python"
 	}
-	return conf.LangConfigs[lang]
+	return conf.TestingLangConfigs[lang]
 }
 
 func GetBinaryFilePathByFilePath(filePathWithExt string) string {

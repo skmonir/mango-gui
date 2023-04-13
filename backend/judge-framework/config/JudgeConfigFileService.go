@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -37,10 +38,13 @@ func GetJudgeConfigFromFile() *JudgeConfig {
 
 	fmt.Println("Returning app config from file")
 
+	config = decryptJudgeAccPII(config)
+
 	return &config
 }
 
 func SaveConfigIntoJsonFile(config JudgeConfig) error {
+	config = encryptJudgeAccPII(config)
 	data, err := json.MarshalIndent(config, "", " ")
 	if err != nil {
 		return err
@@ -56,6 +60,36 @@ func SaveConfigIntoJsonFile(config JudgeConfig) error {
 		return err
 	}
 	return nil
+}
+
+func encryptJudgeAccPII(conf JudgeConfig) JudgeConfig {
+	platforms := []string{"codeforces", "atcoder"}
+	for _, p := range platforms {
+		fmt.Println(p)
+		accInfo := conf.JudgeAccInfo[p]
+		decryptedPass, err := utils.Encrypt(accInfo.HandleOrEmail, accInfo.Password)
+		if err == nil {
+			accInfo.Password = decryptedPass
+		}
+		conf.JudgeAccInfo[p] = accInfo
+	}
+	return conf
+}
+
+func decryptJudgeAccPII(conf JudgeConfig) JudgeConfig {
+	platforms := []string{"codeforces", "atcoder"}
+	for _, p := range platforms {
+		fmt.Println(p)
+		accInfo := conf.JudgeAccInfo[p]
+		if len(accInfo.Password) > 0 {
+			decryptedPass, err := utils.Decrypt(accInfo.HandleOrEmail, accInfo.Password)
+			if err == nil {
+				accInfo.Password = decryptedPass
+			}
+			conf.JudgeAccInfo[p] = accInfo
+		}
+	}
+	return conf
 }
 
 func getConfigFilePath() string {
@@ -91,10 +125,9 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 	}
 
 	conf := JudgeConfig{
-		AppVersion:   constants.APP_VERSION,
-		ActiveLang:   "cpp",
-		ActiveLangId: "73",
-		LangConfigs: map[string]LanguageConfig{
+		AppVersion:        constants.APP_VERSION,
+		ActiveTestingLang: "cpp",
+		TestingLangConfigs: map[string]LanguageConfig{
 			"cpp": {
 				Lang:                "CPP",
 				CompilationCommand:  "g++",
@@ -117,6 +150,14 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 				ExecutionCommand:    map[bool]string{true: "py", false: "python3"}[utils.IsOsWindows()],
 				FileExtension:       ".py",
 				DefaultTemplatePath: utils.GetDefaultTemplateFilePathByLang("python"),
+			},
+		},
+		JudgeAccInfo: map[string]models.JudgeAccountInfo{
+			"codeforces": {
+				SubmissionLangId: "73",
+			},
+			"atcoder": {
+				SubmissionLangId: "4003",
 			},
 		},
 		EditorPreference: EditorPreferences{

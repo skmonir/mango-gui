@@ -1,14 +1,16 @@
 package config
 
+import "github.com/skmonir/mango-gui/backend/judge-framework/models"
+
 type JudgeConfig struct {
-	AppVersion         string                    `json:"appVersion"`
-	WorkspaceDirectory string                    `json:"workspaceDirectory"`
-	SourceDirectory    string                    `json:"sourceDirectory"`
-	Author             string                    `json:"author"`
-	ActiveLang         string                    `json:"activeLang"`
-	ActiveLangId       string                    `json:"activeLangId"`
-	LangConfigs        map[string]LanguageConfig `json:"langConfigs"`
-	EditorPreference   EditorPreferences         `json:"editorPreference"`
+	AppVersion         string                             `json:"appVersion"`
+	WorkspaceDirectory string                             `json:"workspaceDirectory"`
+	SourceDirectory    string                             `json:"sourceDirectory"`
+	Author             string                             `json:"author"`
+	JudgeAccInfo       map[string]models.JudgeAccountInfo `json:"judgeAccInfo"`
+	ActiveTestingLang  string                             `json:"activeTestingLang"`
+	TestingLangConfigs map[string]LanguageConfig          `json:"testingLangConfigs"`
+	EditorPreference   EditorPreferences                  `json:"editorPreference"`
 }
 
 type LanguageConfig struct {

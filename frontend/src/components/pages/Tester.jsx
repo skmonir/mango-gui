@@ -6,7 +6,7 @@ import {
   Col,
   Row,
   Spinner,
-  Table
+  Table,
 } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +20,7 @@ import {
   faPlus,
   faTasks,
   faTerminal,
-  faTrashAlt
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import SocketClient from "../../socket/SocketClient.js";
@@ -48,14 +48,14 @@ export default function Tester({ config, appData }) {
     { label: "Wrong Answer", value: "WA" },
     { label: "Runtime Error", value: "RE" },
     { label: "Time Limit Exceeded", value: "TLE" },
-    { label: "Memory Limit Exceeded", value: "MLE" }
+    { label: "Memory Limit Exceeded", value: "MLE" },
   ];
   const verdictIcons = {
     AC: AC,
     WA: WA,
     CE: CE,
     RE: RE,
-    TLE: TLE
+    TLE: TLE,
   };
 
   const [selectedVerdictKey, setSelectedVerdictKey] = useState("");
@@ -72,18 +72,18 @@ export default function Tester({ config, appData }) {
   const [selectedProblemMetadata, setSelectedProblemMetadata] = useState("");
   const [
     selectedProblemOriginalExecResult,
-    setSelectedProblemOriginalExecResult
+    setSelectedProblemOriginalExecResult,
   ] = useState(null);
   const [
     selectedProblemFilteredExecResult,
-    setSelectedProblemFilteredExecResult
+    setSelectedProblemFilteredExecResult,
   ] = useState(null);
   const [selectedTestcase, setSelectedTestcase] = useState(null);
   const [testStatusMessage, setTestStatusMessage] = useState({});
   const [showToast, setShowToast] = useState(false);
   const [toastMsgObj, setToastMsgObj] = useState({
     variant: "",
-    message: ""
+    message: "",
   });
   const [customTestEvent, setCustomTestEvent] = useState("");
 
@@ -106,7 +106,7 @@ export default function Tester({ config, appData }) {
   const getProblemList = () => {
     setLoadingInProgress(true);
     setTimeout(() => {
-      DataService.getProblemList(window.btoa(testContestUrl)).then(data => {
+      DataService.getProblemList(window.btoa(testContestUrl)).then((data) => {
         setLoadingInProgress(false);
         setProblemList(data ? data : []);
         if (data && data.length > 0) {
@@ -121,10 +121,10 @@ export default function Tester({ config, appData }) {
     }, 0);
   };
 
-  const getSelectedProblemExecResult = metadata => {
+  const getSelectedProblemExecResult = (metadata) => {
     if (metadata && metadata.length > 0) {
       setLoadingInProgress(true);
-      DataService.getExecutionResult(metadata).then(data => {
+      DataService.getExecutionResult(metadata).then((data) => {
         setSelectedProblemOriginalExecResult(data);
         setSelectedProblemFilteredExecResult(data);
         setLoadingInProgress(false);
@@ -139,10 +139,10 @@ export default function Tester({ config, appData }) {
 
   const openSource = () => {
     DataService.openSourceByMetadata(selectedProblemMetadata)
-      .then(resp => {
+      .then((resp) => {
         console.log(resp);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
         showToastMessage("Error", error.response.data);
       });
@@ -150,10 +150,10 @@ export default function Tester({ config, appData }) {
 
   const generateSourceCode = () => {
     DataService.generateSourceCode(selectedProblemMetadata)
-      .then(resp => {
+      .then((resp) => {
         showToastMessage("Success", "Generated source code successfully!");
       })
-      .catch(e => {
+      .catch((e) => {
         showToastMessage(
           "Error",
           "Oops! Something went wrong while generating the source!"
@@ -164,7 +164,7 @@ export default function Tester({ config, appData }) {
   const runTest = () => {
     setTestingInProgress(true);
     DataService.runTest(selectedProblemMetadata)
-      .then(data => {
+      .then((data) => {
         setSelectedProblemOriginalExecResult(data);
         setSelectedProblemFilteredExecResult(data);
         setSelectedVerdictKey("");
@@ -172,30 +172,30 @@ export default function Tester({ config, appData }) {
       .finally(() => setTestingInProgress(false));
   };
 
-  const updateTestStatusMessageFromSocket = message => {
+  const updateTestStatusMessageFromSocket = (message) => {
     console.log(message);
     setTestStatusMessage(message);
   };
 
-  const updateExecResultFromSocket = data => {
+  const updateExecResultFromSocket = (data) => {
     setSelectedProblemOriginalExecResult(data);
     setSelectedProblemFilteredExecResult(data);
     setSelectedVerdictKey("");
   };
 
-  const changeSelectedProblemMetadata = metadata => {
+  const changeSelectedProblemMetadata = (metadata) => {
     setTestStatusMessage(null);
     setSelectedProblemByMetadata(metadata);
     getSelectedProblemExecResult(metadata);
     setSelectedProblemMetadata(metadata);
   };
 
-  const setSelectedProblemByMetadata = metadata => {
+  const setSelectedProblemByMetadata = (metadata) => {
     if (metadata && metadata.length > 0) {
       console.log(problemList);
       const values = metadata.split("/");
       const prob = problemList.find(
-        p =>
+        (p) =>
           p.platform === values[0] &&
           p.contestId === values[1] &&
           p.label === values[2]
@@ -212,10 +212,10 @@ export default function Tester({ config, appData }) {
   const submitCode = () => {
     setSubmittingInProgress(true);
     DataService.submitCode(selectedProblemMetadata)
-      .then(resp => {
+      .then((resp) => {
         console.log(resp);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error.response.data.message);
       })
       .finally(() => setSubmittingInProgress(false));
@@ -233,36 +233,36 @@ export default function Tester({ config, appData }) {
     setShowAddEditTestModal(true);
   };
 
-  const deleteCustomTestTriggered = inputFilePath => {
+  const deleteCustomTestTriggered = (inputFilePath) => {
     const data = selectedProblemMetadata.split("/");
     const req = {
       platform: data[0],
       contestId: data[1],
       label: data[2],
-      inputFilePath: inputFilePath
+      inputFilePath: inputFilePath,
     };
     confirmAlert({
       title: "",
       message: "Are you sure to delete this testcase?",
       buttons: [
         {
-          label: "Cancel"
+          label: "Cancel",
         },
         {
           label: "Yes, Delete!",
-          onClick: () => deleteCustomTest(req)
-        }
-      ]
+          onClick: () => deleteCustomTest(req),
+        },
+      ],
     });
   };
 
-  const deleteCustomTest = req => {
+  const deleteCustomTest = (req) => {
     DataService.deleteCustomTest(req)
       .then(() => {
         getSelectedProblemExecResult(selectedProblemMetadata);
         showToastMessage("Success", "Testcase deleted successfully!");
       })
-      .catch(error => {
+      .catch((error) => {
         showToastMessage("Error", error.response.data);
       });
   };
@@ -276,13 +276,13 @@ export default function Tester({ config, appData }) {
     setShowToast(true);
     setToastMsgObj({
       variant: variant,
-      message: message
+      message: message,
     });
   };
 
-  const scrollToId = id => {
+  const scrollToId = (id) => {
     document.getElementById(id).scrollIntoView({
-      behavior: "smooth"
+      behavior: "smooth",
     });
   };
 
@@ -290,7 +290,7 @@ export default function Tester({ config, appData }) {
     const rows = document.querySelectorAll(`#${id} tr`);
     rows[row].scrollIntoView({
       behavior: "smooth",
-      block: "center"
+      block: "center",
     });
   };
 
@@ -317,8 +317,9 @@ export default function Tester({ config, appData }) {
         const stat = JSON.parse(testStatusMessage.message);
         return (
           <strong>
-            <span style={{ color: "#262625FF" }}>{`Done: ${stat.passed +
-              stat.failed} of ${stat.total}`}</span>
+            <span style={{ color: "#262625FF" }}>{`Done: ${
+              stat.passed + stat.failed
+            } of ${stat.total}`}</span>
             <span>{", "}</span>
             <span style={{ color: "green" }}>{`Passed: ${stat.passed}`}</span>
             <span>{", "}</span>
@@ -331,7 +332,7 @@ export default function Tester({ config, appData }) {
     }
   };
 
-  const getVerdict = testcaseExecutionDetails => {
+  const getVerdict = (testcaseExecutionDetails) => {
     if (testcaseExecutionDetails?.status === "running") {
       return <Spinner animation="border" variant="primary" size="sm" />;
     } else if (testcaseExecutionDetails?.status !== "none") {
@@ -342,7 +343,7 @@ export default function Tester({ config, appData }) {
               testcaseExecutionDetails?.testcaseExecutionResult?.verdict ===
               "AC"
                 ? "green"
-                : "red"
+                : "red",
           }}
         >
           <img
@@ -361,7 +362,7 @@ export default function Tester({ config, appData }) {
     }
   };
 
-  const getTestcaseRowColor = testcaseExecutionDetails => {
+  const getTestcaseRowColor = (testcaseExecutionDetails) => {
     if (["none", "running"].includes(testcaseExecutionDetails?.status)) {
       return "";
     } else {
@@ -373,22 +374,23 @@ export default function Tester({ config, appData }) {
     }
   };
 
-  const filterVerdicts = key => {
+  const filterVerdicts = (key) => {
     console.log(key);
     setSelectedVerdictKey(key);
-    const filteredExecDetailsList = selectedProblemOriginalExecResult?.testcaseExecutionDetailsList.filter(
-      ted => {
-        return (
-          key === "" ||
-          (key === "NA" && ted.testcaseExecutionResult?.verdict !== "AC") ||
-          (key !== "NA" && ted.testcaseExecutionResult?.verdict === key)
-        );
-      }
-    );
+    const filteredExecDetailsList =
+      selectedProblemOriginalExecResult?.testcaseExecutionDetailsList.filter(
+        (ted) => {
+          return (
+            key === "" ||
+            (key === "NA" && ted.testcaseExecutionResult?.verdict !== "AC") ||
+            (key !== "NA" && ted.testcaseExecutionResult?.verdict === key)
+          );
+        }
+      );
     console.log(filteredExecDetailsList);
     const updatedExecResult = {
       ...selectedProblemOriginalExecResult,
-      testcaseExecutionDetailsList: filteredExecDetailsList
+      testcaseExecutionDetailsList: filteredExecDetailsList,
     };
     setSelectedProblemFilteredExecResult(updatedExecResult);
   };
@@ -432,11 +434,7 @@ export default function Tester({ config, appData }) {
         size="sm"
         variant="success"
         onClick={() => submitCode()}
-        disabled={
-          disableActionButtons() ||
-          !selectedProblemFilteredExecResult ||
-          selectedProblem.platform === "atcoder"
-        }
+        disabled={disableActionButtons() || !selectedProblemFilteredExecResult}
       >
         {submittingInProgress ? (
           <Spinner
@@ -468,7 +466,7 @@ export default function Tester({ config, appData }) {
               placeholder="Enter Contest/Problem URL [Codeforces, AtCoder, Custom]"
               value={testContestUrl}
               disabled={!config.workspaceDirectory}
-              onChange={e => setTestContestUrl(e.target.value)}
+              onChange={(e) => setTestContestUrl(e.target.value)}
             />
           </Form.Group>
         </Col>
@@ -500,7 +498,7 @@ export default function Tester({ config, appData }) {
                 size="sm"
                 aria-label="Default select example"
                 value={selectedProblemMetadata}
-                onChange={e =>
+                onChange={(e) =>
                   changeSelectedProblemMetadata(e.currentTarget.value)
                 }
                 disabled={disableActionButtons()}
@@ -560,7 +558,7 @@ export default function Tester({ config, appData }) {
                 size="sm"
                 aria-label="Default select example"
                 value={selectedVerdictKey}
-                onChange={e => filterVerdicts(e.currentTarget.value)}
+                onChange={(e) => filterVerdicts(e.currentTarget.value)}
               >
                 {verdicts.map((ver, id) => (
                   <option key={id} value={ver.value}>
@@ -767,7 +765,7 @@ export default function Tester({ config, appData }) {
                       props={{
                         maxHeight: "50vh",
                         error:
-                          selectedProblemFilteredExecResult?.compilationError
+                          selectedProblemFilteredExecResult?.compilationError,
                       }}
                     />
                   </Col>
@@ -789,16 +787,16 @@ export default function Tester({ config, appData }) {
           customElementsOnHeader={[
             {
               colSpan: "auto",
-              elem: getRunTestButton()
+              elem: getRunTestButton(),
             },
             {
               colSpan: "auto",
-              elem: getSubmitButton()
+              elem: getSubmitButton(),
             },
             {
               colSpan: "auto",
-              elem: <Form.Text> {getTestStatusText()} </Form.Text>
-            }
+              elem: <Form.Text> {getTestStatusText()} </Form.Text>,
+            },
           ]}
         />
       )}

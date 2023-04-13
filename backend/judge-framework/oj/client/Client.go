@@ -4,7 +4,10 @@ import (
 	"errors"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"log"
+	"sync"
 )
+
+var once sync.Once
 
 type IClient interface {
 	DoLogin(handleOrEmail, password string) (err error, handle string)
@@ -17,7 +20,7 @@ func GetClientByPlatform(platform string) (error, IClient) {
 	if platform == "codeforces" {
 		httpClient = getCodeforcesClient()
 	} else if platform == "atcoder" {
-		err = errors.New("AtCoder isn't supported at this moment")
+		httpClient = getAtCoderClient()
 	} else {
 		log.Println("Unknown platform")
 		err = errors.New("Unknown platform")

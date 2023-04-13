@@ -12,7 +12,14 @@ func Login(platform, handleOrEmail, password string) (err error, handle string) 
 	if err != nil {
 		return err, ""
 	}
-	return ojClient.DoLogin(handleOrEmail, password)
+
+	err, handle = ojClient.DoLogin(handleOrEmail, password)
+	if err != nil {
+		return err, ""
+	}
+
+	UpdateJudgeAccountInfo(platform, handleOrEmail, password, handle)
+	return
 }
 
 func Submit(platform, cid, pid string) (error, string) {
@@ -24,7 +31,7 @@ func Submit(platform, cid, pid string) (error, string) {
 	conf := config.GetJudgeConfigFromCache()
 	sourceResp := fileServices.GetCodeByMetadata(platform, cid, pid)
 	socket.PublishStatusMessage("test_status", "Submitting code...", "info")
-	err = ojClient.Submit(problem, conf.ActiveLangId, sourceResp["code"])
+	err = ojClient.Submit(problem, conf.JudgeAccInfo[platform].SubmissionLangId, sourceResp["code"])
 	if err != nil {
 		socket.PublishStatusMessage("test_status", err.Error(), "error")
 		return err, ""

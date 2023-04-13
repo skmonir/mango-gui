@@ -5,7 +5,7 @@ import {
   faCode,
   faRightToBracket,
   faSave,
-  faSyncAlt
+  faSyncAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import DataService from "../../services/DataService.js";
@@ -20,32 +20,33 @@ export default function Settings({ setConfig }) {
     cpp: {
       compCommand: "g++",
       compFlags: "-std=gnu++17, -std=c++20",
-      ext: ".cpp"
+      ext: ".cpp",
     },
     java: {
       compCommand: "javac, C:\\Java\\jdk-20\\bin\\javac.exe",
       compFlags: "-encoding UTF-8 -J-Xmx2048m",
       execCommand: "java, C:\\Java\\jdk-20\\bin\\java.exe",
       execFlags: "-XX:+UseSerialGC -Xss64m -Xms64m -Xmx2048m",
-      ext: ".java"
+      ext: ".java",
     },
     python: {
       compCommand: "py, python3",
       execCommand: "py, python3",
       compFlags: "",
       execFlags: "",
-      ext: ".py"
+      ext: ".py",
     },
-    "": {}
+    "": {},
   };
 
   const [currentConfig, setCurrentConfig] = useState({});
   const [selectedLang, setSelectedLang] = useState("");
   const [selectedLangConfig, setSelectedLangConfig] = useState({});
+  const [loginPlatform, setLoginPlatform] = useState("codeforces");
 
   const [toastMsgObj, setToastMsgObj] = useState({
     variant: "",
-    message: ""
+    message: "",
   });
   const [showToast, setShowToast] = useState(false);
   const [codePathForModal, setCodePathForModal] = useState("");
@@ -55,7 +56,7 @@ export default function Settings({ setConfig }) {
   const [flags, setFlags] = useState({
     savingInProgress: false,
     fetchingInProgress: false,
-    resetInProgress: false
+    resetInProgress: false,
   });
 
   useEffect(() => {
@@ -65,14 +66,14 @@ export default function Settings({ setConfig }) {
   const fetchConfig = () => {
     setFlags({
       ...flags,
-      fetchingInProgress: true
+      fetchingInProgress: true,
     });
     DataService.getConfig()
-      .then(config => {
+      .then((config) => {
         console.log(config);
         updateConfig(config);
       })
-      .catch(e => {
+      .catch((e) => {
         showToastMessage(
           "Error",
           "Oops! Something went wrong while fetching the currentConfig!"
@@ -81,60 +82,62 @@ export default function Settings({ setConfig }) {
       .finally(() =>
         setFlags({
           ...flags,
-          fetchingInProgress: false
+          fetchingInProgress: false,
         })
       );
   };
 
-  const updateConfig = config => {
+  const updateConfig = (config) => {
     setCurrentConfig(config);
     setConfig(config);
-    setSelectedLang(config?.activeLang);
-    setSelectedLangConfig(config.langConfigs[config.activeLang]);
+    setSelectedLang(config?.activeTestingLang);
+    setSelectedLangConfig(config.testingLangConfigs[config.activeTestingLang]);
   };
 
-  const validate = confToSave => {
+  const validate = (confToSave) => {
     let errMessage = "";
     if (Utils.isStrNullOrEmpty(confToSave.workspaceDirectory)) {
       errMessage += "Workspace directory path can't be empty\n";
     }
     if (
       Utils.isStrNullOrEmpty(
-        confToSave.langConfigs[confToSave.activeLang].compilationCommand
+        confToSave.testingLangConfigs[confToSave.activeTestingLang]
+          .compilationCommand
       )
     ) {
       errMessage += "Compilation command of active language can't be empty\n";
     }
     if (
-      ["java", "python"].includes(confToSave.activeLang) &&
+      ["java", "python"].includes(confToSave.activeTestingLang) &&
       Utils.isStrNullOrEmpty(
-        confToSave.langConfigs[confToSave.activeLang].executionCommand
+        confToSave.testingLangConfigs[confToSave.activeTestingLang]
+          .executionCommand
       )
     ) {
       errMessage += "Execution command of active language can't be empty\n";
     }
     if (
-      confToSave.activeLang !== selectedLang &&
+      confToSave.activeTestingLang !== selectedLang &&
       Utils.isStrNullOrEmpty(
-        confToSave.langConfigs[selectedLang].compilationCommand
+        confToSave.testingLangConfigs[selectedLang].compilationCommand
       )
     ) {
       errMessage += "Compilation command of selected language can't be empty\n";
     }
     if (
-      confToSave.activeLang !== selectedLang &&
+      confToSave.activeTestingLang !== selectedLang &&
       ["java", "python"].includes(selectedLang) &&
       Utils.isStrNullOrEmpty(
-        confToSave.langConfigs[selectedLang].executionCommand
+        confToSave.testingLangConfigs[selectedLang].executionCommand
       )
     ) {
       errMessage += "Execution command of selected language can't be empty\n";
     }
     if (
       !Utils.isStrNullOrEmpty(
-        confToSave.langConfigs[selectedLang].userTemplatePath
+        confToSave.testingLangConfigs[selectedLang].userTemplatePath
       ) &&
-      !confToSave.langConfigs[selectedLang].userTemplatePath.endsWith(
+      !confToSave.testingLangConfigs[selectedLang].userTemplatePath.endsWith(
         placeholders[selectedLang].ext
       )
     ) {
@@ -157,14 +160,14 @@ export default function Settings({ setConfig }) {
     if (validate(confToSave)) {
       setFlags({
         ...flags,
-        savingInProgress: true
+        savingInProgress: true,
       });
       DataService.updateConfig(confToSave)
-        .then(config => {
+        .then((config) => {
           setConfig(config);
           showToastMessage("Success", "Settings saved successfully!");
         })
-        .catch(e => {
+        .catch((e) => {
           showToastMessage(
             "Error",
             "Oops! Something went wrong while saving the currentConfig!"
@@ -173,7 +176,7 @@ export default function Settings({ setConfig }) {
         .finally(() =>
           setFlags({
             ...flags,
-            savingInProgress: false
+            savingInProgress: false,
           })
         );
     }
@@ -185,100 +188,82 @@ export default function Settings({ setConfig }) {
       message: "Are you sure to reset the settings?",
       buttons: [
         {
-          label: "Cancel"
+          label: "Cancel",
         },
         {
           label: "Yes, Reset!",
-          onClick: () => resetSettings()
-        }
-      ]
+          onClick: () => resetSettings(),
+        },
+      ],
     });
   };
 
   const resetSettings = () => {
     setFlags({
       ...flags,
-      resetInProgress: true
+      resetInProgress: true,
     });
     DataService.resetConfig()
-      .then(config => {
+      .then((config) => {
         updateConfig(config);
         showToastMessage("Success", "Settings reset is successful!");
       })
-      .catch(error => {
+      .catch((error) => {
         showToastMessage("Error", error.response.data);
       })
       .finally(() =>
         setFlags({
           ...flags,
-          resetInProgress: false
+          resetInProgress: false,
         })
       );
   };
 
-  const activeLangIdChanged = langId => {
-    setCurrentConfig({
-      ...currentConfig,
-      activeLang: getLangByLangId(langId),
-      activeLangId: langId
-    })
-  }
-
-  const getLangByLangId = (id) => {
-    const cppLangIds = ['50', '54', '73']
-    const javaLangIds = ['36', '60', '74']
-    const pythonLangIds = ['7', '31']
-
-    if (cppLangIds.includes(id)) {
-      return "cpp"
-    }
-    if (javaLangIds.includes(id)) {
-      return "java"
-    }
-    if (pythonLangIds.includes(id)) {
-      return "python"
-    }
-    return "unknown"
-  }
-
-  const selectedLangChanged = lang => {
+  const selectedLangChanged = (lang) => {
     if (!Utils.isStrNullOrEmpty(selectedLang)) {
       updateLangConfigs();
     }
     setSelectedLang(lang);
-    setSelectedLangConfig(currentConfig.langConfigs[lang]);
+    setSelectedLangConfig(currentConfig.testingLangConfigs[lang]);
   };
 
   const updateLangConfigs = () => {
     let updatedLangConfigs = {
-      ...currentConfig.langConfigs
+      ...currentConfig.testingLangConfigs,
     };
     updatedLangConfigs[selectedLang] = { ...selectedLangConfig };
     const updatedConfig = {
       ...currentConfig,
-      langConfigs: updatedLangConfigs
+      testingLangConfigs: updatedLangConfigs,
     };
     setCurrentConfig(updatedConfig);
     return updatedConfig;
   };
 
-  const showCodeTriggered = codePath => {
+  const showCodeTriggered = (codePath) => {
     setCodePathForModal(codePath);
     setTimeout(() => setShowCodeModal(true), 0);
+  };
+
+  const actionOnLogin = (isLoggedIn) => {
+    if (isLoggedIn) {
+      fetchConfig();
+    }
+    setShowLoginModal(false);
   };
 
   const showToastMessage = (variant, message) => {
     setShowToast(true);
     setToastMsgObj({
       variant: variant,
-      message: message
+      message: message,
     });
   };
 
-  const checkDirectoryPathValidity = dirPath => {
+  const checkDirectoryPathValidity = (dirPath) => {
     if (!Utils.isStrNullOrEmpty(dirPath)) {
       DataService.checkDirectoryPathValidity(window.btoa(dirPath)).then(
-        resp => {
+        (resp) => {
           if (resp.isExist === false) {
             showToastMessage("Error", `${dirPath} is not a valid directory`);
           }
@@ -287,9 +272,9 @@ export default function Settings({ setConfig }) {
     }
   };
 
-  const checkFilePathValidity = filePath => {
+  const checkFilePathValidity = (filePath) => {
     if (!Utils.isStrNullOrEmpty(filePath)) {
-      DataService.checkFilePathValidity(window.btoa(filePath)).then(resp => {
+      DataService.checkFilePathValidity(window.btoa(filePath)).then((resp) => {
         if (resp.isExist === false) {
           showToastMessage("Error", `${filePath} is not a valid file`);
         }
@@ -300,9 +285,22 @@ export default function Settings({ setConfig }) {
   return (
     <div>
       <div className="panel">
+        <div className="panel-heading">
+          <div className="panel-title">
+            <Row>
+              <Col xs="4">
+                <hr />
+              </Col>
+              <Col xs="4">Workspace Setup</Col>
+              <Col xs="4">
+                <hr />
+              </Col>
+            </Row>
+          </div>
+        </div>
         <div className="panel-body">
           <Row>
-            <Col xs={6}>
+            <Col xs={9}>
               <Form.Group className="mb-3">
                 <Form.Label>
                   <strong>
@@ -317,10 +315,10 @@ export default function Settings({ setConfig }) {
                   autoCapitalize="none"
                   placeholder="Enter your workspace directory absolute path. All the testcases and sources will be saved here."
                   value={currentConfig.workspaceDirectory}
-                  onChange={e =>
+                  onChange={(e) =>
                     setCurrentConfig({
                       ...currentConfig,
-                      workspaceDirectory: e.target.value
+                      workspaceDirectory: e.target.value,
                     })
                   }
                   onBlur={() =>
@@ -342,36 +340,32 @@ export default function Settings({ setConfig }) {
                   autoCapitalize="none"
                   placeholder="Enter your name"
                   value={currentConfig.author}
-                  onChange={e =>
+                  onChange={(e) =>
                     setCurrentConfig({
                       ...currentConfig,
-                      author: e.target.value
+                      author: e.target.value,
                     })
                   }
                 />
-              </Form.Group>
-            </Col>
-            <Col sm={3}>
-              <Form.Group className="mb-3">
-                <Form.Label>
-                  <strong>Online Judge Login</strong>
-                </Form.Label>
-                <div className="d-grid gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline-success"
-                    onClick={() => setShowLoginModal(true)}
-                  >
-                    <FontAwesomeIcon icon={faRightToBracket} /> Login to your OJ
-                    account
-                  </Button>
-                </div>
               </Form.Group>
             </Col>
           </Row>
         </div>
       </div>
       <div className="panel">
+        <div className="panel-heading">
+          <div className="panel-title">
+            <Row>
+              <Col xs="4">
+                <hr />
+              </Col>
+              <Col xs="4">Local Testing Setup</Col>
+              <Col xs="4">
+                <hr />
+              </Col>
+            </Row>
+          </div>
+        </div>
         <div className="panel-body">
           <Row>
             <Col sm={2}>
@@ -384,19 +378,17 @@ export default function Settings({ setConfig }) {
                 <Form.Select
                   size="sm"
                   aria-label="Default select example"
-                  value={currentConfig.activeLangId}
-                  onChange={e =>
-                    activeLangIdChanged(e.currentTarget.value)
+                  value={currentConfig.activeTestingLang}
+                  onChange={(e) =>
+                    setCurrentConfig({
+                      ...currentConfig,
+                      activeTestingLang: e.currentTarget.value,
+                    })
                   }
                 >
-                  <option value="50">C++14</option>
-                  <option value="54">C++17</option>
-                  <option value="73">C++20</option>
-                  <option value="36">Java 1.8</option>
-                  <option value="60">Java 11</option>
-                  <option value="74">Java 17</option>
-                  <option value="7">Python 2</option>
-                  <option value="31">Python 3</option>
+                  <option value="cpp">CPP</option>
+                  <option value="java">Java</option>
+                  <option value="python">Python</option>
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -409,7 +401,7 @@ export default function Settings({ setConfig }) {
                   size="sm"
                   aria-label="Default select example"
                   value={selectedLang}
-                  onChange={e => selectedLangChanged(e.currentTarget.value)}
+                  onChange={(e) => selectedLangChanged(e.currentTarget.value)}
                 >
                   <option value="cpp">CPP</option>
                   <option value="java">Java</option>
@@ -436,10 +428,10 @@ export default function Settings({ setConfig }) {
                     "Example: " + placeholders[selectedLang].compCommand
                   }
                   value={selectedLangConfig.compilationCommand}
-                  onChange={e =>
+                  onChange={(e) =>
                     setSelectedLangConfig({
                       ...selectedLangConfig,
-                      compilationCommand: e.target.value
+                      compilationCommand: e.target.value,
                     })
                   }
                 />
@@ -460,10 +452,10 @@ export default function Settings({ setConfig }) {
                     "Example: " + placeholders[selectedLang].compFlags
                   }
                   value={selectedLangConfig.compilationFlags}
-                  onChange={e =>
+                  onChange={(e) =>
                     setSelectedLangConfig({
                       ...selectedLangConfig,
-                      compilationFlags: e.target.value
+                      compilationFlags: e.target.value,
                     })
                   }
                 />
@@ -489,10 +481,10 @@ export default function Settings({ setConfig }) {
                       "Example: " + placeholders[selectedLang].execCommand
                     }
                     value={selectedLangConfig.executionCommand}
-                    onChange={e =>
+                    onChange={(e) =>
                       setSelectedLangConfig({
                         ...selectedLangConfig,
-                        executionCommand: e.target.value
+                        executionCommand: e.target.value,
                       })
                     }
                   />
@@ -513,10 +505,10 @@ export default function Settings({ setConfig }) {
                       "Example: " + placeholders[selectedLang].execFlags
                     }
                     value={selectedLangConfig.executionFlags}
-                    onChange={e =>
+                    onChange={(e) =>
                       setSelectedLangConfig({
                         ...selectedLangConfig,
-                        executionFlags: e.target.value
+                        executionFlags: e.target.value,
                       })
                     }
                   />
@@ -557,10 +549,10 @@ export default function Settings({ setConfig }) {
                     autoComplete="off"
                     autoCapitalize="none"
                     value={selectedLangConfig.userTemplatePath}
-                    onChange={e =>
+                    onChange={(e) =>
                       setSelectedLangConfig({
                         ...selectedLangConfig,
-                        userTemplatePath: e.target.value
+                        userTemplatePath: e.target.value,
                       })
                     }
                     onBlur={() =>
@@ -584,8 +576,170 @@ export default function Settings({ setConfig }) {
           </Row>
         </div>
       </div>
-      <br />
-      <Row>
+      <div className="panel">
+        <div className="panel-heading">
+          <div className="panel-title">
+            <Row>
+              <Col xs="4">
+                <hr />
+              </Col>
+              <Col xs="4">Online Judge Setup</Col>
+              <Col xs="4">
+                <hr />
+              </Col>
+            </Row>
+          </div>
+        </div>
+        <div className="panel-body">
+          <Row>
+            <Col sm={2}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Platform</strong>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  value="Codeforces"
+                  disabled={true}
+                />
+              </Form.Group>
+            </Col>
+            <Col sm={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>
+                    Submission Language<span style={{ color: "red" }}>*</span>
+                  </strong>
+                </Form.Label>
+                <Form.Select
+                  size="sm"
+                  aria-label="Default select example"
+                  value={
+                    currentConfig?.judgeAccInfo?.codeforces?.submissionLangId
+                  }
+                  onChange={(e) => {
+                    setCurrentConfig({
+                      ...currentConfig,
+                      judgeAccInfo: {
+                        ...currentConfig.judgeAccInfo,
+                        codeforces: {
+                          ...currentConfig.judgeAccInfo.codeforces,
+                          submissionLangId: e.currentTarget.value,
+                        },
+                      },
+                    });
+                  }}
+                >
+                  <option value="50">GNU G++14 6.4.0</option>
+                  <option value="54">GNU G++17 7.3.0</option>
+                  <option value="61">GNU G++17 9.2.0 (64 bit, msys 2)</option>
+                  <option value="73">GNU G++20 11.2.0 (64 bit, winlibs)</option>
+                  <option value="80">Clang++20 Diagnostics</option>
+                  <option value="52">Clang++17 Diagnostics</option>
+                  <option value="36">Java 1.8.0_241</option>
+                  <option value="60">Java 11.0.6</option>
+                  <option value="74">Java 17 64bit</option>
+                  <option value="7">Python 2.7.18</option>
+                  <option value="31">Python 3.8.10</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col sm={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Current User</strong>
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  value={currentConfig?.judgeAccInfo?.codeforces?.handle}
+                  disabled={true}
+                />
+              </Form.Group>
+            </Col>
+            <Col sm={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  <strong>Account Login</strong>
+                </Form.Label>
+                <div className="d-grid gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline-success"
+                    onClick={() => {
+                      setLoginPlatform("Codeforces");
+                      setShowLoginModal(true);
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faRightToBracket} /> Login to your CF
+                    account
+                  </Button>
+                </div>
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={2}>
+              <Form.Control
+                type="text"
+                size="sm"
+                value="AtCoder"
+                disabled={true}
+              />
+            </Col>
+            <Col sm={4}>
+              <Form.Select
+                size="sm"
+                aria-label="Default select example"
+                value={currentConfig?.judgeAccInfo?.atcoder?.submissionLangId}
+                onChange={(e) => {
+                  setCurrentConfig({
+                    ...currentConfig,
+                    judgeAccInfo: {
+                      ...currentConfig.judgeAccInfo,
+                      atcoder: {
+                        ...currentConfig.judgeAccInfo.atcoder,
+                        submissionLangId: e.currentTarget.value,
+                      },
+                    },
+                  });
+                }}
+              >
+                <option value="4003">C++ (GCC 9.2.1)</option>
+                <option value="4004">C++ (Clang 10.0.0)</option>
+                <option value="4052">Java (OpenJDK 1.8.0)</option>
+                <option value="4005">Java (OpenJDK 11.0.6)</option>
+                <option value="4006">Python (3.8.2)</option>
+              </Form.Select>
+            </Col>
+            <Col sm={3}>
+              <Form.Control
+                type="text"
+                size="sm"
+                value={currentConfig?.judgeAccInfo?.atcoder?.handle}
+                disabled={true}
+              />
+            </Col>
+            <Col sm={3}>
+              <div className="d-grid gap-2">
+                <Button
+                  size="sm"
+                  variant="outline-success"
+                  onClick={() => {
+                    setLoginPlatform("AtCoder");
+                    setShowLoginModal(true);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faRightToBracket} /> Login to your AC
+                  account
+                </Button>
+              </div>
+            </Col>
+          </Row>
+        </div>
+      </div>
+      <Row className="mb-2 mt-2">
         <Col md={{ span: 6, offset: 3 }}>
           <Row>
             <Col xs={4}>
@@ -596,7 +750,7 @@ export default function Settings({ setConfig }) {
                   onClick={() => {
                     setFlags({
                       ...flags,
-                      fetchingInProgress: true
+                      fetchingInProgress: true,
                     });
                     setTimeout(fetchConfig, 500);
                   }}
@@ -675,7 +829,13 @@ export default function Settings({ setConfig }) {
           setShowCodeModal={setShowCodeModal}
         />
       )}
-      {showLoginModal && <LoginModal setShowLoginModal={setShowLoginModal} />}
+      {showLoginModal && (
+        <LoginModal
+          loginPlatform={loginPlatform}
+          judgeAccInfo={currentConfig.judgeAccInfo}
+          actionOnLogin={actionOnLogin}
+        />
+      )}
     </div>
   );
 }

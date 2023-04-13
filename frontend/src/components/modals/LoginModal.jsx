@@ -5,32 +5,46 @@ import {
   InputGroup,
   Modal,
   Row,
-  Spinner
+  Spinner,
 } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEye,
   faEyeSlash,
-  faRightToBracket
+  faRightToBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import DataService from "../../services/DataService.js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Utils from "../../Utils.js";
 
-export default function LoginModal({ setShowLoginModal }) {
+export default function LoginModal({
+  loginPlatform,
+  judgeAccInfo,
+  actionOnLogin,
+}) {
   const [form, setForm] = useState({
     platform: "codeforces",
     handleOrEmail: "",
-    password: ""
+    password: "",
   });
   const [showModal, setShowModal] = useState(true);
   const [showPass, setShowPass] = useState(false);
   const [loginInProgress, setLoginInProgress] = useState(false);
   const [alert, setAlert] = useState({
     message: "",
-    variant: ""
+    variant: "",
   });
+
+  useEffect(() => {
+    const accInfo = judgeAccInfo[loginPlatform.toLowerCase()];
+    setForm({
+      ...form,
+      platform: loginPlatform.toLowerCase(),
+      handleOrEmail: accInfo.handleOrEmail,
+      password: accInfo.password,
+    });
+  }, []);
 
   const validate = () => {
     let ok = true;
@@ -40,7 +54,7 @@ export default function LoginModal({ setShowLoginModal }) {
     if (!ok) {
       setAlert({
         message: "No field can be empty",
-        variant: "danger"
+        variant: "danger",
       });
     }
     return ok;
@@ -53,26 +67,26 @@ export default function LoginModal({ setShowLoginModal }) {
     }
     setLoginInProgress(true);
     DataService.login(form)
-      .then(resp => {
+      .then((resp) => {
         console.log(resp);
         setAlert({
           message: `Hi, ${resp.handle}!`,
-          variant: "success"
+          variant: "success",
         });
-        setTimeout(() => closeModal(), 1000);
+        setTimeout(() => closeModal(true), 1000);
       })
-      .catch(error => {
+      .catch((error) => {
         setAlert({
           message: error.response.data.message,
-          variant: "danger"
+          variant: "danger",
         });
       })
       .finally(() => setLoginInProgress(false));
   };
 
-  const closeModal = () => {
+  const closeModal = (isLoggedIn) => {
     setShowModal(false);
-    setTimeout(() => setShowLoginModal(false), 500);
+    setTimeout(() => actionOnLogin(isLoggedIn), 500);
   };
 
   return (
@@ -83,23 +97,32 @@ export default function LoginModal({ setShowLoginModal }) {
       centered
     >
       <Modal.Header style={{ paddingBottom: "5px", paddingTop: "5px" }}>
-        <strong>Login</strong>
+        <strong>{`${loginPlatform} Login`}</strong>
       </Modal.Header>
       <Modal.Body style={{ paddingBottom: "2px", paddingTop: "5px" }}>
+        {/*<Row>*/}
+        {/*  <Col xs={12}>*/}
+        {/*    <Form.Group className="mb-3">*/}
+        {/*      <Form.Label>Platform</Form.Label>*/}
+        {/*      <Form.Select size="sm" aria-label="Default select example"*/}
+        {/*          value={form.platform}*/}
+        {/*          onChange={e =>*/}
+        {/*          setForm({...form, platform: e.currentTarget.value})*/}
+        {/*      }>*/}
+        {/*        <option value="codeforces">Codeforces</option>*/}
+        {/*        <option value="atcoder">AtCoder</option>*/}
+        {/*      </Form.Select>*/}
+        {/*    </Form.Group>*/}
+        {/*  </Col>*/}
+        {/*</Row>*/}
         <Row>
           <Col xs={12}>
             <Form.Group className="mb-3">
-              <Form.Label>Platform</Form.Label>
-              <Form.Select size="sm" aria-label="Default select example">
-                <option value="codeforces">Codeforces</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12}>
-            <Form.Group className="mb-3">
-              <Form.Label>Handle or Email</Form.Label>
+              <Form.Label>
+                {form.platform === "codeforces"
+                  ? "Username or Email"
+                  : "Username"}
+              </Form.Label>
               <Form.Control
                 type="text"
                 size="sm"
@@ -107,7 +130,7 @@ export default function LoginModal({ setShowLoginModal }) {
                 autoComplete="off"
                 autoCapitalize="none"
                 value={form.handleOrEmail}
-                onChange={e =>
+                onChange={(e) =>
                   setForm({ ...form, handleOrEmail: e.target.value })
                 }
               />
@@ -126,7 +149,9 @@ export default function LoginModal({ setShowLoginModal }) {
                   autoComplete="off"
                   autoCapitalize="none"
                   value={form.password}
-                  onChange={e => setForm({ ...form, password: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
                 />
                 <Button
                   size="sm"
@@ -150,7 +175,11 @@ export default function LoginModal({ setShowLoginModal }) {
         )}
       </Modal.Body>
       <Modal.Footer style={{ paddingBottom: "5px", paddingTop: "5px" }}>
-        <Button size="sm" variant="outline-secondary" onClick={closeModal}>
+        <Button
+          size="sm"
+          variant="outline-secondary"
+          onClick={() => closeModal(false)}
+        >
           Cancel
         </Button>
         <Button size="sm" variant="outline-success" onClick={doLogin}>

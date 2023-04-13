@@ -24,7 +24,7 @@ func CreateSourceFiles(problems []models.Problem) {
 func saveSourceIntoFile(judgeConfig *config.JudgeConfig, problem models.Problem) {
 	logger.Info(fmt.Sprintf("Saving source file for: %v", problem))
 	folderPath := fmt.Sprintf("%v/%v/%v/source", strings.TrimRight(judgeConfig.WorkspaceDirectory, "/"), problem.Platform, problem.ContestId)
-	fileName := problem.Label + judgeConfig.LangConfigs[judgeConfig.ActiveLang].FileExtension
+	fileName := problem.Label + judgeConfig.TestingLangConfigs[judgeConfig.ActiveTestingLang].FileExtension
 	filePath := filepath.Join(folderPath, fileName)
 
 	if !utils.IsFileExist(filePath) {
@@ -75,7 +75,7 @@ func GetSourceFilePath(platform string, cid string, label string) string {
 	judgeConfig := config.GetJudgeConfigFromCache()
 
 	folderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
-	fileName := label + judgeConfig.LangConfigs[judgeConfig.ActiveLang].FileExtension
+	fileName := label + judgeConfig.TestingLangConfigs[judgeConfig.ActiveTestingLang].FileExtension
 	filePath := filepath.Join(folderPath, fileName)
 
 	return filePath

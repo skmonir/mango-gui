@@ -45,13 +45,13 @@ func GetTemplateCode() string {
 	conf := config.GetJudgeConfigFromCache()
 
 	body := ""
-	if len(conf.LangConfigs[conf.ActiveLang].UserTemplatePath) > 0 {
-		body = utils.ReadFileContent(conf.LangConfigs[conf.ActiveLang].UserTemplatePath, constants.SOURCE_MAX_ROW_FOR_TEST, constants.SOURCE_MAX_COL_FOR_TEST)
+	if len(conf.TestingLangConfigs[conf.ActiveTestingLang].UserTemplatePath) > 0 {
+		body = utils.ReadFileContent(conf.TestingLangConfigs[conf.ActiveTestingLang].UserTemplatePath, constants.SOURCE_MAX_ROW_FOR_TEST, constants.SOURCE_MAX_COL_FOR_TEST)
 		if len(strings.Trim(body, " \n\t")) == 0 {
-			body = GetDefaultTemplate(conf.ActiveLang)
+			body = GetDefaultTemplate(conf.ActiveTestingLang)
 		}
 	} else {
-		body = GetDefaultTemplate(conf.ActiveLang)
+		body = GetDefaultTemplate(conf.ActiveTestingLang)
 	}
 	return body
 }

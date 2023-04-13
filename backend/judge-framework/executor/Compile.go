@@ -45,7 +45,7 @@ func Compile(platform string, cid string, label string) string {
 	sourceFolderPath := filepath.Join(judgeConfig.WorkspaceDirectory, platform, cid, "source")
 	filePathWithoutExt := filepath.Join(sourceFolderPath, label)
 
-	err, command := languageServices.GetCompilationCommand(filePathWithoutExt, judgeConfig.LangConfigs[judgeConfig.ActiveLang])
+	err, command := languageServices.GetCompilationCommand(filePathWithoutExt, judgeConfig.TestingLangConfigs[judgeConfig.ActiveTestingLang])
 	if err != nil {
 		logger.Error(err.Error())
 		return err.Error()

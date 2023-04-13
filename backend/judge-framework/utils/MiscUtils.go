@@ -1,9 +1,15 @@
 package utils
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/md5"
+	"crypto/rand"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -19,11 +25,11 @@ import (
 func GetHtmlBody(URL string) (string, error) {
 	log.Println("Fetching html from " + URL)
 	resp, err := http.Get(URL)
-	defer resp.Body.Close()
-	log.Println("Fetched html with status ", resp.StatusCode)
 	if err != nil || resp.StatusCode >= 400 {
 		return "", errors.New("Error while fetching web page")
 	}
+	defer resp.Body.Close()
+	log.Println("Fetched html with status ", resp.StatusCode)
 	bt, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
@@ -34,22 +40,22 @@ func GetHtmlBody(URL string) (string, error) {
 func GetBody(client *http.Client, URL string) ([]byte, error) {
 	log.Println("Fetching html from " + URL)
 	resp, err := client.Get(URL)
-	log.Println("Fetched html with status ", resp.StatusCode)
-	if err != nil {
+	if err != nil || resp.StatusCode >= 400 {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	log.Println("Fetched html with status ", resp.StatusCode)
 	return ioutil.ReadAll(resp.Body)
 }
 
 func PostBody(client *http.Client, URL string, data url.Values) ([]byte, error) {
 	log.Println("Posting data to ", URL)
 	resp, err := client.PostForm(URL, data)
-	log.Println("Posted data with status ", resp.StatusCode)
-	if err != nil {
+	if err != nil || resp.StatusCode >= 400 {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	log.Println("Fetched html with status ", resp.StatusCode)
 	return ioutil.ReadAll(resp.Body)
 }
 
@@ -91,6 +97,7 @@ func ExtractInfoFromUrl(url string) (string, string, string, string) {
 		}
 	} else if strings.Contains(url, "atcoder.jp/contests") {
 		platform = "atcoder"
+		ctype = "contests"
 		index := strings.Index(url, "atcoder.jp/contests")
 		path := strings.Trim(url[index+len("atcoder.jp/contests"):], "/")
 		values := splitUrlPath(path)
@@ -244,4 +251,52 @@ func SliceContains[T comparable](s []T, e T) bool {
 		}
 	}
 	return false
+}
+
+func createHash(key string) []byte {
+	hashFunc := md5.New()
+	hashFunc.Write([]byte(key))
+	return hashFunc.Sum(nil)
+}
+
+func Encrypt(handle, password string) (ret string, err error) {
+	block, err := aes.NewCipher(createHash("tiutiu" + handle + "477"))
+	if err != nil {
+		return
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return
+	}
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+		return
+	}
+	text := gcm.Seal(nonce, nonce, []byte(password), nil)
+	ret = hex.EncodeToString(text)
+	return
+}
+
+func Decrypt(handle, password string) (ret string, err error) {
+	data, err := hex.DecodeString(password)
+	if err != nil {
+		err = errors.New("Cannot decode the password")
+		return
+	}
+	block, err := aes.NewCipher(createHash("tiutiu" + handle + "477"))
+	if err != nil {
+		return
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return
+	}
+	nonceSize := gcm.NonceSize()
+	nonce, text := data[:nonceSize], data[nonceSize:]
+	plain, err := gcm.Open(nil, nonce, text, nil)
+	if err != nil {
+		return
+	}
+	ret = string(plain)
+	return
 }
