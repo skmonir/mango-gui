@@ -31,17 +31,6 @@ type AtCoderClient struct {
 	Password      string `json:"password"`
 }
 
-var acClient *AtCoderClient
-
-func getAtCoderClient() *AtCoderClient {
-	if cfClient == nil {
-		once.Do(func() {
-			acClient = createAtCoderClient()
-		})
-	}
-	return acClient
-}
-
 func createAtCoderClient() *AtCoderClient {
 	jar, _ := cookiejar.New(nil)
 	client := &AtCoderClient{

@@ -34,18 +34,7 @@ type CodeforcesClient struct {
 	Password      string `json:"password"`
 }
 
-var cfClient *CodeforcesClient
-
-func getCodeforcesClient() *CodeforcesClient {
-	if cfClient == nil {
-		once.Do(func() {
-			cfClient = createClient()
-		})
-	}
-	return cfClient
-}
-
-func createClient() *CodeforcesClient {
+func createCodeforcesClient() *CodeforcesClient {
 	jar, _ := cookiejar.New(nil)
 	client := &CodeforcesClient{
 		Jar:        jar,
@@ -130,7 +119,7 @@ func (c *CodeforcesClient) login() (err error) {
 
 func (c *CodeforcesClient) DoLogin(handleOrEmail, password string) (err error, handle string) {
 	defer utils.PanicRecovery()
-	
+
 	c.HandleOrEmail = handleOrEmail
 	c.Password, err = utils.Encrypt(handleOrEmail, password)
 	if err != nil {

@@ -18,9 +18,9 @@ func GetClientByPlatform(platform string) (error, IClient) {
 	var err error
 	var httpClient IClient
 	if platform == "codeforces" {
-		httpClient = getCodeforcesClient()
+		httpClient = createCodeforcesClient()
 	} else if platform == "atcoder" {
-		httpClient = getAtCoderClient()
+		httpClient = createAtCoderClient()
 	} else {
 		log.Println("Unknown platform")
 		err = errors.New("Unknown platform")
