@@ -129,6 +129,8 @@ func (c *CodeforcesClient) login() (err error) {
 }
 
 func (c *CodeforcesClient) DoLogin(handleOrEmail, password string) (err error, handle string) {
+	defer utils.PanicRecovery()
+	
 	c.HandleOrEmail = handleOrEmail
 	c.Password, err = utils.Encrypt(handleOrEmail, password)
 	if err != nil {

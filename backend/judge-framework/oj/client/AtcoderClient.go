@@ -116,6 +116,8 @@ func (c *AtCoderClient) login() (err error) {
 }
 
 func (c *AtCoderClient) DoLogin(handleOrEmail, password string) (err error, handle string) {
+	defer utils.PanicRecovery()
+
 	fmt.Println(handleOrEmail, password)
 	c.HandleOrEmail = handleOrEmail
 	c.Password, err = utils.Encrypt(handleOrEmail, password)
