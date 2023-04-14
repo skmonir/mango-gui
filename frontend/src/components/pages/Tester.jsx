@@ -370,12 +370,12 @@ export default function Tester({ config, appData }) {
 
   const getTestcaseRowColor = (testcaseExecutionDetails) => {
     if (["none", "running"].includes(testcaseExecutionDetails?.status)) {
-      return "";
+      return "#e2e3e5";
     } else {
       if (testcaseExecutionDetails?.testcaseExecutionResult?.verdict === "AC") {
-        return "table-success";
+        return "#d1e7dd";
       } else {
-        return "table-danger";
+        return "#f8d7da";
       }
     }
   };
@@ -693,8 +693,8 @@ export default function Tester({ config, appData }) {
     const execTableColumns = [
       {
         Header: () => (
-          <span>
-            <p style={{ textAlign: "center" }}>Case Name</p>
+          <span style={{ textAlign: "center" }}>
+            <strong>Testcase</strong>
           </span>
         ),
         accessor: "inputFilePath",
@@ -712,8 +712,8 @@ export default function Tester({ config, appData }) {
       },
       {
         Header: () => (
-          <span>
-            <p style={{ textAlign: "center" }}>Result</p>
+          <span style={{ textAlign: "center" }}>
+            <strong>Result</strong>
           </span>
         ),
         accessor: "event",
@@ -724,8 +724,8 @@ export default function Tester({ config, appData }) {
       },
       {
         Header: () => (
-          <span>
-            <p style={{ textAlign: "center" }}>Time</p>
+          <span style={{ textAlign: "center" }}>
+            <strong>Time</strong>
           </span>
         ),
         accessor: "event",
@@ -740,8 +740,8 @@ export default function Tester({ config, appData }) {
       },
       {
         Header: () => (
-          <span>
-            <p style={{ textAlign: "center" }}>Memory</p>
+          <span style={{ textAlign: "center" }}>
+            <strong>Memory</strong>
           </span>
         ),
         accessor: "event",
@@ -756,8 +756,8 @@ export default function Tester({ config, appData }) {
       },
       {
         Header: () => (
-          <span>
-            <p style={{ textAlign: "center" }}>Actions</p>
+          <span style={{ textAlign: "center" }}>
+            <strong>Actions</strong>
           </span>
         ),
         accessor: "event",
@@ -771,41 +771,49 @@ export default function Tester({ config, appData }) {
     const ioTableColumns = [
       {
         Header: () => (
-          <span>
-            <p style={{ textAlign: "center" }}>Input</p>
+          <span style={{ textAlign: "center" }}>
+            <strong>Input</strong>
           </span>
         ),
         accessor: "input",
         minWidth: 300,
         Cell: ({ original }) => {
-          return <div className="pre">{original?.testcase?.input}</div>;
+          return (
+            <pre style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+              {original?.testcase?.input}
+            </pre>
+          );
         },
       },
       {
         Header: () => (
-          <span>
-            <p style={{ textAlign: "center" }}>Expected Output</p>
+          <span style={{ textAlign: "center" }}>
+            <strong>Expected Output</strong>
           </span>
         ),
         accessor: "expectedOutput",
         minWidth: 375,
         Cell: ({ original }) => {
-          return <div className="pre">{original?.testcase?.output}</div>;
+          return (
+            <pre style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+              {original?.testcase?.output}
+            </pre>
+          );
         },
       },
       {
         Header: () => (
-          <span>
-            <p style={{ textAlign: "center" }}>Program Output</p>
+          <span style={{ textAlign: "center" }}>
+            <strong>Program Output</strong>
           </span>
         ),
         accessor: "programOutput",
         minWidth: 375,
         Cell: ({ original }) => {
           return (
-            <div className="pre">
+            <pre style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
               {original?.testcaseExecutionResult?.output}
-            </div>
+            </pre>
           );
         },
       },
@@ -821,17 +829,11 @@ export default function Tester({ config, appData }) {
           showPagination={false}
           showPageSizeOptions={false}
           resizable={false}
+          collapseOnDataChange={false}
           minRows={0}
-          className="-highlight"
           SubComponent={(rowInfo) => {
             return (
-              <div
-                style={{
-                  border: "2px solid transparent",
-                  borderColor: "darkseagreen",
-                  borderRadius: "5px",
-                }}
-              >
+              <div>
                 <ReactTable
                   data={[rowInfo.original]}
                   data-testid={`io_table_${rowInfo.index + 1}`}
@@ -845,62 +847,17 @@ export default function Tester({ config, appData }) {
               </div>
             );
           }}
+          getTrProps={(state, rowInfo, instance) => {
+            if (rowInfo === undefined) {
+              return {};
+            }
+            return {
+              style: {
+                background: getTestcaseRowColor(rowInfo.original),
+              },
+            };
+          }}
         />
-      </div>
-    );
-  };
-
-  const getCompleteExecutionTable = () => {
-    return (
-      <div>
-        <Table bordered responsive="sm" size="sm">
-          <thead>
-            <tr className="text-center">
-              <th>#</th>
-              <th>Input</th>
-              <th>Expected Output</th>
-              <th>Program Output</th>
-              <th>Result</th>
-              <th>Time</th>
-              <th>Mem.</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {selectedProblemFilteredExecResult.testcaseExecutionDetailsList.map(
-              (execDetails, id) => (
-                <tr key={id} className={getTestcaseRowColor(execDetails)}>
-                  <td>{id + 1}</td>
-                  <td>
-                    <pre>{execDetails.testcase.input}</pre>
-                  </td>
-                  <td>
-                    <pre>{execDetails.testcase.output}</pre>
-                  </td>
-                  <td>
-                    <pre>{execDetails.testcaseExecutionResult?.output}</pre>
-                  </td>
-                  <td className="text-center">{getVerdict(execDetails)}</td>
-                  <td className="text-center">
-                    <pre>
-                      {execDetails.testcaseExecutionResult?.consumedTime +
-                        " ms"}
-                    </pre>
-                  </td>
-                  <td className="text-center">
-                    <pre>
-                      {execDetails.testcaseExecutionResult?.consumedMemory +
-                        " KB"}
-                    </pre>
-                  </td>
-                  <td className="text-center">
-                    {getExecTableActionButtons(execDetails)}
-                  </td>
-                </tr>
-              )
-            )}
-          </tbody>
-        </Table>
       </div>
     );
   };

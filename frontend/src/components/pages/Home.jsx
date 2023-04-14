@@ -12,9 +12,9 @@ export default function Home() {
   const features = [
     "Supports C++, Java and Python",
     "Schedule upcoming contests to be parsed automatically",
+    "Auto generate source files with specified or default template code",
+    "Write code in integrated rich Code Editor",
     "Test and Submit your code directly from Mango to the online judge platform",
-    "Edit or view code with integrated rich Code Editor",
-    "Auto generate source files with user specified or default template code",
     "Add custom tests to cover all the corner cases",
     "All testcases are stored in file-system for offline testing",
     "Generate random testcases easily with Input/Output Generator",
@@ -116,7 +116,7 @@ export default function Home() {
                     })
                   }
                 >
-                  <FontAwesomeIcon icon={faBug} /> Report issues
+                  <FontAwesomeIcon icon={faBug} /> Report bugs
                 </Button>
               </div>
             </Col>
