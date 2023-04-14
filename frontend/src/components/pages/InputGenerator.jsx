@@ -632,7 +632,7 @@ export default function InputGenerator({ config, appData }) {
 
   const getActionElements = () => {
     return (
-      <Row className="mt-2">
+      <Row className="mt-3">
         <Col md={{ span: 2, offset: 5 }}>
           <Row>
             <Col xs={12} className="d-grid gap-2">
