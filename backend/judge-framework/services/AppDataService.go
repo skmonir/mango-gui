@@ -9,6 +9,7 @@ import (
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 	"github.com/skmonir/mango-gui/backend/socket"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 )
@@ -133,6 +134,8 @@ func GetFutureParseScheduledTasks() []models.ParseSchedulerTask {
 }
 
 func getFilteredParseScheduledTasks(tasks []models.ParseSchedulerTask) ([]models.ParseSchedulerTask, []models.ParseSchedulerTask) {
+	sort.Slice(tasks, func(i, j int) bool { return tasks[i].StartTime.Before(tasks[j].StartTime) })
+
 	futureTasks := []models.ParseSchedulerTask{}
 	expiredTasks := []models.ParseSchedulerTask{}
 	for i := 0; i < len(tasks); i++ {
