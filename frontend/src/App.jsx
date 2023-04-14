@@ -7,7 +7,7 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faDiagramProject,
+  faCircleNodes,
   faDownload,
   faHome,
   faLaptopCode,
@@ -108,8 +108,7 @@ function App() {
                         onClick={() => setCurrentTab("input_generator")}
                         eventKey="input_generator"
                       >
-                        <FontAwesomeIcon icon={faDiagramProject} /> Input
-                        Generator
+                        <FontAwesomeIcon icon={faCircleNodes} /> Input Generator
                       </Nav.Link>
                     </Nav.Item>
                     <Nav.Item className="text-center">
