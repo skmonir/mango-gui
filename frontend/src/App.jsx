@@ -12,7 +12,7 @@ import {
   faHome,
   faLaptopCode,
   faMicrochip,
-  faTools
+  faTools,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import Settings from "./components/pages/Settings.jsx";
@@ -48,19 +48,19 @@ function App() {
 
   const initApp = () => {
     setTimeout(() => {
-      DataService.initApp().then(resp => {
+      DataService.initApp().then((resp) => {
         setShowInitModal(false);
         fetchAppData();
       });
     }, 1000);
   };
 
-  const updateInitMessageFromSocket = data => {
+  const updateInitMessageFromSocket = (data) => {
     setInitMessage(data.message);
   };
 
   const fetchAppData = () => {
-    DataService.getAppData().then(appData => {
+    DataService.getAppData().then((appData) => {
       setAppData(appData);
       setAppDataLoaded(true);
     });
@@ -138,7 +138,7 @@ function App() {
               maxHeight: "92vh",
               overflowY: "auto",
               overflowX: "auto",
-              marginBottom: "5px"
+              marginBottom: "5px",
             }}
           >
             <Col xs={12}>
@@ -155,10 +155,10 @@ function App() {
                       <Tester config={config} appData={appData} />
                     </Tab.Pane>
                     <Tab.Pane eventKey="input_generator">
-                      <InputGenerator appData={appData} />
+                      <InputGenerator config={config} appData={appData} />
                     </Tab.Pane>
                     <Tab.Pane eventKey="output_generator">
-                      <OutputGenerator appData={appData} />
+                      <OutputGenerator config={config} appData={appData} />
                     </Tab.Pane>
                     <Tab.Pane eventKey="settings">
                       <Settings setConfig={setConfig} />

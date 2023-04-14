@@ -79,7 +79,7 @@ func (c *CodeforcesClient) login() (err error) {
 		return errors.New(constants.ErrorServerError)
 	}
 
-	csrf, err := findCsrf(body)
+	csrf, err := findCodeforcesCsrf(body)
 	if err != nil {
 		logger.Error(err.Error())
 		return errors.New(constants.ErrorServerError)
@@ -102,7 +102,7 @@ func (c *CodeforcesClient) login() (err error) {
 		return
 	}
 
-	handle, err := findHandle(body)
+	handle, err := findCodeforcesHandle(body)
 	if err != nil {
 		logger.Error(err.Error())
 		return errors.New(constants.ErrorLoginFailed)
@@ -147,14 +147,14 @@ func (c *CodeforcesClient) Submit(problem models.Problem, langId, source string)
 		return errors.New(constants.ErrorServerError)
 	}
 
-	handle, err := findHandle(body)
+	handle, err := findCodeforcesHandle(body)
 	if err != nil {
 		return
 	}
 
 	fmt.Printf("Current user: %v\n", handle)
 
-	csrf, err := findCsrf(body)
+	csrf, err := findCodeforcesCsrf(body)
 	if err != nil {
 		logger.Error(err.Error())
 		return errors.New(constants.ErrorServerError)
@@ -213,7 +213,7 @@ func (c *CodeforcesClient) monitorSubmission(problem models.Problem) {
 			logger.Error(err.Error())
 			return
 		}
-		handle, err := findHandle(body)
+		handle, err := findCodeforcesHandle(body)
 		if err != nil {
 			return
 		}
@@ -276,7 +276,7 @@ func (c *CodeforcesClient) save() (err error) {
 	return
 }
 
-func findHandle(body []byte) (string, error) {
+func findCodeforcesHandle(body []byte) (string, error) {
 	reg := regexp.MustCompile(`handle = "([\s\S]+?)"`)
 	tmp := reg.FindSubmatch(body)
 	if len(tmp) < 2 {
@@ -285,7 +285,7 @@ func findHandle(body []byte) (string, error) {
 	return string(tmp[1]), nil
 }
 
-func findCsrf(body []byte) (string, error) {
+func findCodeforcesCsrf(body []byte) (string, error) {
 	reg := regexp.MustCompile(`csrf='(.+?)'`)
 	tmp := reg.FindSubmatch(body)
 	if len(tmp) < 2 {

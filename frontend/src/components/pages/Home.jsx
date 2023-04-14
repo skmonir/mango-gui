@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBookOpenReader,
   faBug,
-  faCheck
+  faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import appLogo from "../../assets/icons/logo.png";
 import DataService from "../../services/DataService.js";
@@ -11,14 +11,14 @@ import DataService from "../../services/DataService.js";
 export default function Home() {
   const features = [
     "Supports C++, Java and Python",
-    "Configure and set active language as per your need",
-    "Auto generate source files with user specified or default template code",
+    "Schedule upcoming contests to be parsed automatically",
+    "Test and Submit your code directly from Mango to the online judge platform",
     "Edit or view code with integrated rich Code Editor",
-    "Parse and store testcases for offline testing",
-    "Schedule upcoming contests to parse automatically",
+    "Auto generate source files with user specified or default template code",
     "Add custom tests to cover all the corner cases",
+    "All testcases are stored in file-system for offline testing",
     "Generate random testcases easily with Input/Output Generator",
-    "TGen script works like magic to generate testcases with few lines of code"
+    "TGen script works like magic to generate testcases with few lines of code",
   ];
 
   return (
@@ -97,8 +97,7 @@ export default function Home() {
                   variant="outline-success"
                   onClick={() =>
                     DataService.openResource({
-                      path:
-                        "https://github.com/skmonir/mango-gui/blob/main/README.md"
+                      path: "https://github.com/skmonir/mango-gui/blob/main/README.md",
                     })
                   }
                 >
@@ -113,7 +112,7 @@ export default function Home() {
                   variant="outline-dark"
                   onClick={() =>
                     DataService.openResource({
-                      path: "https://github.com/skmonir/mango-gui/issues"
+                      path: "https://github.com/skmonir/mango-gui/issues",
                     })
                   }
                 >

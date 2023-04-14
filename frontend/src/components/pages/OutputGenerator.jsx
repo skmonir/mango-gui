@@ -1,12 +1,4 @@
-import {
-  Button,
-  Card,
-  Col,
-  InputGroup,
-  Row,
-  Spinner,
-  Table
-} from "react-bootstrap";
+import { Alert, Button, Col, InputGroup, Row, Spinner } from "react-bootstrap";
 import SocketClient from "../../socket/SocketClient.js";
 import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
@@ -19,12 +11,12 @@ import Utils from "../../Utils.js";
 import CompilationErrorMessage from "../misc/CompilationErrorMessage.jsx";
 import GeneratorLogs from "../misc/GeneratorLogs.jsx";
 
-export default function OutputGenerator({ appData }) {
+export default function OutputGenerator({ config, appData }) {
   const socketClient = new SocketClient();
 
   const [toastMsgObj, setToastMsgObj] = useState({
     variant: "",
-    message: ""
+    message: "",
   });
 
   const [showCodeModal, setShowCodeModal] = useState(false);
@@ -37,7 +29,7 @@ export default function OutputGenerator({ appData }) {
     fileMode: "write",
     inputDirectoryPath: "",
     outputDirectoryPath: "",
-    generatorScriptPath: ""
+    generatorScriptPath: "",
   });
 
   const [generatorExecResult, setGeneratorExecResult] = useState({});
@@ -57,20 +49,20 @@ export default function OutputGenerator({ appData }) {
     if (!Utils.isStrNullOrEmpty(outputGenerateRequest.parsedProblemUrl)) {
       DataService.getInputOutputDirectoriesByUrl(
         window.btoa(outputGenerateRequest.parsedProblemUrl)
-      ).then(dir => {
+      ).then((dir) => {
         setOutputGenerateRequest({
           ...outputGenerateRequest,
           inputDirectoryPath: dir?.inputDirectory,
-          outputDirectoryPath: dir?.outputDirectory
+          outputDirectoryPath: dir?.outputDirectory,
         });
       });
     }
   };
 
-  const checkDirectoryPathValidity = dirPath => {
+  const checkDirectoryPathValidity = (dirPath) => {
     if (!Utils.isStrNullOrEmpty(dirPath)) {
       DataService.checkDirectoryPathValidity(window.btoa(dirPath)).then(
-        resp => {
+        (resp) => {
           if (resp.isExist === false) {
             showToastMessage("Error", `${dirPath} is not a valid directory`);
           }
@@ -79,9 +71,9 @@ export default function OutputGenerator({ appData }) {
     }
   };
 
-  const checkFilePathValidity = filePath => {
+  const checkFilePathValidity = (filePath) => {
     if (!Utils.isStrNullOrEmpty(filePath)) {
-      DataService.checkFilePathValidity(window.btoa(filePath)).then(resp => {
+      DataService.checkFilePathValidity(window.btoa(filePath)).then((resp) => {
         if (resp.isExist === false) {
           showToastMessage("Error", `${filePath} is not a valid file`);
         }
@@ -93,7 +85,7 @@ export default function OutputGenerator({ appData }) {
     setShowToast(true);
     setToastMsgObj({
       variant: variant,
-      message: message
+      message: message,
     });
   };
 
@@ -122,7 +114,7 @@ export default function OutputGenerator({ appData }) {
       setTimeout(() => {
         console.log(outputGenerateRequest);
         setIsGeneratingInProgress(true);
-        DataService.generateOutput(outputGenerateRequest).then(data => {
+        DataService.generateOutput(outputGenerateRequest).then((data) => {
           setGeneratorExecResult(data);
           setIsGeneratingInProgress(false);
         });
@@ -130,7 +122,7 @@ export default function OutputGenerator({ appData }) {
     }
   };
 
-  const updateExecResultFromSocket = data => {
+  const updateExecResultFromSocket = (data) => {
     setGeneratorExecResult(data);
   };
 
@@ -148,13 +140,13 @@ export default function OutputGenerator({ appData }) {
               <InputGroup className="mb-3" size="sm">
                 <InputGroup.Checkbox
                   checked={outputGenerateRequest.isForParsedProblem}
-                  onChange={e => {
+                  onChange={(e) => {
                     setOutputGenerateRequest({
                       ...outputGenerateRequest,
                       isForParsedProblem: e.currentTarget.checked,
                       parsedProblemUrl: "",
                       inputDirectoryPath: "",
-                      outputDirectoryPath: ""
+                      outputDirectoryPath: "",
                     });
                   }}
                 />
@@ -167,10 +159,10 @@ export default function OutputGenerator({ appData }) {
                   placeholder="Enter Problem URL [Codeforces, AtCoder, Custom]"
                   disabled={!outputGenerateRequest.isForParsedProblem}
                   value={outputGenerateRequest.parsedProblemUrl}
-                  onChange={e =>
+                  onChange={(e) =>
                     setOutputGenerateRequest({
                       ...outputGenerateRequest,
-                      parsedProblemUrl: e.target.value
+                      parsedProblemUrl: e.target.value,
                     })
                   }
                   onBlur={fetchIODirectories}
@@ -195,10 +187,10 @@ export default function OutputGenerator({ appData }) {
                   autoCapitalize="none"
                   placeholder="e.g. /user/Desktop/solution.cpp, /user/Desktop/solution.py"
                   value={outputGenerateRequest.generatorScriptPath}
-                  onChange={e =>
+                  onChange={(e) =>
                     setOutputGenerateRequest({
                       ...outputGenerateRequest,
-                      generatorScriptPath: e.target.value
+                      generatorScriptPath: e.target.value,
                     })
                   }
                   onBlur={() =>
@@ -237,10 +229,10 @@ export default function OutputGenerator({ appData }) {
                 placeholder="Enter directory where all the input files have"
                 disabled={outputGenerateRequest.isForParsedProblem}
                 value={outputGenerateRequest.inputDirectoryPath}
-                onChange={e =>
+                onChange={(e) =>
                   setOutputGenerateRequest({
                     ...outputGenerateRequest,
-                    inputDirectoryPath: e.target.value
+                    inputDirectoryPath: e.target.value,
                   })
                 }
                 onBlur={() =>
@@ -268,10 +260,10 @@ export default function OutputGenerator({ appData }) {
                 placeholder="Enter directory where you want to save the output files"
                 disabled={outputGenerateRequest.isForParsedProblem}
                 value={outputGenerateRequest.outputDirectoryPath}
-                onChange={e =>
+                onChange={(e) =>
                   setOutputGenerateRequest({
                     ...outputGenerateRequest,
-                    outputDirectoryPath: e.target.value
+                    outputDirectoryPath: e.target.value,
                   })
                 }
                 onBlur={() =>
@@ -283,34 +275,61 @@ export default function OutputGenerator({ appData }) {
             </Form.Group>
           </Col>
         </Row>
+      </>
+    );
+  };
+
+  const getConfigAlert = () => {
+    if (
+      outputGenerateRequest.isForParsedProblem &&
+      !config.workspaceDirectory
+    ) {
+      return (
         <Row>
-          <Col md={{ span: 2, offset: 5 }}>
-            <Row>
-              <Col xs={12} className="d-flex justify-content-center">
-                <Button
-                  size="sm"
-                  variant="outline-success"
-                  onClick={generateOutputTriggered}
-                  disabled={isGeneratingInProgress}
-                >
-                  {!isGeneratingInProgress ? (
-                    <FontAwesomeIcon icon={faCog} />
-                  ) : (
-                    <Spinner
-                      as="span"
-                      animation="border"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                    />
-                  )}
-                  {" Generate Output"}
-                </Button>
-              </Col>
-            </Row>
+          <Col>
+            <Alert variant="danger" className="text-center p-1 mb-2">
+              Configuration is not set properly. Please go to Settings and set
+              necessary fields.
+            </Alert>
           </Col>
         </Row>
-      </>
+      );
+    }
+  };
+
+  const getActionElements = () => {
+    return (
+      <Row>
+        <Col md={{ span: 2, offset: 5 }}>
+          <Row>
+            <Col xs={12} className="d-grid gap-2">
+              <Button
+                size="sm"
+                variant="outline-success"
+                onClick={generateOutputTriggered}
+                disabled={
+                  isGeneratingInProgress ||
+                  (outputGenerateRequest.isForParsedProblem &&
+                    !config.workspaceDirectory)
+                }
+              >
+                {!isGeneratingInProgress ? (
+                  <FontAwesomeIcon icon={faCog} />
+                ) : (
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                )}
+                {" Generate Output"}
+              </Button>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
     );
   };
 
@@ -318,7 +337,9 @@ export default function OutputGenerator({ appData }) {
     <div>
       <div className="panel">
         <div className="panel-body">
+          {getConfigAlert()}
           {getQueryForm()}
+          {getActionElements()}
           <Row>
             <Col xs={12}>
               <br />
@@ -327,7 +348,7 @@ export default function OutputGenerator({ appData }) {
                   props={{
                     minHeight: "35vh",
                     maxHeight: "52vh",
-                    logList: generatorExecResult.testcaseExecutionDetailsList
+                    logList: generatorExecResult.testcaseExecutionDetailsList,
                   }}
                 />
               )}
@@ -335,7 +356,7 @@ export default function OutputGenerator({ appData }) {
                 <CompilationErrorMessage
                   props={{
                     maxHeight: "52vh",
-                    error: generatorExecResult?.compilationError
+                    error: generatorExecResult?.compilationError,
                   }}
                 />
               )}

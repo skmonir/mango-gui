@@ -739,7 +739,7 @@ export default function Settings({ setConfig }) {
           </Row>
         </div>
       </div>
-      <Row className="mb-2 mt-2">
+      <Row className="mb-3 mt-2">
         <Col md={{ span: 6, offset: 3 }}>
           <Row>
             <Col xs={4}>

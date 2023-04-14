@@ -434,7 +434,11 @@ export default function Tester({ config, appData }) {
         size="sm"
         variant="success"
         onClick={() => submitCode()}
-        disabled={disableActionButtons() || !selectedProblemFilteredExecResult}
+        disabled={
+          disableActionButtons() ||
+          !selectedProblemFilteredExecResult ||
+          selectedProblem.platform === "custom"
+        }
       >
         {submittingInProgress ? (
           <Spinner
