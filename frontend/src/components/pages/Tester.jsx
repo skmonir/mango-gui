@@ -2,7 +2,6 @@ import {
   Alert,
   Button,
   ButtonGroup,
-  Card,
   Col,
   Row,
   Spinner,
@@ -37,6 +36,8 @@ import ShowToast from "../Toast/ShowToast.jsx";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import CompilationErrorMessage from "../misc/CompilationErrorMessage.jsx";
+import "react-table/react-table.css";
+import ReactTable from "react-table";
 
 export default function Tester({ config, appData }) {
   const socketClient = new SocketClient();
@@ -334,11 +335,16 @@ export default function Tester({ config, appData }) {
 
   const getVerdict = (testcaseExecutionDetails) => {
     if (testcaseExecutionDetails?.status === "running") {
-      return <Spinner animation="border" variant="primary" size="sm" />;
+      return (
+        <div className="d-flex justify-content-center">
+          <Spinner animation="border" variant="primary" size="sm" />
+        </div>
+      );
     } else if (testcaseExecutionDetails?.status !== "none") {
       return (
         <pre
           style={{
+            textAlign: "center",
             color:
               testcaseExecutionDetails?.testcaseExecutionResult?.verdict ===
               "AC"
@@ -647,7 +653,204 @@ export default function Tester({ config, appData }) {
     );
   };
 
-  const getExecutionTable = () => {
+  const getExecTableActionButtons = (execDetails) => {
+    return (
+      <ButtonGroup className="d-flex justify-content-center">
+        <Button
+          size="sm"
+          variant="primary"
+          title="Edit"
+          onClick={() => cloneUpdateCustomTest(execDetails.testcase, "Update")}
+          disabled={disableActionButtons()}
+        >
+          <FontAwesomeIcon icon={faEdit} />
+        </Button>
+        <Button
+          size="sm"
+          variant="success"
+          title="Clone"
+          onClick={() => cloneUpdateCustomTest(execDetails.testcase, "Clone")}
+          disabled={disableActionButtons()}
+        >
+          <FontAwesomeIcon icon={faClone} />
+        </Button>
+        <Button
+          size="sm"
+          variant="danger"
+          title="Delete"
+          onClick={() =>
+            deleteCustomTestTriggered(execDetails.testcase.inputFilePath)
+          }
+          disabled={disableActionButtons()}
+        >
+          <FontAwesomeIcon icon={faTrashAlt} />
+        </Button>
+      </ButtonGroup>
+    );
+  };
+
+  const getCompactExecutionTable = () => {
+    const execTableColumns = [
+      {
+        Header: () => (
+          <span>
+            <p style={{ textAlign: "center" }}>Case Name</p>
+          </span>
+        ),
+        accessor: "inputFilePath",
+        Cell: ({ original }) => {
+          return (
+            <pre style={{ textAlign: "center" }}>
+              {original?.testcase?.inputFilePath
+                .split("\\")
+                .pop()
+                .split("/")
+                .pop()}
+            </pre>
+          );
+        },
+      },
+      {
+        Header: () => (
+          <span>
+            <p style={{ textAlign: "center" }}>Result</p>
+          </span>
+        ),
+        accessor: "event",
+        maxWidth: 150,
+        Cell: ({ original }) => {
+          return getVerdict(original);
+        },
+      },
+      {
+        Header: () => (
+          <span>
+            <p style={{ textAlign: "center" }}>Time</p>
+          </span>
+        ),
+        accessor: "event",
+        maxWidth: 150,
+        Cell: ({ original }) => {
+          return (
+            <pre style={{ textAlign: "center" }}>
+              {original?.testcaseExecutionResult?.consumedTime + " ms"}
+            </pre>
+          );
+        },
+      },
+      {
+        Header: () => (
+          <span>
+            <p style={{ textAlign: "center" }}>Memory</p>
+          </span>
+        ),
+        accessor: "event",
+        maxWidth: 150,
+        Cell: ({ original }) => {
+          return (
+            <pre style={{ textAlign: "center" }}>
+              {original?.testcaseExecutionResult?.consumedMemory + " KB"}
+            </pre>
+          );
+        },
+      },
+      {
+        Header: () => (
+          <span>
+            <p style={{ textAlign: "center" }}>Actions</p>
+          </span>
+        ),
+        accessor: "event",
+        maxWidth: 120,
+        Cell: ({ original }) => {
+          return getExecTableActionButtons(original);
+        },
+      },
+    ];
+
+    const ioTableColumns = [
+      {
+        Header: () => (
+          <span>
+            <p style={{ textAlign: "center" }}>Input</p>
+          </span>
+        ),
+        accessor: "input",
+        minWidth: 300,
+        Cell: ({ original }) => {
+          return <div className="pre">{original?.testcase?.input}</div>;
+        },
+      },
+      {
+        Header: () => (
+          <span>
+            <p style={{ textAlign: "center" }}>Expected Output</p>
+          </span>
+        ),
+        accessor: "expectedOutput",
+        minWidth: 375,
+        Cell: ({ original }) => {
+          return <div className="pre">{original?.testcase?.output}</div>;
+        },
+      },
+      {
+        Header: () => (
+          <span>
+            <p style={{ textAlign: "center" }}>Program Output</p>
+          </span>
+        ),
+        accessor: "programOutput",
+        minWidth: 375,
+        Cell: ({ original }) => {
+          return (
+            <div className="pre">
+              {original?.testcaseExecutionResult?.output}
+            </div>
+          );
+        },
+      },
+    ];
+
+    return (
+      <div>
+        <ReactTable
+          data={selectedProblemFilteredExecResult.testcaseExecutionDetailsList}
+          data-testid="exec_result_table"
+          columns={execTableColumns}
+          sortable={false}
+          showPagination={false}
+          showPageSizeOptions={false}
+          resizable={false}
+          minRows={0}
+          className="-highlight"
+          SubComponent={(rowInfo) => {
+            return (
+              <div
+                style={{
+                  border: "2px solid transparent",
+                  borderColor: "darkseagreen",
+                  borderRadius: "5px",
+                }}
+              >
+                <ReactTable
+                  data={[rowInfo.original]}
+                  data-testid={`io_table_${rowInfo.index + 1}`}
+                  columns={ioTableColumns}
+                  sortable={false}
+                  showPagination={false}
+                  showPageSizeOptions={false}
+                  minRows={0}
+                  className="-bordered"
+                />
+              </div>
+            );
+          }}
+        />
+      </div>
+    );
+  };
+
+  const getCompleteExecutionTable = () => {
     return (
       <div>
         <Table bordered responsive="sm" size="sm">
@@ -691,43 +894,7 @@ export default function Tester({ config, appData }) {
                     </pre>
                   </td>
                   <td className="text-center">
-                    <ButtonGroup>
-                      <Button
-                        size="sm"
-                        variant="primary"
-                        title="Edit"
-                        onClick={() =>
-                          cloneUpdateCustomTest(execDetails.testcase, "Update")
-                        }
-                        disabled={disableActionButtons()}
-                      >
-                        <FontAwesomeIcon icon={faEdit} />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="success"
-                        title="Clone"
-                        onClick={() =>
-                          cloneUpdateCustomTest(execDetails.testcase, "Clone")
-                        }
-                        disabled={disableActionButtons()}
-                      >
-                        <FontAwesomeIcon icon={faClone} />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        title="Delete"
-                        onClick={() =>
-                          deleteCustomTestTriggered(
-                            execDetails.testcase.inputFilePath
-                          )
-                        }
-                        disabled={disableActionButtons()}
-                      >
-                        <FontAwesomeIcon icon={faTrashAlt} />
-                      </Button>
-                    </ButtonGroup>
+                    {getExecTableActionButtons(execDetails)}
                   </td>
                 </tr>
               )
@@ -780,7 +947,7 @@ export default function Tester({ config, appData }) {
           )}
           <Row>
             {selectedProblemFilteredExecResult?.testcaseExecutionDetailsList &&
-              getExecutionTable()}
+              getCompactExecutionTable()}
           </Row>
         </div>
       </div>
