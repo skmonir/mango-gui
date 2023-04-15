@@ -23,6 +23,8 @@ import Home from "./components/pages/Home.jsx";
 import DataService from "./services/DataService.js";
 import SocketClient from "./socket/SocketClient.js";
 import InitializerModal from "./components/modals/InitializerModal.jsx";
+import Form from "react-bootstrap/Form";
+import Utils from "./Utils.js";
 
 function App() {
   const socketClient = new SocketClient();
@@ -78,7 +80,7 @@ function App() {
             <Col xs={12}>
               <Navbar collapseOnSelect expand="lg" sticky="top">
                 <Navbar.Collapse id="basic-navbar-nav">
-                  <Nav className="mr-auto">
+                  <Nav className="me-auto my-2 my-lg-0">
                     <Nav.Item className="text-center">
                       <Nav.Link
                         onClick={() => setCurrentTab("home")}
@@ -128,6 +130,11 @@ function App() {
                       </Nav.Link>
                     </Nav.Item>
                   </Nav>
+                  <Form className="d-flex">
+                    <pre style={{ color: "darkgreen", fontWeight: "bold" }}>
+                      {Utils.getAppVersion()}
+                    </pre>
+                  </Form>
                 </Navbar.Collapse>
               </Navbar>
             </Col>

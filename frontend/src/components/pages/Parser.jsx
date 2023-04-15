@@ -9,7 +9,7 @@ import {
   faFileCirclePlus,
   faRefresh,
   faSyncAlt,
-  faTimesCircle
+  faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import SocketClient from "../../socket/SocketClient.js";
@@ -29,17 +29,16 @@ function Parser({ config, appData }) {
   const [showToast, setShowToast] = useState(false);
   const [toastMsgObj, setToastMsgObj] = useState({
     variant: "",
-    message: ""
+    message: "",
   });
   const [parsedProblemList, setParsedProblemList] = useState([]);
-  const [showAddCustomProblemModal, setShowAddCustomProblemModal] = useState(
-    false
-  );
+  const [showAddCustomProblemModal, setShowAddCustomProblemModal] =
+    useState(false);
   const [ipFlags, setIpFlags] = useState({
     parsingWithUrl: false,
     parsingWithRefresh: false,
     scheduling: false,
-    refreshingScheduledTasks: false
+    refreshingScheduledTasks: false,
   });
 
   useEffect(() => {
@@ -63,14 +62,14 @@ function Parser({ config, appData }) {
   const parseTriggerred = () => {
     setIpFlags({
       ...ipFlags,
-      parsingWithUrl: true
+      parsingWithUrl: true,
     });
     setTimeout(() => {
-      DataService.parse(window.btoa(parseUrl)).then(data => {
+      DataService.parse(window.btoa(parseUrl)).then((data) => {
         setParsedProblemList(data);
         setIpFlags({
           ...ipFlags,
-          parsingWithUrl: false
+          parsingWithUrl: false,
         });
         setInitAlert(true);
       });
@@ -81,27 +80,27 @@ function Parser({ config, appData }) {
     setIpFlags({
       ...ipFlags,
       parsingWithUrl: true,
-      parsingWithRefresh: true
+      parsingWithRefresh: true,
     });
     setParsedProblemList(
       parsedProblemList.map((prob, i) =>
         i === index
           ? {
               ...prob,
-              status: "running"
+              status: "running",
             }
           : prob
       )
     );
     console.log(parsedProblemList);
-    DataService.parse(window.btoa(url)).then(data => {
+    DataService.parse(window.btoa(url)).then((data) => {
       setParsedProblemList(
         parsedProblemList.map((prob, i) => (i === index ? data[0] : prob))
       );
       setIpFlags({
         ...ipFlags,
         parsingWithUrl: false,
-        parsingWithRefresh: false
+        parsingWithRefresh: false,
       });
     });
   };
@@ -109,59 +108,59 @@ function Parser({ config, appData }) {
   const scheduleParse = () => {
     setIpFlags({
       ...ipFlags,
-      scheduling: true
+      scheduling: true,
     });
     DataService.scheduleParse({ url: parseUrl })
-      .then(data => {
+      .then((data) => {
         console.log(data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
         showToastMessage("Error", error.response.data.message);
       })
       .finally(() =>
         setIpFlags({
           ...ipFlags,
-          scheduling: false
+          scheduling: false,
         })
       );
   };
 
-  const removeScheduledTaskTriggered = taskId => {
+  const removeScheduledTaskTriggered = (taskId) => {
     confirmAlert({
       title: "",
       message: "Are you sure to cancel this scheduled task?",
       buttons: [
         {
-          label: "No"
+          label: "No",
         },
         {
           label: "Yes, Cancel!",
-          onClick: () => removeScheduledTask(taskId)
-        }
-      ]
+          onClick: () => removeScheduledTask(taskId),
+        },
+      ],
     });
   };
 
-  const removeScheduledTask = taskId => {
-    DataService.removeParseScheduledTask(taskId).then(data => {
+  const removeScheduledTask = (taskId) => {
+    DataService.removeParseScheduledTask(taskId).then((data) => {
       console.log(data);
     });
   };
 
-  const updateParseStatusFromSocket = data => {
+  const updateParseStatusFromSocket = (data) => {
     console.log(data);
     if (data.length > 1) {
       setParsedProblemList(data);
       setInitAlert(false);
       setIpFlags({
         ...ipFlags,
-        parsingWithUrl: false
+        parsingWithUrl: false,
       });
     }
   };
 
-  const updateParseScheduledTasksFromSocket = tasks => {
+  const updateParseScheduledTasksFromSocket = (tasks) => {
     console.log(tasks);
     setParseSchedulerTasks(tasks);
   };
@@ -169,17 +168,17 @@ function Parser({ config, appData }) {
   const getScheduledTasks = () => {
     setIpFlags({
       ...ipFlags,
-      refreshingScheduledTasks: true
+      refreshingScheduledTasks: true,
     });
     setTimeout(() => {
       DataService.getParseScheduledTasks()
-        .then(tasks => {
+        .then((tasks) => {
           setParseSchedulerTasks(tasks);
         })
         .finally(() => {
           setIpFlags({
             ...ipFlags,
-            refreshingScheduledTasks: false
+            refreshingScheduledTasks: false,
           });
         });
     }, 700);
@@ -193,11 +192,11 @@ function Parser({ config, appData }) {
     setShowAddCustomProblemModal(false);
   };
 
-  const insertCustomProblemIntoList = data => {
+  const insertCustomProblemIntoList = (data) => {
     setParsedProblemList(data);
   };
 
-  const getProblemStatusIcon = status => {
+  const getProblemStatusIcon = (status) => {
     if (!status || status === "running") {
       return <Spinner animation="border" variant="primary" size="sm" />;
     } else if (status === "failed") {
@@ -213,7 +212,7 @@ function Parser({ config, appData }) {
     setShowToast(true);
     setToastMsgObj({
       variant: variant,
-      message: message
+      message: message,
     });
   };
 
@@ -225,7 +224,7 @@ function Parser({ config, appData }) {
     return disable || !config.workspaceDirectory;
   };
 
-  const getSchedulerRowColor = stage => {
+  const getSchedulerRowColor = (stage) => {
     if (
       stage === "SCHEDULED" ||
       stage === "RE_SCHEDULED" ||
@@ -309,7 +308,7 @@ function Parser({ config, appData }) {
           </tr>
         </thead>
         <tbody>
-          {parseSchedulerTasks.map(scheduledTask => (
+          {parseSchedulerTasks.map((scheduledTask) => (
             <tr
               key={scheduledTask.id}
               className={getSchedulerRowColor(scheduledTask.stage)}
@@ -392,7 +391,7 @@ function Parser({ config, appData }) {
                 placeholder="Enter Contest/Problem URL [Codeforces, AtCoder]"
                 value={parseUrl}
                 disabled={!config.workspaceDirectory}
-                onChange={e => setParseUrl(e.target.value)}
+                onChange={(e) => setParseUrl(e.target.value)}
               />
             </Col>
             <Col xs={2}>
@@ -463,11 +462,11 @@ function Parser({ config, appData }) {
           {parseSchedulerTasks?.length > 0 && (
             <>
               <Row className="mt-0">
-                <Col xs="9"></Col>
-                <Col xs="3" className="d-grid gap-2">
+                <Col xs="10"></Col>
+                <Col xs="2" className="d-grid gap-2">
                   <Button
                     size="sm"
-                    variant="outline-secondary"
+                    variant="success"
                     className="mb-1"
                     disabled={disableActionButtons()}
                     onClick={getScheduledTasks}
@@ -479,12 +478,12 @@ function Parser({ config, appData }) {
                         size="sm"
                         role="status"
                         aria-hidden="true"
-                        variant="success"
+                        variant="warning"
                       />
                     ) : (
                       <FontAwesomeIcon icon={faRefresh} />
                     )}{" "}
-                    Refresh Scheduled Tasks
+                    Refresh
                   </Button>
                 </Col>
               </Row>

@@ -1,4 +1,8 @@
 class Utils {
+  getAppVersion() {
+    return "v1.0";
+  }
+
   isStrNullOrEmpty(str) {
     return (
       str === null || str === undefined || str.trim() === "" || str.length === 0
@@ -21,7 +25,7 @@ class Utils {
       month: "short",
       year: "numeric",
       hour: "numeric",
-      minute: "2-digit"
+      minute: "2-digit",
     });
     return formattedDate;
   }
@@ -32,7 +36,7 @@ class Utils {
       month: "short",
       year: "numeric",
       hour: "numeric",
-      minute: "2-digit"
+      minute: "2-digit",
     });
   }
 }
