@@ -8,7 +8,7 @@ import (
 )
 
 func Login(platform, handleOrEmail, password string) (err error, handle string) {
-	err, ojClient := client.GetClientByPlatform(platform)
+	err, ojClient := client.GetOjClientByPlatform(platform)
 	if err != nil {
 		return err, ""
 	}
@@ -23,7 +23,7 @@ func Login(platform, handleOrEmail, password string) (err error, handle string) 
 }
 
 func Submit(platform, cid, pid string) (error, string) {
-	err, ojClient := client.GetClientByPlatform(platform)
+	err, ojClient := client.GetOjClientByPlatform(platform)
 	if err != nil {
 		return err, ""
 	}

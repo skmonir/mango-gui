@@ -253,24 +253,28 @@ function Parser({ config, appData }) {
           {parsedProblemList.map((problem, id) => (
             <tr key={id}>
               <td className="text-center">
-                <a
-                  href="#"
-                  onClick={() =>
-                    DataService.openResource({ path: problem?.url })
-                  }
-                >
-                  {problem?.label}
-                </a>
+                <pre className="mb-0">
+                  <a
+                    href="#"
+                    onClick={() =>
+                      DataService.openResource({ path: problem?.url })
+                    }
+                  >
+                    {problem?.label}
+                  </a>
+                </pre>
               </td>
               <td>
-                <a
-                  href="#"
-                  onClick={() =>
-                    DataService.openResource({ path: problem?.url })
-                  }
-                >
-                  {problem?.name}
-                </a>
+                <pre className="mb-0">
+                  <a
+                    href="#"
+                    onClick={() =>
+                      DataService.openResource({ path: problem?.url })
+                    }
+                  >
+                    {problem?.name}
+                  </a>
+                </pre>
               </td>
               <td className="text-center">
                 {getProblemStatusIcon(problem?.status)}
@@ -314,14 +318,16 @@ function Parser({ config, appData }) {
               className={getSchedulerRowColor(scheduledTask.stage)}
             >
               <td>
-                <a
-                  href="#"
-                  onClick={() =>
-                    DataService.openResource({ path: scheduledTask.url })
-                  }
-                >
-                  {scheduledTask.url}
-                </a>{" "}
+                <pre className="mb-0">
+                  <a
+                    href="#"
+                    onClick={() =>
+                      DataService.openResource({ path: scheduledTask.url })
+                    }
+                  >
+                    {scheduledTask.url}
+                  </a>
+                </pre>{" "}
                 {scheduledTask?.stage === "RUNNING" && (
                   <span>
                     <Spinner
@@ -336,9 +342,13 @@ function Parser({ config, appData }) {
                 )}
               </td>
               <td className="text-center">
-                {Utils.dateToLocaleString(scheduledTask.startTime)}
+                <pre className="mb-0">
+                  {Utils.dateToLocaleString(scheduledTask.startTime)}
+                </pre>
               </td>
-              <td className="text-center">{scheduledTask?.stage}</td>
+              <td className="text-center">
+                <pre className="mb-0">{scheduledTask?.stage}</pre>
+              </td>
               <td className="text-center">
                 {(scheduledTask.stage === "SCHEDULED" ||
                   scheduledTask.stage === "RE_SCHEDULED") && (

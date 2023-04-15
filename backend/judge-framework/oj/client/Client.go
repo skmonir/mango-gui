@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
 	"log"
+	"net/http"
 	"sync"
 )
 
@@ -14,13 +15,27 @@ type IClient interface {
 	Submit(problem models.Problem, langId, source string) (err error)
 }
 
-func GetClientByPlatform(platform string) (error, IClient) {
+func GetOjClientByPlatform(platform string) (error, IClient) {
 	var err error
-	var httpClient IClient
+	var ojClient IClient
 	if platform == "codeforces" {
-		httpClient = createCodeforcesClient()
+		ojClient = createCodeforcesClient()
 	} else if platform == "atcoder" {
-		httpClient = createAtCoderClient()
+		ojClient = createAtCoderClient()
+	} else {
+		log.Println("Unknown platform")
+		err = errors.New("Unknown platform")
+	}
+	return err, ojClient
+}
+
+func GetHttpClientByPlatform(platform string) (error, *http.Client) {
+	var err error
+	var httpClient *http.Client
+	if platform == "codeforces" {
+		httpClient = createCodeforcesClient().httpClient
+	} else if platform == "atcoder" {
+		httpClient = createAtCoderClient().httpClient
 	} else {
 		log.Println("Unknown platform")
 		err = errors.New("Unknown platform")

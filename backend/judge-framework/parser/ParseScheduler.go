@@ -7,9 +7,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/oj/client"
 	"github.com/skmonir/mango-gui/backend/judge-framework/scheduler"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -47,8 +49,10 @@ func fetchStartTime(url string) (time.Time, error) {
 		return time.Time{}, errors.New("Error! Please check the url.")
 	}
 
+	_, httpClient := client.GetHttpClientByPlatform(platform)
+
 	if platform == "codeforces" && strings.Contains(url, "codeforces.com/contest") {
-		err, body := getContestDetailPage("https://codeforces.com/contests?complete=true")
+		err, body := getContestDetailPage(httpClient, "https://codeforces.com/contests?complete=true")
 		if err != nil {
 			return time.Time{}, err
 		}
@@ -57,7 +61,7 @@ func fetchStartTime(url string) (time.Time, error) {
 			return time.Time{}, err
 		}
 	} else if platform == "codeforces" && strings.Contains(url, "codeforces.com/gym") {
-		err, body := getContestDetailPage("https://codeforces.com/gyms")
+		err, body := getContestDetailPage(httpClient, "https://codeforces.com/gyms")
 		if err != nil {
 			return time.Time{}, err
 		}
@@ -66,7 +70,7 @@ func fetchStartTime(url string) (time.Time, error) {
 			return time.Time{}, err
 		}
 	} else if platform == "atcoder" {
-		err, body := getContestDetailPage(url)
+		err, body := getContestDetailPage(httpClient, url)
 		if err != nil {
 			return time.Time{}, err
 		}
@@ -90,14 +94,14 @@ func checkIfParsingIsAlreadyScheduledForThisURL(url string) bool {
 	return false
 }
 
-func getContestDetailPage(url string) (error, soup.Root) {
-	html, err := utils.GetHtmlBody(url)
+func getContestDetailPage(httpClient *http.Client, url string) (error, soup.Root) {
+	html, err := utils.GetBody(httpClient, url)
 	if err != nil {
 		logger.Error(err.Error())
 		return errors.New(genericError), soup.Root{}
 	}
 
-	return nil, soup.HTMLParse(html)
+	return nil, soup.HTMLParse(string(html))
 }
 
 func getCodeforcesContestStartTime(body soup.Root, cid string, childId int) (time.Time, error) {
@@ -177,19 +181,20 @@ func ScheduleTaskInScheduler(scheduleTask models.ParseSchedulerTask) error {
 	if !utils.IsTimeInFuture(scheduleTask.StartTime) {
 		return errors.New("Schedule only upcoming contests")
 	}
-	return scheduler.ScheduleOneTimeTask(scheduleTask.Id, func() { go parseWithRetry(scheduleTask) }, scheduleTask.StartTime)
+	return scheduler.ScheduleOneTimeTask(scheduleTask.Id, func() { parseWithRetry(scheduleTask) }, scheduleTask.StartTime)
 }
 
 func parseWithRetry(scheduleTask models.ParseSchedulerTask) {
+	fmt.Println("Started parsing ", scheduleTask.Url)
 	if timeChanged, newStartTime := checkIfScheduledTimeChanged(scheduleTask.Url, scheduleTask.StartTime); timeChanged {
 		RemoveParseSchedule(scheduleTask.Id)
 		_ = scheduleTheParsing(scheduleTask.Url, "RE_SCHEDULED", newStartTime)
 		return
 	}
+	time.Sleep(1 * time.Second)
 	isParsed := false
+	services.UpdateParseScheduledTaskStage(scheduleTask.Id, "RUNNING")
 	for i := 0; i < 10; i++ {
-		services.UpdateParseScheduledTaskStage(scheduleTask.Id, "RUNNING")
-		time.Sleep(15 * time.Second)
 		problems := Parse(scheduleTask.Url)
 		if len(problems) > 0 {
 			isParsed = true
@@ -197,6 +202,7 @@ func parseWithRetry(scheduleTask models.ParseSchedulerTask) {
 			services.UpdateParseScheduledTaskStage(scheduleTask.Id, "COMPLETE")
 			break
 		}
+		time.Sleep(15 * time.Second)
 	}
 	if !isParsed {
 		services.UpdateParseScheduledTaskStage(scheduleTask.Id, "FAILED")
@@ -204,6 +210,7 @@ func parseWithRetry(scheduleTask models.ParseSchedulerTask) {
 }
 
 func checkIfScheduledTimeChanged(url string, prevStartTime time.Time) (bool, time.Time) {
+	fmt.Println("Checking if scheduled time is changed")
 	newStartTime, err := fetchStartTime(url)
 	if err != nil || newStartTime == prevStartTime {
 		return false, time.Time{}

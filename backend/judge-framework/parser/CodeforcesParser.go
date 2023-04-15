@@ -22,13 +22,13 @@ func (parser *CodeforcesParser) ParseProblemListOnContestPage() []models.Problem
 
 	var problemList []models.Problem
 
-	html, err := utils.GetHtmlBody(parser.getContestUrl())
+	html, err := utils.GetBody(parser.httpClient, parser.getContestUrl())
 	if err != nil {
 		log.Println("Error occurred while trying to fetch the contest page")
 		return problemList
 	}
 
-	body := soup.HTMLParse(html)
+	body := soup.HTMLParse(string(html))
 
 	problemElements := body.Find("select", "name", "submittedProblemIndex").Children()
 
