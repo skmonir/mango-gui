@@ -18,7 +18,7 @@ import Loading from "../misc/Loading.jsx";
 import Utils from "../../Utils.js";
 import AddCustomProblemModal from "../modals/AddCustomProblemModal.jsx";
 import ShowToast from "../Toast/ShowToast.jsx";
-import { confirmAlert } from "react-confirm-alert";
+import { confirmDialog } from "../modals/ConfirmationDialog.jsx";
 
 function Parser({ config, appData }) {
   const socketClient = new SocketClient();
@@ -127,18 +127,17 @@ function Parser({ config, appData }) {
   };
 
   const removeScheduledTaskTriggered = (taskId) => {
-    confirmAlert({
-      title: "",
-      message: "Are you sure to cancel this scheduled task?",
-      buttons: [
-        {
-          label: "No",
-        },
-        {
-          label: "Yes, Cancel!",
-          onClick: () => removeScheduledTask(taskId),
-        },
-      ],
+    confirmDialog({
+      title: "Delete Confirmation!",
+      message: "Are you sure to delete this scheduled task?",
+      okButton: {
+        label: "Yes, Delete!",
+        variant: "outline-danger",
+      },
+    }).then((yes) => {
+      if (yes === true) {
+        removeScheduledTask(taskId);
+      }
     });
   };
 
@@ -360,7 +359,7 @@ function Parser({ config, appData }) {
                       removeScheduledTaskTriggered(scheduledTask.id)
                     }
                   >
-                    <FontAwesomeIcon icon={faBan} /> Cancel Schedule
+                    <FontAwesomeIcon icon={faBan} /> Delete Task
                   </Button>
                 )}
               </td>

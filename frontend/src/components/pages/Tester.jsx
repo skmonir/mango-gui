@@ -1,12 +1,4 @@
-import {
-  Alert,
-  Button,
-  ButtonGroup,
-  Col,
-  Row,
-  Spinner,
-  Table,
-} from "react-bootstrap";
+import { Alert, Button, ButtonGroup, Col, Row, Spinner } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -33,11 +25,10 @@ import TLE from "../../assets/icons/TLE.svg";
 import WA from "../../assets/icons/WA.svg";
 import Utils from "../../Utils.js";
 import ShowToast from "../Toast/ShowToast.jsx";
-import { confirmAlert } from "react-confirm-alert";
-import "react-confirm-alert/src/react-confirm-alert.css";
 import CompilationErrorMessage from "../misc/CompilationErrorMessage.jsx";
 import "react-table/react-table.css";
 import ReactTable from "react-table";
+import { confirmDialog } from "../modals/ConfirmationDialog.jsx";
 
 export default function Tester({ config, appData }) {
   const socketClient = new SocketClient();
@@ -210,6 +201,25 @@ export default function Tester({ config, appData }) {
     }
   };
 
+  const submitCodeTriggered = () => {
+    if (selectedProblemFilteredExecResult?.isAllTestPassed) {
+      submitCode();
+    } else {
+      confirmDialog({
+        title: "Submit Confirmation!",
+        message: "All tests are not passed. Are you sure to submit this code?",
+        okButton: {
+          label: "Submit",
+          variant: "success",
+        },
+      }).then((yes) => {
+        if (yes === true) {
+          submitCode();
+        }
+      });
+    }
+  };
+
   const submitCode = () => {
     setSubmittingInProgress(true);
     DataService.submitCode(selectedProblemMetadata)
@@ -242,18 +252,17 @@ export default function Tester({ config, appData }) {
       label: data[2],
       inputFilePath: inputFilePath,
     };
-    confirmAlert({
-      title: "",
+    confirmDialog({
+      title: "Delete Confirmation!",
       message: "Are you sure to delete this testcase?",
-      buttons: [
-        {
-          label: "Cancel",
-        },
-        {
-          label: "Yes, Delete!",
-          onClick: () => deleteCustomTest(req),
-        },
-      ],
+      okButton: {
+        label: "Yes, Delete!",
+        variant: "outline-danger",
+      },
+    }).then((yes) => {
+      if (yes === true) {
+        deleteCustomTest(req);
+      }
     });
   };
 
@@ -439,7 +448,7 @@ export default function Tester({ config, appData }) {
       <Button
         size="sm"
         variant="success"
-        onClick={() => submitCode()}
+        onClick={submitCodeTriggered}
         disabled={
           disableActionButtons() ||
           !selectedProblemFilteredExecResult ||

@@ -13,8 +13,8 @@ import DataService from "../../services/DataService.js";
 import ViewCodeModal from "../modals/ViewCodeModal.jsx";
 import ShowToast from "../Toast/ShowToast.jsx";
 import Utils from "../../Utils.js";
-import { confirmAlert } from "react-confirm-alert";
 import LoginModal from "../modals/LoginModal.jsx";
+import { confirmDialog } from "../modals/ConfirmationDialog.jsx";
 
 export default function Settings({ setConfig }) {
   const placeholders = {
@@ -184,18 +184,17 @@ export default function Settings({ setConfig }) {
   };
 
   const resetSettingsTriggered = () => {
-    confirmAlert({
-      title: "",
+    confirmDialog({
+      title: "Reset Confirmation!",
       message: "Are you sure to reset the settings?",
-      buttons: [
-        {
-          label: "Cancel",
-        },
-        {
-          label: "Yes, Reset!",
-          onClick: () => resetSettings(),
-        },
-      ],
+      okButton: {
+        label: "Yes, Reset!",
+        variant: "outline-danger",
+      },
+    }).then((yes) => {
+      if (yes === true) {
+        resetSettings();
+      }
     });
   };
 

@@ -4,7 +4,7 @@ import { Modal, Button, Row, Col } from "react-bootstrap";
 import { confirmable, createConfirmation } from "react-confirm";
 
 const ConfirmationDialog = ({
-  title = "Confirmation",
+  title = "Confirmation!",
   message = "Are you sure?",
   okButton = {
     label: "OK",

@@ -62,7 +62,7 @@ func PublishExecutionResult(execResult dto.ProblemExecutionResult, socketEvent s
 	}
 
 	if socketEvent == "test_exec_result_event" {
-		PublishPreviousRunStatus(execResult)
+		PublishPreviousRunStatus(&execResult)
 	}
 
 	fmt.Println("Publishing execution result.....")
@@ -79,7 +79,7 @@ func PublishExecutionResult(execResult dto.ProblemExecutionResult, socketEvent s
 	})
 }
 
-func PublishPreviousRunStatus(execResult dto.ProblemExecutionResult) {
+func PublishPreviousRunStatus(execResult *dto.ProblemExecutionResult) {
 	if execResult.CompilationError != "" {
 		PublishStatusMessage("test_status", "Compilation error!", "error")
 		return
@@ -95,6 +95,7 @@ func PublishPreviousRunStatus(execResult dto.ProblemExecutionResult) {
 			}
 		}
 	}
+	execResult.IsAllTestPassed = totalTests == totalPassed
 
 	testStatus := fmt.Sprintf("{\"total\": %v,\"passed\": %v,\"failed\": %v}", totalTests, totalPassed, totalFailed)
 	PublishStatusMessage("test_status", testStatus, "test_stat")

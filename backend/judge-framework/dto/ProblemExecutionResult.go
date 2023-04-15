@@ -10,5 +10,6 @@ type TestcaseExecutionDetails struct {
 
 type ProblemExecutionResult struct {
 	CompilationError             string                     `json:"compilationError"`
+	IsAllTestPassed              bool                       `json:"isAllTestPassed"`
 	TestcaseExecutionDetailsList []TestcaseExecutionDetails `json:"testcaseExecutionDetailsList"`
 }
