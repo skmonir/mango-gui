@@ -2,6 +2,7 @@ import { Button, Col, InputGroup, Row, Spinner } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faArrowRotateLeft,
   faCode,
   faRightToBracket,
   faSave,
@@ -803,7 +804,7 @@ export default function Settings({ setConfig }) {
                   disabled={flags.resetInProgress}
                 >
                   {!flags.resetInProgress ? (
-                    <FontAwesomeIcon icon={faSyncAlt} />
+                    <FontAwesomeIcon icon={faArrowRotateLeft} />
                   ) : (
                     <Spinner
                       as="span"
