@@ -746,7 +746,7 @@ export default function Settings({ setConfig }) {
               <div className="d-grid gap-2">
                 <Button
                   size="sm"
-                  variant="outline-secondary"
+                  variant="outline-primary"
                   onClick={() => {
                     setFlags({
                       ...flags,
@@ -767,7 +767,7 @@ export default function Settings({ setConfig }) {
                       aria-hidden="true"
                     />
                   )}
-                  {" Refresh Settings"}
+                  {" Refresh"}
                 </Button>
               </div>
             </Col>
@@ -790,7 +790,7 @@ export default function Settings({ setConfig }) {
                       aria-hidden="true"
                     />
                   )}
-                  {" Save Settings"}
+                  {" Save"}
                 </Button>
               </div>
             </Col>
@@ -798,7 +798,7 @@ export default function Settings({ setConfig }) {
               <div className="d-grid gap-2">
                 <Button
                   size="sm"
-                  variant="outline-primary"
+                  variant="outline-danger"
                   onClick={resetSettingsTriggered}
                   disabled={flags.resetInProgress}
                 >
@@ -813,7 +813,7 @@ export default function Settings({ setConfig }) {
                       aria-hidden="true"
                     />
                   )}
-                  {" Reset Settings"}
+                  {" Reset"}
                 </Button>
               </div>
             </Col>
