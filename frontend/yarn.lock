@@ -906,6 +906,11 @@ react-confirm-alert@^3.0.6:
   resolved "https://registry.yarnpkg.com/react-confirm-alert/-/react-confirm-alert-3.0.6.tgz#f7552ec839c1e189370cef02ffed3035e7ca2e22"
   integrity sha512-rplP6Ed9ZSNd0KFV5BUzk4EPQ77BxsrayllBXGFuA8xPXc7sbBjgU5KUrNpl7aWFmP7mXRlVXfuy1IT5DbffYw==
 
+react-confirm@0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/react-confirm/-/react-confirm-0.2.1.tgz#d937722859974fe30f0485fbc32443af6d88b5e8"
+  integrity sha512-dJ3SzyJ/oGWVqyD2YraKt28Ui0VZ0MtrmkiaRU7F3dVHdmTZRaFZt36S2uIj5ZUPqO0/O4CVzWmuyaEIv6AGzQ==
+
 react-dom@^18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-18.2.0.tgz#22aaf38708db2674ed9ada224ca4aa708d821e3d"
