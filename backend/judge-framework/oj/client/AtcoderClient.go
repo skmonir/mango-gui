@@ -167,7 +167,7 @@ func (c *AtCoderClient) Submit(problem models.Problem, langId, source string) (e
 
 	socket.PublishStatusMessage("test_status", "Submitted successfully", "success")
 
-	c.monitorSubmission(problem)
+	go c.monitorSubmission(problem)
 
 	c.Handle = c.HandleOrEmail
 	return c.save()

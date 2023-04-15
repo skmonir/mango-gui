@@ -193,7 +193,7 @@ func (c *CodeforcesClient) Submit(problem models.Problem, langId, source string)
 	}
 	socket.PublishStatusMessage("test_status", "Submitted successfully", "success")
 
-	c.monitorSubmission(problem)
+	go c.monitorSubmission(problem)
 
 	c.Handle = handle
 	return c.save()
