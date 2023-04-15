@@ -25,11 +25,14 @@ import (
 func GetHtmlBody(URL string) (string, error) {
 	log.Println("Fetching html from " + URL)
 	resp, err := http.Get(URL)
-	if err != nil || resp.StatusCode >= 400 {
+	if err != nil {
+		return "", errors.New("Error while fetching web page")
+	}
+	log.Println("Fetched html with status ", resp.StatusCode)
+	if resp.StatusCode >= 400 {
 		return "", errors.New("Error while fetching web page")
 	}
 	defer resp.Body.Close()
-	log.Println("Fetched html with status ", resp.StatusCode)
 	bt, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
@@ -40,11 +43,14 @@ func GetHtmlBody(URL string) (string, error) {
 func GetBody(client *http.Client, URL string) ([]byte, error) {
 	log.Println("Fetching html from " + URL)
 	resp, err := client.Get(URL)
-	if err != nil || resp.StatusCode >= 400 {
+	if err != nil {
+		return nil, err
+	}
+	log.Println("Fetched html with status ", resp.StatusCode)
+	if resp.StatusCode >= 400 {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	log.Println("Fetched html with status ", resp.StatusCode)
 	return ioutil.ReadAll(resp.Body)
 }
 

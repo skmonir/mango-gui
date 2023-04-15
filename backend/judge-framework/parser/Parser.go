@@ -6,7 +6,9 @@ import (
 	"github.com/anaskhan96/soup"
 	"github.com/skmonir/mango-gui/backend/judge-framework/config"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
+	"github.com/skmonir/mango-gui/backend/judge-framework/oj/client"
 	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
+	"net/http"
 	"path/filepath"
 	"strings"
 )
@@ -22,10 +24,11 @@ type IParser interface {
 }
 
 type Parser struct {
-	url       string
-	isContest bool
-	platform  string
-	contestId string
+	url        string
+	isContest  bool
+	platform   string
+	contestId  string
+	httpClient *http.Client
 }
 
 func (parser *Parser) ExtractUrlAndSetVars(url string) error {
@@ -41,6 +44,7 @@ func (parser *Parser) ExtractUrlAndSetVars(url string) error {
 	parser.platform = platform
 	parser.contestId = cid
 	parser.isContest = pid == ""
+	_, parser.httpClient = client.GetHttpClientByPlatform(platform)
 
 	return nil
 }
