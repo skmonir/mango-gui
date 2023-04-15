@@ -181,15 +181,17 @@ func ScheduleTaskInScheduler(scheduleTask models.ParseSchedulerTask) error {
 	if !utils.IsTimeInFuture(scheduleTask.StartTime) {
 		return errors.New("Schedule only upcoming contests")
 	}
-	return scheduler.ScheduleOneTimeTask(scheduleTask.Id, func() { go parseWithRetry(scheduleTask) }, scheduleTask.StartTime)
+	return scheduler.ScheduleOneTimeTask(scheduleTask.Id, func() { parseWithRetry(scheduleTask) }, scheduleTask.StartTime)
 }
 
 func parseWithRetry(scheduleTask models.ParseSchedulerTask) {
+	fmt.Println("Started parsing ", scheduleTask.Url)
 	if timeChanged, newStartTime := checkIfScheduledTimeChanged(scheduleTask.Url, scheduleTask.StartTime); timeChanged {
 		RemoveParseSchedule(scheduleTask.Id)
 		_ = scheduleTheParsing(scheduleTask.Url, "RE_SCHEDULED", newStartTime)
 		return
 	}
+	time.Sleep(1 * time.Second)
 	isParsed := false
 	services.UpdateParseScheduledTaskStage(scheduleTask.Id, "RUNNING")
 	for i := 0; i < 10; i++ {
@@ -208,6 +210,7 @@ func parseWithRetry(scheduleTask models.ParseSchedulerTask) {
 }
 
 func checkIfScheduledTimeChanged(url string, prevStartTime time.Time) (bool, time.Time) {
+	fmt.Println("Checking if scheduled time is changed")
 	newStartTime, err := fetchStartTime(url)
 	if err != nil || newStartTime == prevStartTime {
 		return false, time.Time{}

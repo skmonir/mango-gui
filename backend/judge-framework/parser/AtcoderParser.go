@@ -29,27 +29,25 @@ func (parser *AtcoderParser) ParseProblemListOnContestPage() []models.Problem {
 
 	body := soup.HTMLParse(string(html))
 
-	problemElements := body.
-		FindStrict("div", "id", "contest-nav-tabs").
-		FindNextElementSibling().Find("table", "class", "table").
-		Children()[3].
-		FindAll("a")
+	rows := body.Find("tbody").FindAll("tr")
 
-	for index, row := range problemElements {
-		if index%2 == 1 {
-			label := strings.ToUpper(strings.TrimSpace(problemElements[index-1].Text()))
-			name := strings.TrimSpace(row.Text())
-			url := strings.ToLower(acHost + row.Attrs()["href"])
-			log.Println(label, name, url)
-			problemList = append(problemList, models.Problem{
-				Platform:  "atcoder",
-				ContestId: parser.contestId,
-				Label:     label,
-				Name:      name,
-				Url:       url,
-				Status:    "none",
-			})
-		}
+	for _, row := range rows {
+		tds := row.FindAll("td")
+		a1 := tds[0].Find("a")
+		a2 := tds[1].Find("a")
+
+		label := strings.TrimSpace(a1.Text())
+		name := strings.TrimSpace(a2.Text())
+		url := strings.ToLower(acHost + a1.Attrs()["href"])
+		log.Println(label, name, url)
+		problemList = append(problemList, models.Problem{
+			Platform:  "atcoder",
+			ContestId: parser.contestId,
+			Label:     label,
+			Name:      name,
+			Url:       url,
+			Status:    "none",
+		})
 	}
 	return problemList
 }
