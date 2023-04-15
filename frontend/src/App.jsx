@@ -132,7 +132,7 @@ function App() {
                   </Nav>
                   <Form className="d-flex">
                     <pre style={{ color: "darkgreen", fontWeight: "bold" }}>
-                      {Utils.getAppVersion()}
+                      {config?.appVersion && `v${config?.appVersion}`}
                     </pre>
                   </Form>
                 </Navbar.Collapse>
