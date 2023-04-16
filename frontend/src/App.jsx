@@ -1,6 +1,6 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Col, Row, Tab } from "react-bootstrap";
+import { Badge, Col, Row, Tab } from "react-bootstrap";
 import Tester from "./components/pages/Tester.jsx";
 import Parser from "./components/pages/Parser.jsx";
 import Container from "react-bootstrap/Container";
@@ -131,9 +131,9 @@ function App() {
                     </Nav.Item>
                   </Nav>
                   <Form className="d-flex">
-                    <pre style={{ color: "darkgreen", fontWeight: "bold" }}>
+                    <Badge bg="light" text="success">
                       {config?.appVersion && `v${config?.appVersion}`}
-                    </pre>
+                    </Badge>
                   </Form>
                 </Navbar.Collapse>
               </Navbar>
