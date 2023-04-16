@@ -325,6 +325,13 @@ export default function Tester({ config, appData }) {
       } else if (testStatusMessage.type === "test_stat") {
         console.log(testStatusMessage.message);
         const stat = JSON.parse(testStatusMessage.message);
+        if (stat.total === stat.passed) {
+          return (
+            <strong>
+              <span style={{ color: "green" }}>All tests passed</span>
+            </strong>
+          );
+        }
         return (
           <strong>
             <span style={{ color: "#262625FF" }}>{`Done: ${
