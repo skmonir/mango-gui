@@ -9,23 +9,23 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function AddCustomProblemModal({
   closeAddCustomProblemModal,
-  insertCustomProblemIntoList
+  insertCustomProblemIntoList,
 }) {
   const [showModal, setShowModal] = useState(false);
   const [toastMsgObj, setToastMsgObj] = useState({
     variant: "",
-    message: ""
+    message: "",
   });
   const [showToast, setShowToast] = useState(false);
   const [customProblem, setCustomProblem] = useState({
-    platform: "custom",
+    platform: "codeforces",
     contestId: "",
     label: "",
     name: "",
     timeLimit: 2,
     memoryLimit: 512,
     url: "",
-    status: ""
+    status: "",
   });
 
   useEffect(() => {
@@ -41,14 +41,14 @@ export default function AddCustomProblemModal({
     setShowToast(true);
     setToastMsgObj({
       variant: variant,
-      message: message
+      message: message,
     });
   };
 
   const validate = () => {
     let errorMessage = "";
     const strKeys = ["platform", "contestId", "label", "name"];
-    strKeys.forEach(key => {
+    strKeys.forEach((key) => {
       if (Utils.isStrNullOrEmpty(customProblem[key])) {
         errorMessage = "No field can be empty\n";
       }
@@ -69,11 +69,11 @@ export default function AddCustomProblemModal({
   const saveAndCloseModal = () => {
     if (validate()) {
       DataService.addCustomProblem(customProblem)
-        .then(data => {
+        .then((data) => {
           insertCustomProblemIntoList(data);
           closeModal();
         })
-        .catch(e => {
+        .catch((e) => {
           showToastMessage(
             "Error",
             "Oops! Something went wrong while saving the problem!"
@@ -102,7 +102,7 @@ export default function AddCustomProblemModal({
             height: "55vh",
             overflowY: "auto",
             paddingBottom: "1px",
-            paddingTop: "1px"
+            paddingTop: "1px",
           }}
         >
           <Row>
@@ -111,22 +111,20 @@ export default function AddCustomProblemModal({
                 <Form.Label>
                   <strong>Platform</strong>
                 </Form.Label>
-                <Form.Control
-                  type="text"
+                <Form.Select
                   size="sm"
-                  autoCorrect="off"
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  placeholder="Example. 1502, abc123"
                   value={customProblem.platform}
-                  disabled={true}
-                  onChange={e =>
+                  onChange={(e) =>
                     setCustomProblem({
                       ...customProblem,
-                      platform: e.target.value
+                      platform: e.currentTarget.value,
                     })
                   }
-                />
+                >
+                  <option value="codeforces">Codeforces</option>
+                  <option value="atcoder">AtCoder</option>
+                  <option value="custom">Custom</option>
+                </Form.Select>
               </Form.Group>
             </Col>
             <Col xs={3}>
@@ -142,10 +140,10 @@ export default function AddCustomProblemModal({
                   autoCapitalize="none"
                   placeholder="Example. 1502, abc123"
                   value={customProblem.contestId}
-                  onChange={e =>
+                  onChange={(e) =>
                     setCustomProblem({
                       ...customProblem,
-                      contestId: e.target.value
+                      contestId: e.target.value,
                     })
                   }
                 />
@@ -163,10 +161,10 @@ export default function AddCustomProblemModal({
                   autoComplete="off"
                   autoCapitalize="none"
                   value={customProblem.timeLimit}
-                  onChange={e =>
+                  onChange={(e) =>
                     setCustomProblem({
                       ...customProblem,
-                      timeLimit: e.target.value
+                      timeLimit: e.target.value,
                     })
                   }
                 />
@@ -184,10 +182,10 @@ export default function AddCustomProblemModal({
                   autoComplete="off"
                   autoCapitalize="none"
                   value={customProblem.memoryLimit}
-                  onChange={e =>
+                  onChange={(e) =>
                     setCustomProblem({
                       ...customProblem,
-                      memoryLimit: e.target.value
+                      memoryLimit: e.target.value,
                     })
                   }
                 />
@@ -207,10 +205,10 @@ export default function AddCustomProblemModal({
                   autoComplete="off"
                   autoCapitalize="none"
                   value={customProblem.label}
-                  onChange={e =>
+                  onChange={(e) =>
                     setCustomProblem({
                       ...customProblem,
-                      label: e.target.value
+                      label: e.target.value,
                     })
                   }
                 />
@@ -228,10 +226,10 @@ export default function AddCustomProblemModal({
                   autoComplete="off"
                   autoCapitalize="none"
                   value={customProblem.name}
-                  onChange={e =>
+                  onChange={(e) =>
                     setCustomProblem({
                       ...customProblem,
-                      name: e.target.value
+                      name: e.target.value,
                     })
                   }
                 />
@@ -241,26 +239,22 @@ export default function AddCustomProblemModal({
           <Row>
             <Alert variant="info">
               <pre>
-                {`*** Follow any of the ways below to generate testcases for this problem. \n1. Use Input Generator \n2. Load problem in Tester and add custom test\n\n`}
-                {`*** Custom platform URL will be like 'custom/:contest_id/:problem_label'\nSo use like 'custom/1234/A', 'custom/1234/D1' in Tester or Input/Output Generator`}
+                {`*** Follow any of the ways below to generate testcases for this problem.\n1. Load problem in Tester and add custom test \n2. Use Input Generator\n\n`}
+                {`*** For Platform = 'custom' URL will be like 'custom/:contest_id/:problem_label'\nSo use like 'custom/1234/A', 'custom/1234/D1' in Tester or Input/Output Generator`}
               </pre>
             </Alert>
           </Row>
         </Modal.Body>
         <Modal.Footer style={{ paddingBottom: "2px", paddingTop: "2px" }}>
+          <Button size="sm" variant="secondary" onClick={() => closeModal()}>
+            Cancel
+          </Button>
           <Button
             size="sm"
             variant="outline-success"
             onClick={() => saveAndCloseModal()}
           >
             <FontAwesomeIcon icon={faSave} /> Save Problem
-          </Button>
-          <Button
-            size="sm"
-            variant="outline-danger"
-            onClick={() => closeModal()}
-          >
-            Close
           </Button>
         </Modal.Footer>
       </Modal>
