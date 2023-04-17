@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Modal, Button, Row, Col } from "react-bootstrap";
+import { Modal, Button, Row, Col, Form } from "react-bootstrap";
 import { confirmable, createConfirmation } from "react-confirm";
 
 const ConfirmationDialog = ({
@@ -14,41 +14,61 @@ const ConfirmationDialog = ({
     label: "Cancel",
     variant: "secondary",
   },
+  flag = {
+    show: false,
+    label: "",
+  },
   show,
   proceed,
 }) => {
+  const [form, setForm] = useState({
+    ok: false,
+    flag: false,
+  });
+
   return (
     <Modal
       size="md"
       aria-labelledby="contained-modal-title-vcenter"
       show={show}
-      onHide={() => proceed(false)}
+      keyboard={false}
       centered
     >
       <Modal.Body style={{ paddingBottom: "2px", paddingTop: "5px" }}>
-        <Row className="d-flex" style={{ fontSize: 22, fontWeight: 650 }}>
-          <Col xs={12}>
-            <pre>{title}</pre>
-          </Col>
+        <Row className="d-flex mb-2" style={{ fontSize: 22, fontWeight: 650 }}>
+          <Col xs={12}>{title}</Col>
         </Row>
-        <Row>
-          <Col xs={12}>
-            <pre style={{ whiteSpace: "pre-wrap" }}>{message}</pre>
-          </Col>
+        <Row className="mb-3">
+          <Col xs={12}>{message}</Col>
         </Row>
+        {flag.show && (
+          <Row>
+            <Col xs={12}>
+              <Form.Check
+                type="checkbox"
+                label={flag.label}
+                onChange={(e) => {
+                  setForm({ ...form, flag: e.currentTarget.checked });
+                }}
+              />
+            </Col>
+          </Row>
+        )}
       </Modal.Body>
       <Modal.Footer style={{ paddingBottom: "2px", paddingTop: "2px" }}>
         <Button
           size="sm"
           variant={cancelButton.variant}
-          onClick={() => proceed(false)}
+          onClick={() => proceed({ ...form, ok: false })}
         >
           {cancelButton.label}
         </Button>
         <Button
           size="sm"
           variant={okButton.variant}
-          onClick={() => proceed(true)}
+          onClick={() => {
+            proceed({ ...form, ok: true });
+          }}
         >
           {okButton.label}
         </Button>
@@ -62,6 +82,7 @@ ConfirmationDialog.propTypes = {
   message: PropTypes.string,
   okButton: PropTypes.object,
   cancelButton: PropTypes.object,
+  flag: PropTypes.object,
   show: PropTypes.bool,
   proceed: PropTypes.func, // called when ok button is clicked.
   enableEscape: PropTypes.bool,

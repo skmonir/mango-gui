@@ -8,15 +8,18 @@ import {
   faSave,
   faSyncAlt,
 } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import DataService from "../../services/DataService.js";
 import ViewCodeModal from "../modals/ViewCodeModal.jsx";
 import ShowToast from "../Toast/ShowToast.jsx";
 import Utils from "../../Utils.js";
 import LoginModal from "../modals/LoginModal.jsx";
 import { confirmDialog } from "../modals/ConfirmationDialog.jsx";
+import SocketClient from "../../socket/SocketClient.js";
 
 export default function Settings({ setConfig }) {
+  const socketClient = new SocketClient();
+
   const placeholders = {
     cpp: {
       compCommand: "g++",
@@ -62,6 +65,13 @@ export default function Settings({ setConfig }) {
 
   useEffect(() => {
     fetchConfig();
+    let socketConnGenerator = socketClient.initSocketConnection(
+      "app_conf_get_event",
+      updateConfigFromSocket
+    );
+    return () => {
+      socketConnGenerator.close();
+    };
   }, []);
 
   const fetchConfig = () => {
@@ -86,6 +96,10 @@ export default function Settings({ setConfig }) {
           fetchingInProgress: false,
         })
       );
+  };
+
+  const updateConfigFromSocket = (config) => {
+    updateConfig(config);
   };
 
   const updateConfig = (config) => {
@@ -191,8 +205,8 @@ export default function Settings({ setConfig }) {
         label: "Yes, Reset!",
         variant: "outline-danger",
       },
-    }).then((yes) => {
-      if (yes === true) {
+    }).then((response) => {
+      if (response?.ok) {
         resetSettings();
       }
     });
@@ -735,6 +749,24 @@ export default function Settings({ setConfig }) {
                   account
                 </Button>
               </div>
+            </Col>
+          </Row>
+          <Row className="mt-3">
+            <Col xs={4}>
+              <Form.Check
+                type="checkbox"
+                label="Don't ask before code submission"
+                checked={currentConfig.flags.dontAskOnSubmit}
+                onChange={(e) => {
+                  setCurrentConfig({
+                    ...currentConfig,
+                    flags: {
+                      ...currentConfig.flags,
+                      dontAskOnSubmit: e.currentTarget.checked,
+                    },
+                  });
+                }}
+              />
             </Col>
           </Row>
         </div>

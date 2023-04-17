@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/skmonir/mango-gui/backend/judge-framework/config"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
@@ -49,4 +50,21 @@ func UpdateEditorPreference(ctx *fiber.Ctx) error {
 	}
 	editorPreference = services.UpdateEditorPreference(editorPreference)
 	return ctx.Status(fiber.StatusOK).JSON(editorPreference)
+}
+
+func UpdateFlags(ctx *fiber.Ctx) error {
+	request := map[string]bool{}
+	err := ctx.BodyParser(&request)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	fmt.Println(request)
+
+	services.UpdateFlags(request)
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+	})
 }

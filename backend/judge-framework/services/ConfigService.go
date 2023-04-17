@@ -26,3 +26,10 @@ func UpdateJudgeAccountInfo(platform, handleOrEmail, password, handle string) {
 	conf = config.UpdateJudgeConfigIntoCache(*conf)
 	socket.PublishAppConfig(*conf)
 }
+
+func UpdateFlags(flags map[string]bool) {
+	judgeConfig := config.GetJudgeConfigFromCache()
+	judgeConfig.Flags = flags
+	judgeConfig = config.UpdateJudgeConfigIntoCache(*judgeConfig)
+	socket.PublishAppConfig(*judgeConfig)
+}

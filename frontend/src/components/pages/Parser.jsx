@@ -134,8 +134,8 @@ function Parser({ config, appData }) {
         label: "Yes, Delete!",
         variant: "outline-danger",
       },
-    }).then((yes) => {
-      if (yes === true) {
+    }).then((response) => {
+      if (response?.ok) {
         removeScheduledTask(taskId);
       }
     });

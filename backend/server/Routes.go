@@ -34,6 +34,8 @@ func SetRoutes(app fiber.Router) {
 
 	app.Put("/config/editor", controllers.UpdateEditorPreference)
 
+	app.Put("/config/flags", controllers.UpdateFlags)
+
 	// Code Routes
 	app.Get("/code/:platform/:cid/:label", controllers.GetCodeByProblemPath)
 

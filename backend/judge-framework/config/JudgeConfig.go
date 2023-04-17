@@ -11,6 +11,7 @@ type JudgeConfig struct {
 	ActiveTestingLang  string                             `json:"activeTestingLang"`
 	TestingLangConfigs map[string]LanguageConfig          `json:"testingLangConfigs"`
 	EditorPreference   EditorPreferences                  `json:"editorPreference"`
+	Flags              map[string]bool                    `json:"flags"`
 }
 
 type LanguageConfig struct {

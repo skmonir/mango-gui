@@ -165,6 +165,9 @@ func CreateDefaultConfig() (JudgeConfig, error) {
 			FontSize: "14",
 			TabSize:  "4",
 		},
+		Flags: map[string]bool{
+			"dontAskOnSubmit": false,
+		},
 	}
 
 	if err := SaveConfigIntoJsonFile(conf); err != nil {

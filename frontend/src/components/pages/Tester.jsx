@@ -202,19 +202,30 @@ export default function Tester({ config, appData }) {
   };
 
   const submitCodeTriggered = () => {
-    if (selectedProblemFilteredExecResult?.isAllTestPassed) {
+    if (config?.flags?.dontAskOnSubmit) {
       submitCode();
     } else {
       confirmDialog({
         title: "Submit Confirmation!",
-        message: "All tests are not passed. Are you sure to submit this code?",
+        message: "Are you sure to submit this code?",
         okButton: {
           label: "Submit",
           variant: "success",
         },
-      }).then((yes) => {
-        if (yes === true) {
+        flag: {
+          show: !config?.flags?.dontAskOnSubmit,
+          label: "Don't ask me again",
+        },
+      }).then((response) => {
+        console.log(response);
+        if (response?.ok) {
           submitCode();
+          if (response?.flag) {
+            DataService.updateConfigFlags({
+              ...config.flags,
+              dontAskOnSubmit: true,
+            }).then((resp) => console.log(resp));
+          }
         }
       });
     }
@@ -259,8 +270,8 @@ export default function Tester({ config, appData }) {
         label: "Yes, Delete!",
         variant: "outline-danger",
       },
-    }).then((yes) => {
-      if (yes === true) {
+    }).then((response) => {
+      if (response?.ok) {
         deleteCustomTest(req);
       }
     });
