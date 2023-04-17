@@ -94,6 +94,7 @@ export default function Home() {
             <Col xs={6}>
               <div className="d-grid gap-2">
                 <Button
+                  size="sm"
                   variant="outline-success"
                   onClick={() =>
                     DataService.openResource({
@@ -109,6 +110,7 @@ export default function Home() {
             <Col xs={6}>
               <div className="d-grid gap-2">
                 <Button
+                  size="sm"
                   variant="outline-dark"
                   onClick={() =>
                     DataService.openResource({
