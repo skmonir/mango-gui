@@ -756,7 +756,7 @@ export default function Settings({ setConfig }) {
               <Form.Check
                 type="checkbox"
                 label="Don't ask before code submission"
-                checked={currentConfig.flags.dontAskOnSubmit}
+                checked={currentConfig?.flags?.dontAskOnSubmit}
                 onChange={(e) => {
                   setCurrentConfig({
                     ...currentConfig,
