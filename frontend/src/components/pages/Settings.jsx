@@ -108,7 +108,7 @@ export default function Settings({ setConfig }) {
     setConfig(config);
     if (config?.activeTestingLang) {
       setSelectedLang(config?.activeTestingLang);
-      if (config?.testingLangConfigs?.length > 0) {
+      if (config?.testingLangConfigs) {
         setSelectedLangConfig(
           config.testingLangConfigs[config.activeTestingLang]
         );
