@@ -85,6 +85,7 @@ export default function Settings({ setConfig }) {
         updateConfig(config);
       })
       .catch((e) => {
+        updateConfig({});
         showToastMessage(
           "Error",
           "Oops! Something went wrong while fetching the currentConfig!"
@@ -105,8 +106,14 @@ export default function Settings({ setConfig }) {
   const updateConfig = (config) => {
     setCurrentConfig(config);
     setConfig(config);
-    setSelectedLang(config?.activeTestingLang);
-    setSelectedLangConfig(config.testingLangConfigs[config.activeTestingLang]);
+    if (config?.activeTestingLang) {
+      setSelectedLang(config?.activeTestingLang);
+      if (config?.testingLangConfigs?.length > 0) {
+        setSelectedLangConfig(
+          config.testingLangConfigs[config.activeTestingLang]
+        );
+      }
+    }
   };
 
   const validate = (confToSave) => {
