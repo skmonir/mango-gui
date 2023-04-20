@@ -117,7 +117,7 @@ export default function ExecutionResultComponent({
         accessor: "inputFilePath",
         Cell: ({ original }) => {
           return (
-            <pre style={{ textAlign: "center" }}>
+            <pre style={{ textAlign: "center", overflow: "hidden", textOverflow: "ellipsis" }}>
               {original?.testcase?.inputFilePath
                 .split("\\")
                 .pop()

@@ -321,7 +321,6 @@ export default function Tester({ config, appData }) {
           <strong style={{ color: "red" }}>{testStatusMessage.message}</strong>
         );
       } else if (testStatusMessage.type === "test_stat") {
-        console.log(testStatusMessage.message);
         const stat = JSON.parse(testStatusMessage.message);
         if (stat.total === stat.passed) {
           return (
@@ -332,13 +331,7 @@ export default function Tester({ config, appData }) {
         }
         return (
           <strong>
-            <span style={{ color: "#262625FF" }}>{`Done: ${
-              stat.passed + stat.failed
-            } of ${stat.total}`}</span>
-            <span>{", "}</span>
-            <span style={{ color: "green" }}>{`Passed: ${stat.passed}`}</span>
-            <span>{", "}</span>
-            <span style={{ color: "red" }}>{`Failed: ${stat.failed}`}</span>
+          <span style={{ color: "red" }}>{ `${stat.passed}/${stat.total} tests passed`}</span>
           </strong>
         );
       }

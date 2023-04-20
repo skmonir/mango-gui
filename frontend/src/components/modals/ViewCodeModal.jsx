@@ -151,13 +151,13 @@ export default function ViewCodeModal({
           {executionResult?.show && (
             <SplitPane
               split="vertical"
-              defaultSize="50%"
+              defaultSize="40%"
               primary="first"
               className="mt-0"
               style={{ height: "99%" }}
             >
-              <div>{executionResult.component}</div>
-              <div>
+              <div style={{marginRight: "5px"}}>{executionResult.component}</div>
+              <div style={{marginLeft: "5px"}}>
                 <CodeEditor
                   codeContent={codeContent}
                   onChange={onCodeChange}
