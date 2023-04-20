@@ -1,7 +1,7 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Badge, Col, Row, Tab } from "react-bootstrap";
-import Tester from "./components/pages/Tester.jsx";
+import Tester from "./components/pages/Tester/Tester.jsx";
 import Parser from "./components/pages/Parser.jsx";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";

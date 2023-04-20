@@ -14,21 +14,15 @@ import {
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import SocketClient from "../../socket/SocketClient.js";
-import DataService from "../../services/DataService.js";
-import ViewCodeModal from "../modals/ViewCodeModal.jsx";
-import AddEditCustomTestModal from "../modals/AddEditCustomTestModal.jsx";
-import AC from "../../assets/icons/AC.svg";
-import CE from "../../assets/icons/CE.svg";
-import RE from "../../assets/icons/RE.svg";
-import TLE from "../../assets/icons/TLE.svg";
-import WA from "../../assets/icons/WA.svg";
-import Utils from "../../Utils.js";
-import ShowToast from "../Toast/ShowToast.jsx";
-import CompilationErrorMessage from "../misc/CompilationErrorMessage.jsx";
+import SocketClient from "../../../socket/SocketClient.js";
+import DataService from "../../../services/DataService.js";
+import ViewCodeModal from "../../modals/ViewCodeModal.jsx";
+import AddEditCustomTestModal from "../../modals/AddEditCustomTestModal.jsx";
+import Utils from "../../../Utils.js";
+import ShowToast from "../../Toast/ShowToast.jsx";
 import "react-table/react-table.css";
-import ReactTable from "react-table";
-import { confirmDialog } from "../modals/ConfirmationDialog.jsx";
+import { confirmDialog } from "../../modals/ConfirmationDialog.jsx";
+import ExecutionResultComponent from "./ExecutionResultComponent.jsx";
 
 export default function Tester({ config, appData }) {
   const socketClient = new SocketClient();
@@ -42,13 +36,6 @@ export default function Tester({ config, appData }) {
     { label: "Time Limit Exceeded", value: "TLE" },
     { label: "Memory Limit Exceeded", value: "MLE" },
   ];
-  const verdictIcons = {
-    AC: AC,
-    WA: WA,
-    CE: CE,
-    RE: RE,
-    TLE: TLE,
-  };
 
   const [selectedVerdictKey, setSelectedVerdictKey] = useState("");
 
@@ -360,53 +347,6 @@ export default function Tester({ config, appData }) {
     }
   };
 
-  const getVerdict = (testcaseExecutionDetails) => {
-    if (testcaseExecutionDetails?.status === "running") {
-      return (
-        <div className="d-flex justify-content-center">
-          <Spinner animation="border" variant="primary" size="sm" />
-        </div>
-      );
-    } else if (testcaseExecutionDetails?.status !== "none") {
-      return (
-        <pre
-          style={{
-            textAlign: "center",
-            color:
-              testcaseExecutionDetails?.testcaseExecutionResult?.verdict ===
-              "AC"
-                ? "green"
-                : "red",
-          }}
-        >
-          <img
-            src={
-              verdictIcons[
-                testcaseExecutionDetails?.testcaseExecutionResult?.verdict
-              ]
-            }
-            style={{ maxWidth: "30px" }}
-          />{" "}
-          <strong>
-            {testcaseExecutionDetails?.testcaseExecutionResult?.verdict}
-          </strong>
-        </pre>
-      );
-    }
-  };
-
-  const getTestcaseRowColor = (testcaseExecutionDetails) => {
-    if (["none", "running"].includes(testcaseExecutionDetails?.status)) {
-      return "#e2e3e5";
-    } else {
-      if (testcaseExecutionDetails?.testcaseExecutionResult?.verdict === "AC") {
-        return "#d1e7dd";
-      } else {
-        return "#f8d7da";
-      }
-    }
-  };
-
   const filterVerdicts = (key) => {
     console.log(key);
     setSelectedVerdictKey(key);
@@ -680,212 +620,14 @@ export default function Tester({ config, appData }) {
     );
   };
 
-  const getExecTableActionButtons = (execDetails) => {
+  const getExecutionResultComponent = () => {
     return (
-      <ButtonGroup className="d-flex justify-content-center">
-        <Button
-          size="sm"
-          variant="primary"
-          title="Edit"
-          onClick={() => cloneUpdateCustomTest(execDetails.testcase, "Update")}
-          disabled={disableActionButtons()}
-        >
-          <FontAwesomeIcon icon={faEdit} />
-        </Button>
-        <Button
-          size="sm"
-          variant="success"
-          title="Clone"
-          onClick={() => cloneUpdateCustomTest(execDetails.testcase, "Clone")}
-          disabled={disableActionButtons()}
-        >
-          <FontAwesomeIcon icon={faClone} />
-        </Button>
-        <Button
-          size="sm"
-          variant="danger"
-          title="Delete"
-          onClick={() =>
-            deleteCustomTestTriggered(execDetails.testcase.inputFilePath)
-          }
-          disabled={disableActionButtons()}
-        >
-          <FontAwesomeIcon icon={faTrashAlt} />
-        </Button>
-      </ButtonGroup>
-    );
-  };
-
-  const getCompactExecutionTable = () => {
-    const execTableColumns = [
-      {
-        Header: () => (
-          <span style={{ textAlign: "center" }}>
-            <strong>Testcase</strong>
-          </span>
-        ),
-        accessor: "inputFilePath",
-        Cell: ({ original }) => {
-          return (
-            <pre style={{ textAlign: "center" }}>
-              {original?.testcase?.inputFilePath
-                .split("\\")
-                .pop()
-                .split("/")
-                .pop()}
-            </pre>
-          );
-        },
-      },
-      {
-        Header: () => (
-          <span style={{ textAlign: "center" }}>
-            <strong>Result</strong>
-          </span>
-        ),
-        accessor: "event",
-        maxWidth: 150,
-        Cell: ({ original }) => {
-          return getVerdict(original);
-        },
-      },
-      {
-        Header: () => (
-          <span style={{ textAlign: "center" }}>
-            <strong>Time</strong>
-          </span>
-        ),
-        accessor: "event",
-        maxWidth: 150,
-        Cell: ({ original }) => {
-          return (
-            <pre style={{ textAlign: "center" }}>
-              {original?.testcaseExecutionResult?.consumedTime + " ms"}
-            </pre>
-          );
-        },
-      },
-      {
-        Header: () => (
-          <span style={{ textAlign: "center" }}>
-            <strong>Memory</strong>
-          </span>
-        ),
-        accessor: "event",
-        maxWidth: 150,
-        Cell: ({ original }) => {
-          return (
-            <pre style={{ textAlign: "center" }}>
-              {original?.testcaseExecutionResult?.consumedMemory + " KB"}
-            </pre>
-          );
-        },
-      },
-      {
-        Header: () => (
-          <span style={{ textAlign: "center" }}>
-            <strong>Actions</strong>
-          </span>
-        ),
-        accessor: "event",
-        maxWidth: 120,
-        Cell: ({ original }) => {
-          return getExecTableActionButtons(original);
-        },
-      },
-    ];
-
-    const ioTableColumns = [
-      {
-        Header: () => (
-          <span style={{ textAlign: "center" }}>
-            <strong>Input</strong>
-          </span>
-        ),
-        accessor: "input",
-        minWidth: 300,
-        Cell: ({ original }) => {
-          return (
-            <pre style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-              {original?.testcase?.input}
-            </pre>
-          );
-        },
-      },
-      {
-        Header: () => (
-          <span style={{ textAlign: "center" }}>
-            <strong>Expected Output</strong>
-          </span>
-        ),
-        accessor: "expectedOutput",
-        minWidth: 375,
-        Cell: ({ original }) => {
-          return (
-            <pre style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-              {original?.testcase?.output}
-            </pre>
-          );
-        },
-      },
-      {
-        Header: () => (
-          <span style={{ textAlign: "center" }}>
-            <strong>Program Output</strong>
-          </span>
-        ),
-        accessor: "programOutput",
-        minWidth: 375,
-        Cell: ({ original }) => {
-          return (
-            <pre style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-              {original?.testcaseExecutionResult?.output}
-            </pre>
-          );
-        },
-      },
-    ];
-
-    return (
-      <div>
-        <ReactTable
-          data={selectedProblemFilteredExecResult.testcaseExecutionDetailsList}
-          data-testid="exec_result_table"
-          columns={execTableColumns}
-          sortable={false}
-          showPagination={false}
-          showPageSizeOptions={false}
-          resizable={false}
-          collapseOnDataChange={false}
-          minRows={0}
-          SubComponent={(rowInfo) => {
-            return (
-              <div>
-                <ReactTable
-                  data={[rowInfo.original]}
-                  data-testid={`io_table_${rowInfo.index + 1}`}
-                  columns={ioTableColumns}
-                  sortable={false}
-                  showPagination={false}
-                  showPageSizeOptions={false}
-                  minRows={0}
-                  className="-bordered"
-                />
-              </div>
-            );
-          }}
-          getTrProps={(state, rowInfo, instance) => {
-            if (rowInfo === undefined) {
-              return {};
-            }
-            return {
-              style: {
-                background: getTestcaseRowColor(rowInfo.original),
-              },
-            };
-          }}
-        />
-      </div>
+      <ExecutionResultComponent
+        disableActionButtons={disableActionButtons}
+        cloneUpdateCustomTest={cloneUpdateCustomTest}
+        deleteCustomTestTriggered={deleteCustomTestTriggered}
+        selectedProblemFilteredExecResult={selectedProblemFilteredExecResult}
+      />
     );
   };
 
@@ -913,32 +655,20 @@ export default function Tester({ config, appData }) {
           {selectedProblem && (
             <>
               {getActionElements()}
-              {selectedProblemFilteredExecResult?.compilationError && (
-                <Row>
-                  <Col xs={12}>
-                    <CompilationErrorMessage
-                      props={{
-                        maxHeight: "50vh",
-                        error:
-                          selectedProblemFilteredExecResult?.compilationError,
-                      }}
-                    />
-                  </Col>
-                </Row>
-              )}
               {getProblemMetadataAndTestStatusMessage()}
             </>
           )}
-          <Row>
-            {selectedProblemFilteredExecResult?.testcaseExecutionDetailsList &&
-              getCompactExecutionTable()}
-          </Row>
+          {selectedProblem && getExecutionResultComponent()}
         </div>
       </div>
       {showCodeModal && (
         <ViewCodeModal
           metadata={selectedProblemMetadata}
           setShowCodeModal={setShowCodeModal}
+          executionResult={{
+            show: true,
+            component: getExecutionResultComponent(),
+          }}
           customElementsOnHeader={[
             {
               colSpan: "auto",

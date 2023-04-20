@@ -7,20 +7,16 @@ export default function CompilationErrorMessage({ props }) {
         minHeight: props.minHeight,
         maxHeight: props.maxHeight,
         overflowY: "auto",
-        overflowX: "auto"
+        overflowX: "auto",
+        border: "2px solid transparent",
+        borderColor: "black",
+        borderRadius: "5px",
       }}
     >
       <Table bordered responsive="sm" size="sm">
         <tbody>
           <tr>
-            <td
-              style={{
-                border: "2px solid transparent",
-                borderColor: "black",
-                borderRadius: "5px"
-              }}
-              className="table-danger"
-            >
+            <td className="table-danger">
               <pre>{props.error}</pre>
             </td>
           </tr>
