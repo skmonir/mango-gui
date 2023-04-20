@@ -8,9 +8,6 @@ export default function CompilationErrorMessage({ props }) {
         maxHeight: props.maxHeight,
         overflowY: "auto",
         overflowX: "auto",
-        border: "2px solid transparent",
-        borderColor: "black",
-        borderRadius: "5px",
       }}
     >
       <Table bordered responsive="sm" size="sm">
