@@ -154,6 +154,7 @@ export default function ViewCodeModal({
               defaultSize="50%"
               primary="first"
               className="mt-0"
+              style={{ height: "99%" }}
             >
               <div>{executionResult.component}</div>
               <div>

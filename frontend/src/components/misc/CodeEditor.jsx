@@ -28,14 +28,14 @@ export default function CodeEditor({
   onChange,
   onBlur,
   readOnly,
-  customElementsOnHeader
+  customElementsOnHeader,
 }) {
   const themes = ["monokai", "xcode", "textmate", "twilight", "terminal"];
   const fontSizes = ["13", "14", "16", "18", "20", "24", "28", "32", "40"];
   const [editorPref, setEditorPref] = useState({
     theme: "monokai",
     fontSize: "14",
-    tabSize: "4"
+    tabSize: "4",
   });
   const [modalSetup, setModalSetup] = useState({});
   const [editorLang, setEditorLang] = useState("");
@@ -50,23 +50,23 @@ export default function CodeEditor({
   }, []);
 
   const getEditorPreference = () => {
-    DataService.getEditorPreference().then(pref => {
+    DataService.getEditorPreference().then((pref) => {
       handleEditorPrefResponse(pref);
     });
   };
 
-  const updateEditorPreference = preference => {
-    DataService.updateEditorPreference(preference).then(pref => {
+  const updateEditorPreference = (preference) => {
+    DataService.updateEditorPreference(preference).then((pref) => {
       handleEditorPrefResponse(pref);
     });
   };
 
-  const handleEditorPrefResponse = pref => {
+  const handleEditorPrefResponse = (pref) => {
     setEditorPref({
       ...editorPref,
       theme: Utils.isStrNullOrEmpty(pref.theme) ? "monokai" : pref.theme,
       fontSize: Utils.isStrNullOrEmpty(pref.fontSize) ? "14" : pref.fontSize,
-      tabSize: Utils.isStrNullOrEmpty(pref.tabSize) ? "4" : pref.tabSize
+      tabSize: Utils.isStrNullOrEmpty(pref.tabSize) ? "4" : pref.tabSize,
     });
   };
 
@@ -85,7 +85,7 @@ export default function CodeEditor({
   const openEditorPrefModal = () => {
     console.log(editorPref);
     setModalSetup({
-      ...editorPref
+      ...editorPref,
     });
     setTimeout(() => setShowEditorPref(true), 300);
   };
@@ -125,14 +125,14 @@ export default function CodeEditor({
           ))}
       </Row>
       <Row>
-        <Col xs={12} style={{ minHeight: "86vh", overflowY: "auto" }}>
+        <Col xs={12} style={{ minHeight: "88vh", overflowY: "auto" }}>
           <AceEditor
             height={"100%"}
             width={"100%"}
             mode={editorLang}
             theme={editorPref.theme}
             name="code_editor"
-            onChange={code => onChange(code)}
+            onChange={(code) => onChange(code)}
             onBlur={onBlur}
             showPrintMargin={false}
             showGutter={true}
@@ -146,7 +146,7 @@ export default function CodeEditor({
               showLineNumbers: true,
               dragEnabled: true,
               tabSize: Number(editorPref.tabSize),
-              fontSize: Number(editorPref.fontSize)
+              fontSize: Number(editorPref.fontSize),
             }}
           />
         </Col>
@@ -173,10 +173,10 @@ export default function CodeEditor({
                   size="sm"
                   aria-label="Default select example"
                   value={modalSetup.theme}
-                  onChange={e =>
+                  onChange={(e) =>
                     setModalSetup({
                       ...modalSetup,
-                      theme: e.currentTarget.value
+                      theme: e.currentTarget.value,
                     })
                   }
                 >
@@ -197,10 +197,10 @@ export default function CodeEditor({
                   size="sm"
                   aria-label="Default select example"
                   value={modalSetup.fontSize}
-                  onChange={e =>
+                  onChange={(e) =>
                     setModalSetup({
                       ...modalSetup,
-                      fontSize: e.currentTarget.value
+                      fontSize: e.currentTarget.value,
                     })
                   }
                 >
@@ -221,10 +221,10 @@ export default function CodeEditor({
                   size="sm"
                   aria-label="Default select example"
                   value={modalSetup.tabSize}
-                  onChange={e =>
+                  onChange={(e) =>
                     setModalSetup({
                       ...modalSetup,
-                      tabSize: e.currentTarget.value
+                      tabSize: e.currentTarget.value,
                     })
                   }
                 >
