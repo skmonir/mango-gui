@@ -275,9 +275,11 @@ export default function Tester({ config, appData }) {
       });
   };
 
-  const closeAddEditTestModal = () => {
+  const closeAddEditTestModal = (isSavedUpdated) => {
     setShowAddEditTestModal(false);
-    getSelectedProblemExecResult(selectedProblemMetadata);
+    if (isSavedUpdated) {
+      getSelectedProblemExecResult(selectedProblemMetadata);
+    }
   };
 
   const showToastMessage = (variant, message) => {
@@ -331,7 +333,9 @@ export default function Tester({ config, appData }) {
         }
         return (
           <strong>
-          <span style={{ color: "red" }}>{ `${stat.passed}/${stat.total} tests passed`}</span>
+            <span
+              style={{ color: "red" }}
+            >{`${stat.passed}/${stat.total} tests passed`}</span>
           </strong>
         );
       }
@@ -367,6 +371,19 @@ export default function Tester({ config, appData }) {
       testingInProgress ||
       submittingInProgress ||
       !config.workspaceDirectory
+    );
+  };
+
+  const getAddCustomTestButton = () => {
+    return (
+      <Button
+        size="sm"
+        variant="outline-success"
+        onClick={() => addCustomTest()}
+        disabled={disableActionButtons()}
+      >
+        <FontAwesomeIcon icon={faPlus} /> Add Custom Test
+      </Button>
     );
   };
 
@@ -503,16 +520,7 @@ export default function Tester({ config, appData }) {
             </div>
           </Col>
           <Col xs={2}>
-            <div className="d-grid gap-2">
-              <Button
-                size="sm"
-                variant="outline-success"
-                onClick={() => addCustomTest()}
-                disabled={disableActionButtons()}
-              >
-                <FontAwesomeIcon icon={faPlus} /> Add Custom Test
-              </Button>
-            </div>
+            <div className="d-grid gap-2">{getAddCustomTestButton()}</div>
           </Col>
           <Col xs={2}>
             <div className="d-grid gap-2">{getRunTestButton()}</div>
@@ -666,6 +674,10 @@ export default function Tester({ config, appData }) {
             {
               colSpan: "auto",
               elem: getRunTestButton(),
+            },
+            {
+              colSpan: "auto",
+              elem: getAddCustomTestButton(),
             },
             {
               colSpan: "auto",

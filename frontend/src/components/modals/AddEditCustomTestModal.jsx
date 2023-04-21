@@ -10,16 +10,16 @@ export default function AddEditCustomTestModal({
   event,
   metadata,
   testcaseFilePath,
-  closeAddEditTestModal
+  closeAddEditTestModal,
 }) {
   const [inputOutputObj, setInputOutputObj] = useState({
     input: "",
-    output: ""
+    output: "",
   });
   const [showModal, setShowModal] = useState(false);
   const [toastMsgObj, setToastMsgObj] = useState({
     variant: "",
-    message: ""
+    message: "",
   });
   const [showToast, setShowToast] = useState(false);
 
@@ -34,16 +34,16 @@ export default function AddEditCustomTestModal({
 
   const fetchTestcaseByFilePath = () => {
     DataService.getTestcaseByFilePath(testcaseFilePath)
-      .then(testcase => {
+      .then((testcase) => {
         setShowModal(true);
         setTimeout(() => {
           setInputOutputObj({
             input: testcase.input,
-            output: testcase.output
+            output: testcase.output,
           });
         }, 0);
       })
-      .catch(e => {
+      .catch((e) => {
         showToastMessage(
           "Error",
           "Oops! Something went wrong while fetching the testcase!"
@@ -52,26 +52,26 @@ export default function AddEditCustomTestModal({
       .finally(() => setShowModal(true));
   };
 
-  const saveTriggered = isCloseAfterSave => {
+  const saveTriggered = (isCloseAfterSave) => {
     const data = metadata.split("/");
     let req = {
       platform: data[0],
       contestId: data[1],
       label: data[2],
       input: inputOutputObj.input,
-      output: inputOutputObj.output
+      output: inputOutputObj.output,
     };
     if (event !== "Update") {
       DataService.addCustomTest(req)
-        .then(resp => {
+        .then((resp) => {
           if (resp.message === "success") {
             showToastMessage("Success", "Saved custom testcase successfully!");
             if (isCloseAfterSave) {
-              setTimeout(() => closeModal(), 1000);
+              setTimeout(() => closeModal(true), 1000);
             } else {
               setInputOutputObj({
                 input: "",
-                output: ""
+                output: "",
               });
             }
           } else {
@@ -83,15 +83,15 @@ export default function AddEditCustomTestModal({
       DataService.updateCustomTest({
         ...req,
         inputFilePath: testcaseFilePath.inputFilePath,
-        outputFilePath: testcaseFilePath.outputFilePath
+        outputFilePath: testcaseFilePath.outputFilePath,
       })
-        .then(resp => {
+        .then((resp) => {
           if (resp.message === "success") {
             showToastMessage(
               "Success",
               "Updated custom testcase successfully!"
             );
-            setTimeout(() => closeModal(), 1000);
+            setTimeout(() => closeModal(true), 1000);
           } else {
             showToastMessage("Error", "Error from server!");
           }
@@ -100,16 +100,16 @@ export default function AddEditCustomTestModal({
     }
   };
 
-  const closeModal = () => {
+  const closeModal = (isSavedUpdated) => {
     setShowModal(false);
-    setTimeout(() => closeAddEditTestModal(), 500);
+    setTimeout(() => closeAddEditTestModal(isSavedUpdated), 500);
   };
 
   const showToastMessage = (variant, message) => {
     setShowToast(true);
     setToastMsgObj({
       variant: variant,
-      message: message
+      message: message,
     });
   };
 
@@ -117,7 +117,7 @@ export default function AddEditCustomTestModal({
     <div>
       <Modal
         show={showModal}
-        onHide={closeModal}
+        onHide={() => closeModal(false)}
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
@@ -132,7 +132,7 @@ export default function AddEditCustomTestModal({
           style={{
             overflowY: "auto",
             paddingBottom: "1px",
-            paddingTop: "1px"
+            paddingTop: "1px",
           }}
         >
           <Row>
@@ -145,10 +145,10 @@ export default function AddEditCustomTestModal({
                   <Form.Control
                     style={{ fontSize: 13 }}
                     value={inputOutputObj.input}
-                    onChange={e =>
+                    onChange={(e) =>
                       setInputOutputObj({
                         ...inputOutputObj,
-                        input: e.target.value
+                        input: e.target.value,
                       })
                     }
                     autoCorrect="off"
@@ -170,10 +170,10 @@ export default function AddEditCustomTestModal({
                   <Form.Control
                     style={{ fontSize: 13 }}
                     value={inputOutputObj.output}
-                    onChange={e =>
+                    onChange={(e) =>
                       setInputOutputObj({
                         ...inputOutputObj,
-                        output: e.target.value
+                        output: e.target.value,
                       })
                     }
                     autoCorrect="off"
@@ -189,6 +189,13 @@ export default function AddEditCustomTestModal({
           </Row>
         </Modal.Body>
         <Modal.Footer style={{ paddingBottom: "2px", paddingTop: "2px" }}>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => closeModal(false)}
+          >
+            Cancel
+          </Button>
           <Button
             size="sm"
             variant="outline-primary"
@@ -215,13 +222,6 @@ export default function AddEditCustomTestModal({
               <FontAwesomeIcon icon={faPlus} /> Save and Add Another One
             </Button>
           )}
-          <Button
-            size="sm"
-            variant="outline-danger"
-            onClick={() => closeModal()}
-          >
-            Close
-          </Button>
         </Modal.Footer>
       </Modal>
       {showToast && (
