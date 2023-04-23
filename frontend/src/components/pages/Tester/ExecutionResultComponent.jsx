@@ -117,7 +117,13 @@ export default function ExecutionResultComponent({
         accessor: "inputFilePath",
         Cell: ({ original }) => {
           return (
-            <pre style={{ textAlign: "center", overflow: "hidden", textOverflow: "ellipsis" }}>
+            <pre
+              style={{
+                textAlign: "center",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {original?.testcase?.inputFilePath
                 .split("\\")
                 .pop()
@@ -248,6 +254,7 @@ export default function ExecutionResultComponent({
           resizable={false}
           collapseOnDataChange={false}
           minRows={0}
+          defaultPageSize={1000}
           SubComponent={(rowInfo) => {
             return (
               <div>

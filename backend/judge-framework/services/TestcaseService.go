@@ -15,7 +15,7 @@ func GetTestcaseByPath(inputFilePath string, outputFilePath string) models.Testc
 func SaveCustomTestcaseIntoFile(platform string, cid string, label string, input string, output string) {
 	inputDirectory, outputDirectory := fileServices.GetInputOutputDirectories(platform, cid, label)
 	inputFiles := utils.GetFileNamesInDirectory(inputDirectory)
-	maxCustomTestId := -1
+	maxCustomTestId := 0
 	for _, filename := range inputFiles {
 		if strings.Contains(filename, "01_custom_input_") {
 			serialStr := strings.Replace(filename, "01_custom_input_", "", -1)

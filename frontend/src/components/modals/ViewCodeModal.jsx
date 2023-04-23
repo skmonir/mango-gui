@@ -156,8 +156,16 @@ export default function ViewCodeModal({
               className="mt-0"
               style={{ height: "99%" }}
             >
-              <div style={{marginRight: "5px"}}>{executionResult.component}</div>
-              <div style={{marginLeft: "5px"}}>
+              <div
+                style={{
+                  marginRight: "5px",
+                  maxHeight: "95vh",
+                  overflowY: "auto",
+                }}
+              >
+                {executionResult.component}
+              </div>
+              <div style={{ marginLeft: "5px" }}>
                 <CodeEditor
                   codeContent={codeContent}
                   onChange={onCodeChange}
