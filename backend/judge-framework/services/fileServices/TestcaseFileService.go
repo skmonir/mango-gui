@@ -38,7 +38,7 @@ func SaveTestcasesIntoFiles(platform string, cid string, label string, testcases
 	inputDirectory, outputDirectory := GetInputOutputDirectories(platform, cid, label)
 	for id, testcase := range testcases {
 		inputFilename := fmt.Sprintf("00_sample_input_%03d.txt", id+1)
-		outputFilename := fmt.Sprintf("00_sample_output_%03d.txt", id)
+		outputFilename := fmt.Sprintf("00_sample_output_%03d.txt", id+1)
 		go utils.WriteFileContent(inputDirectory, inputFilename, []byte(testcase.Input))
 		go utils.WriteFileContent(outputDirectory, outputFilename, []byte(testcase.Output))
 	}
