@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/skmonir/mango-gui/backend/judge-framework/initializer"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
@@ -10,7 +11,8 @@ import (
 
 func GetInputOutputDirectoriesByUrl(ctx *fiber.Ctx) error {
 	encodedUrl := ctx.Params("encoded_url")
-	inputDirectory, outputDirectory := services.GetInputOutputDirectoryByUrl(utils.DecodeBase64(encodedUrl))
+	decodedUrl := utils.DecodeBase64(encodedUrl)
+	inputDirectory, outputDirectory := services.GetInputOutputDirectoryByUrl(utils.TransformUrl(decodedUrl))
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"inputDirectory":  inputDirectory,
 		"outputDirectory": outputDirectory,

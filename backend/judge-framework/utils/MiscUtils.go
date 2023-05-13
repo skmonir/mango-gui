@@ -121,6 +121,14 @@ func ExtractInfoFromUrl(url string) (string, string, string, string) {
 			ctype = "contest"
 		} else if strings.Contains(url, "codeforces.com/gym") {
 			ctype = "gym"
+		} else if strings.Contains(url, "codeforces.com/problemset/problem") {
+			tokens := splitUrlPath(url)
+			if len(tokens) < 5 {
+				return "", "", "", ""
+			}
+			c := tokens[len(tokens) - 2]
+			p := tokens[len(tokens) - 1]
+			return "codeforces", c, p, "contest"
 		} else {
 			return platform, cid, pid, ctype
 		}
@@ -136,6 +144,19 @@ func ExtractInfoFromUrl(url string) (string, string, string, string) {
 	}
 	fmt.Println("Extracted", url, ", got", platform, cid, pid)
 	return platform, cid, pid, ctype
+}
+
+func TransformUrl(url string) string {
+	if strings.Contains(url, "codeforces.com/problemset/problem") {
+		tokens := splitUrlPath(url)
+		if len(tokens) < 5 {
+			return ""
+		}
+		c := tokens[len(tokens) - 2]
+		p := tokens[len(tokens) - 1]
+		url = fmt.Sprintf("https://codeforces.com/contest/%v/problem/%v", c, p)
+	}
+	return url
 }
 
 func ConvertMemoryInMb(memory uint64) uint64 {

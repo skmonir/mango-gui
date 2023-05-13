@@ -11,6 +11,6 @@ func Parse(ctx *fiber.Ctx) error {
 	encodedUrl := ctx.Params("encoded_url")
 	decodedUrl := utils.DecodeBase64(encodedUrl)
 	services.UpdateParseUrlHistory(decodedUrl)
-	parseResponseList := parser.Parse(decodedUrl)
+	parseResponseList := parser.Parse(utils.TransformUrl(decodedUrl))
 	return ctx.Status(fiber.StatusOK).JSON(parseResponseList)
 }

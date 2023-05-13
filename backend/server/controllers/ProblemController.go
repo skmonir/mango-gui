@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/skmonir/mango-gui/backend/judge-framework/logger"
 	"github.com/skmonir/mango-gui/backend/judge-framework/models"
@@ -13,7 +14,7 @@ func GetProblemList(ctx *fiber.Ctx) error {
 	encodedUrl := ctx.Params("encoded_url")
 	decodedUrl := utils.DecodeBase64(encodedUrl)
 	services.UpdateTestContestUrlHistory(decodedUrl)
-	problems := services.GetProblemListByUrl(decodedUrl)
+	problems := services.GetProblemListByUrl(utils.TransformUrl(decodedUrl))
 	return ctx.Status(fiber.StatusOK).JSON(problems)
 }
 
