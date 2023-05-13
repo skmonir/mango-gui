@@ -1,19 +1,25 @@
-# README
+# Mango
 
 ## About
 
-This is the official Wails React template.
+Mango is an opensource cross-platform desktop application to parse, test and generate IO for programming contest challenges. Mango supports [CodeForces](https://www.codeforces.com/) and [AtCoder](https://atcoder.jp/) online judge.
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+## Features
+✅ Supports C++, Java and Python <br>
+✅ Schedule upcoming contests to be parsed automatically <br>
+✅ Auto generate source files with specified or default template code <br>
+✅ Write code in integrated rich Code Editor <br>
+✅ Test and Submit your code directly from Mango to the online judge platform <br>
+✅ Add custom tests to cover all the corner cases <br>
+✅ All testcases are stored in file-system for offline testing <br>
+✅ Generate random testcases easily with Input/Output Generator <br>
+✅ TGen script works like magic to generate testcases with few lines of code <br>
 
-## Live Development
+## Prerequisite
+* For IO Generator download and install C++ compiler (e.g. MinGW) and add the path to System Variable.
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+## Download
+Download the latest installation file for your OS from the [release](https://github.com/skmonir/mango-gui/releases) page
 
-## Building
-
-To build a redistributable, production mode package, use `wails build`.
+## Wikis
+[IO Generator](wikis/Generator.md)
