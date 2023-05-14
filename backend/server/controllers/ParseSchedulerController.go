@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/skmonir/mango-gui/backend/judge-framework/parser"
 	"github.com/skmonir/mango-gui/backend/judge-framework/services"
-	"strings"
+	"github.com/skmonir/mango-gui/backend/judge-framework/utils"
 )
 
 func ScheduleParse(ctx *fiber.Ctx) error {
@@ -17,7 +19,7 @@ func ScheduleParse(ctx *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
-	scheduleParseRequest.Url = strings.ToLower(scheduleParseRequest.Url)
+	scheduleParseRequest.Url = utils.TransformUrl(strings.ToLower(scheduleParseRequest.Url))
 
 	services.UpdateParseUrlHistory(scheduleParseRequest.Url)
 
