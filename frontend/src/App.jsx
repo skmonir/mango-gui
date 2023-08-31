@@ -1,6 +1,6 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Badge, Col, Row, Tab } from "react-bootstrap";
+import { Badge, Col, OverlayTrigger, Popover, Row, Tab } from "react-bootstrap";
 import Tester from "./components/pages/Tester/Tester.jsx";
 import Parser from "./components/pages/Parser.jsx";
 import Container from "react-bootstrap/Container";
@@ -13,6 +13,7 @@ import {
   faLaptopCode,
   faMicrochip,
   faTools,
+  faUserAstronaut,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import Settings from "./components/pages/Settings.jsx";
@@ -24,7 +25,22 @@ import DataService from "./services/DataService.js";
 import SocketClient from "./socket/SocketClient.js";
 import InitializerModal from "./components/modals/InitializerModal.jsx";
 import Form from "react-bootstrap/Form";
-import Utils from "./Utils.js";
+import authorPic from "./assets/images/skmonir.jpg";
+
+const authorSocials = [
+  {
+    platform: "Github",
+    url: "https://github.com/skmonir",
+  },
+  {
+    platform: "LinkedIn",
+    url: "https://linkedin.com/in/skmonir",
+  },
+  {
+    platform: "Facebook",
+    url: "https://facebook.com/skmnrzaman",
+  },
+];
 
 function App() {
   const socketClient = new SocketClient();
@@ -41,7 +57,7 @@ function App() {
     initApp();
     let socketConn = socketClient.initSocketConnection(
       "init_app_event",
-      updateInitMessageFromSocket
+      updateInitMessageFromSocket,
     );
     return () => {
       socketConn.close();
@@ -67,6 +83,32 @@ function App() {
       setAppDataLoaded(true);
     });
   };
+
+  const authorCard = (
+    <Popover id="popover-basic">
+      <Popover.Body>
+        <Row>
+          <Col xs={4}>
+            <img src={authorPic} height={95}  alt='Broken photo of poor author'/>
+          </Col>
+          <Col xs={8} className="d-flex flex-column">
+            <strong>Md Moniruzzaman</strong>
+            Software Engineer
+            Agoda (Bangkok)
+            {authorSocials.map((soc, index) => (
+              <a
+                key={index}
+                href="#"
+                onClick={() => DataService.openResource({ path: soc.url })}
+              >
+                {soc.platform}
+              </a>
+            ))}
+          </Col>
+        </Row>
+      </Popover.Body>
+    </Popover>
+  );
 
   return (
     <div className="App" style={{ height: "100vh" }}>
@@ -128,6 +170,17 @@ function App() {
                       >
                         <FontAwesomeIcon icon={faTools} /> Settings
                       </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item className="text-center">
+                      <OverlayTrigger
+                        trigger={"click"}
+                        placement="bottom"
+                        overlay={authorCard}
+                      >
+                        <Nav.Link>
+                          <FontAwesomeIcon icon={faUserAstronaut} /> Author
+                        </Nav.Link>
+                      </OverlayTrigger>
                     </Nav.Item>
                   </Nav>
                   <Form className="d-flex">
